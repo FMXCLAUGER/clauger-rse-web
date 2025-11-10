@@ -1,0 +1,62 @@
+export const TOTAL_PAGES = 36
+
+export const RAPPORT_DATA = {
+  title: "Rapport Durable Clauger 2025",
+  baseline: "Passion - Innovation - Performance - Solidarité",
+  notation: {
+    global: 62,
+    environnement: 4.8,
+    social: 7.4,
+    gouvernance: 6.2,
+  },
+  kpis: {
+    collaborateurs: 3200,
+    experienceAnnees: 50,
+    emissionsCarbone: 718000,
+    budgetFormation: 300000,
+  },
+  enjeux: [
+    {
+      id: "environnement",
+      title: "Environnement",
+      subtitle: "Préserver le climat, les ressources et la santé",
+      icon: "🌍",
+      note: 4.8,
+      color: "bg-secondary",
+    },
+    {
+      id: "social",
+      title: "Politique Sociale",
+      subtitle: "Une culture d'entreprise fondée sur l'humain",
+      icon: "👥",
+      note: 7.4,
+      color: "bg-accent",
+    },
+    {
+      id: "gouvernance",
+      title: "Conduite des Affaires",
+      subtitle: "Conformité et éthique",
+      icon: "⚖️",
+      note: 6.2,
+      color: "bg-primary",
+    },
+  ],
+}
+
+export const PAGES = Array.from({ length: TOTAL_PAGES }, (_, i) => ({
+  id: i + 1,
+  src: `/images/rapport/page ${i + 1}.png`,
+  alt: `Page ${i + 1} du rapport RSE`,
+  title: `Page ${i + 1}`,
+}))
+
+export const SOMMAIRE = [
+  { page: 2, title: "Le mot du président", section: "intro" },
+  { page: 4, title: "La RSE chez Clauger", section: "intro" },
+  { page: 6, title: "Présentation de la société", section: "intro" },
+  { page: 10, title: "Nos grands enjeux durables", section: "intro" },
+  { page: 11, title: "Enjeu Environnement", section: "environnement" },
+  { page: 22, title: "Espace durables liés à nos solutions", section: "environnement" },
+  { page: 24, title: "Enjeu Politique Sociale", section: "social" },
+  { page: 32, title: "Enjeu Conduite des Affaires", section: "gouvernance" },
+]
