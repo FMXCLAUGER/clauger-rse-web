@@ -35,3 +35,9 @@ next-env.d.ts
 
 # tesseract language data
 *.traineddata
+
+# Mobile analysis documentation
+IPHONE_MOBILE_ANALYSIS.md
+IPHONE_QUICK_FIXES.md
+MOBILE_ANALYSIS_INDEX.md
+MOBILE_ANALYSIS_SUMMARY.md

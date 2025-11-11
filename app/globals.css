@@ -91,3 +91,29 @@
     }
   }
 }
+
+@supports (padding: max(0px)) {
+  body {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
+@layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  button,
+  a {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  .overflow-y-auto,
+  [role="dialog"] {
+    -webkit-overflow-scrolling: touch;
+  }
+}

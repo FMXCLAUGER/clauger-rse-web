@@ -48,20 +48,29 @@ export function EnjeuxDetailModal({
         aria-hidden="true"
       />
 
-      <div className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-title"
+        className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto"
+      >
         <button
+          type="button"
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          className="absolute top-4 right-4 p-3 md:p-2 min-h-11 min-w-11 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
           aria-label="Fermer"
         >
-          <X className="w-5 h-5" />
+          <X className="w-6 h-6 md:w-5 md:h-5" />
         </button>
 
         <div className="p-8">
           <div className="flex items-start gap-4 mb-6">
             <div className="text-5xl">{getEnjeuxIcon(enjeuxId)}</div>
             <div className="flex-1">
-              <h2 className="font-montserrat text-3xl font-bold mb-2 dark:text-white">
+              <h2
+                id="modal-title"
+                className="font-montserrat text-3xl font-bold mb-2 dark:text-white"
+              >
                 {enjeuDetail.title}
               </h2>
               <p className="text-gray-600 dark:text-gray-300 text-lg">
