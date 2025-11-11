@@ -2,6 +2,7 @@
 
 import { useEffect } from "react"
 import Link from "next/link"
+import { useSwipeable } from "react-swipeable"
 import { X, ArrowRight, CheckCircle2, AlertCircle } from "lucide-react"
 import { getEnjeuxDetail } from "@/lib/data/enjeux-details"
 import { Button } from "@/components/ui/button"
@@ -18,6 +19,12 @@ export function EnjeuxDetailModal({
   onClose,
   enjeuxId,
 }: EnjeuxDetailModalProps) {
+  const swipeHandlers = useSwipeable({
+    onSwipedDown: () => onClose(),
+    trackMouse: false,
+    delta: 50,
+  })
+
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose()
@@ -49,6 +56,7 @@ export function EnjeuxDetailModal({
       />
 
       <div
+        {...swipeHandlers}
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
@@ -63,7 +71,7 @@ export function EnjeuxDetailModal({
           <X className="w-6 h-6 md:w-5 md:h-5" />
         </button>
 
-        <div className="p-8">
+        <div className="p-4 md:p-8">
           <div className="flex items-start gap-4 mb-6">
             <div className="text-5xl">{getEnjeuxIcon(enjeuxId)}</div>
             <div className="flex-1">

@@ -17,7 +17,7 @@ interface WorkforceChartProps {
 
 export function WorkforceChart({ data }: WorkforceChartProps) {
   return (
-    <ResponsiveContainer width="100%" height={350}>
+    <ResponsiveContainer width="100%" height={300}>
       <AreaChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
         <defs>
           <linearGradient id="colorMen" x1="0" y1="0" x2="0" y2="1">

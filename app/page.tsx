@@ -14,7 +14,7 @@ export default function HomePage() {
       <JsonLd data={getOrganizationSchema()} />
       <JsonLd data={getWebSiteSchema()} />
       <main id="main-content" className="min-h-screen dark:bg-gray-950">
-      <section className="relative h-screen bg-gradient-to-br from-primary via-primary/90 to-primary/70 text-white">
+      <section className="relative h-dvh bg-gradient-to-br from-primary via-primary/90 to-primary/70 text-white">
         <div className="absolute inset-0 opacity-20">
           <Image
             src={heroImage.src}
