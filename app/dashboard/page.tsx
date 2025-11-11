@@ -76,24 +76,29 @@ export default function DashboardPage() {
         />
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-8 overflow-x-auto">
-          {tabs.map((tab) => {
-            const Icon = tab.icon
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all whitespace-nowrap ${
-                  activeTab === tab.id
-                    ? "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-lg scale-105"
-                    : "bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800"
-                }`}
-              >
-                <Icon className={`w-5 h-5 ${activeTab === tab.id ? tab.color : ""}`} />
-                {tab.label}
-              </button>
-            )
-          })}
+        <div className="relative mb-8">
+          <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-gray-50 via-gray-50 dark:from-gray-950 dark:via-gray-950 to-transparent pointer-events-none z-10" />
+          <div className="flex gap-2 overflow-x-auto scroll-smooth snap-x snap-mandatory scrollbar-hide px-4">
+            {tabs.map((tab) => {
+              const Icon = tab.icon
+              return (
+                <button
+                  type="button"
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center gap-2 px-6 py-4 rounded-lg font-semibold transition-all whitespace-nowrap snap-start min-w-[160px] justify-center ${
+                    activeTab === tab.id
+                      ? "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-lg scale-105"
+                      : "bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800"
+                  }`}
+                >
+                  <Icon className={`w-5 h-5 ${activeTab === tab.id ? tab.color : ""}`} />
+                  {tab.label}
+                </button>
+              )
+            })}
+          </div>
+          <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-gray-50 via-gray-50 dark:from-gray-950 dark:via-gray-950 to-transparent pointer-events-none z-10" />
         </div>
 
         {/* Environment Tab */}
