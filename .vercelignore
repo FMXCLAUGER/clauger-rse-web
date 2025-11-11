@@ -1,0 +1,51 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Testing
+coverage
+
+# Next.js
+.next/
+out/
+
+# Production build artifacts
+build
+dist
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Local env files
+.env*.local
+.env.development
+.env.test
+
+# Vercel
+.vercel
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Scripts (already run in prebuild)
+scripts/optimize-images.js
+scripts/extract-text.js
+
+# Tesseract language data (large file)
+*.traineddata
+
+# Git
+.git
+.gitignore
