@@ -4,6 +4,9 @@ import "./globals.css"
 import { ThemeProvider } from "@/components/theme/ThemeProvider"
 import { SkipLink } from "@/components/a11y/SkipLink"
 import { SearchModal } from "@/components/search/SearchModal"
+import { Toaster } from "sonner"
+import { SpeedInsights } from "@vercel/speed-insights/next"
+import { Analytics } from "@vercel/analytics/react"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -85,7 +88,15 @@ export default function RootLayout({
         >
           <SearchModal />
           {children}
+          <Toaster
+            position="top-right"
+            expand={false}
+            richColors
+            closeButton
+          />
         </ThemeProvider>
+        <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   )

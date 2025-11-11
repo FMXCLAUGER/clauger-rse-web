@@ -3,11 +3,13 @@
 import { useCallback, useEffect, useState } from "react"
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import Image from "next/image"
+import { useSwipeable } from "react-swipeable"
 import { PAGES, TOTAL_PAGES } from "@/lib/constants"
 import NavigationControls from "./NavigationControls"
 import ThumbnailSidebar from "./ThumbnailSidebar"
 import ImageLightbox from "@/components/lightbox/ImageLightbox"
 import { useKeyboardNavigation } from "@/hooks/useKeyboardNavigation"
+import { toast } from "sonner"
 
 interface ReportViewerProps {
   initialPage: number
@@ -41,6 +43,25 @@ export default function ReportViewer({ initialPage }: ReportViewerProps) {
   }, [currentPage, goToPage])
 
   useKeyboardNavigation(prevPage, nextPage)
+
+  const swipeHandlers = useSwipeable({
+    onSwipedLeft: () => {
+      if (currentPage < TOTAL_PAGES) {
+        nextPage()
+        toast.success(`Page ${currentPage + 1}/${TOTAL_PAGES}`)
+      }
+    },
+    onSwipedRight: () => {
+      if (currentPage > 1) {
+        prevPage()
+        toast.success(`Page ${currentPage - 1}/${TOTAL_PAGES}`)
+      }
+    },
+    trackMouse: false,
+    trackTouch: true,
+    delta: 50,
+    preventScrollOnSwipe: false,
+  })
 
   useEffect(() => {
     const adjacentPages = [currentPage - 1, currentPage + 1].filter(
@@ -87,7 +108,7 @@ export default function ReportViewer({ initialPage }: ReportViewerProps) {
             Page {currentPage} sur {TOTAL_PAGES}
           </div>
 
-          <div className="relative w-full h-full flex items-center justify-center">
+          <div {...swipeHandlers} className="relative w-full h-full flex items-center justify-center touch-pan-y">
             <div className="relative max-w-full max-h-full">
               <button
                 onClick={() => setLightboxOpen(true)}

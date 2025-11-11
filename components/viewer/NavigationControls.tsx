@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight, Home, Search, ZoomIn, Maximize2 } from "luci
 import Link from "next/link"
 import { useState, useEffect } from "react"
 import { ThemeToggle } from "@/components/theme/ThemeToggle"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 interface NavigationControlsProps {
   currentPage: number
@@ -30,44 +31,66 @@ export default function NavigationControls({
   }, [])
 
   return (
-    <header
-      role="navigation"
-      aria-label="Navigation du rapport"
-      className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center justify-between shadow-sm"
-    >
-      <div className="flex items-center gap-4">
-        <Link
-          href="/"
-          className="flex items-center gap-2 text-primary dark:text-primary/90 hover:text-primary/80 dark:hover:text-primary/70 transition-colors"
-        >
-          <Home className="w-5 h-5" />
-          <span className="hidden md:inline text-sm font-medium">Accueil</span>
-        </Link>
+    <TooltipProvider>
+      <header
+        role="navigation"
+        aria-label="Navigation du rapport"
+        className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center justify-between shadow-sm"
+      >
+        <div className="flex items-center gap-4">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Link
+                href="/"
+                className="flex items-center gap-2 text-primary dark:text-primary/90 hover:text-primary/80 dark:hover:text-primary/70 transition-colors"
+              >
+                <Home className="w-5 h-5" />
+                <span className="hidden md:inline text-sm font-medium">Accueil</span>
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Retour à la page d'accueil</p>
+            </TooltipContent>
+          </Tooltip>
 
-        <div className="h-6 w-px bg-gray-300 dark:bg-gray-600" />
+          <div className="h-6 w-px bg-gray-300 dark:bg-gray-600" />
 
-        <div className="flex items-center gap-2">
-          <button
-            onClick={onPrev}
-            disabled={currentPage === 1}
-            className="p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-            aria-label="Page précédente"
-          >
-            <ChevronLeft className="w-5 h-5 text-gray-700 dark:text-gray-200" />
-          </button>
+          <div className="flex items-center gap-2">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={onPrev}
+                  disabled={currentPage === 1}
+                  className="p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  aria-label="Page précédente"
+                >
+                  <ChevronLeft className="w-5 h-5 text-gray-700 dark:text-gray-200" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Page précédente (←)</p>
+              </TooltipContent>
+            </Tooltip>
 
-          <div className="text-sm font-medium min-w-[100px] text-center text-gray-900 dark:text-gray-100">
-            Page <span className="text-primary dark:text-primary/90 font-bold">{currentPage}</span> / {totalPages}
-          </div>
+            <div className="text-sm font-medium min-w-[100px] text-center text-gray-900 dark:text-gray-100">
+              Page <span className="text-primary dark:text-primary/90 font-bold">{currentPage}</span> / {totalPages}
+            </div>
 
-          <button
-            onClick={onNext}
-            disabled={currentPage === totalPages}
-            className="p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-            aria-label="Page suivante"
-          >
-            <ChevronRight className="w-5 h-5 text-gray-700 dark:text-gray-200" />
-          </button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={onNext}
+                  disabled={currentPage === totalPages}
+                  className="p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  aria-label="Page suivante"
+                >
+                  <ChevronRight className="w-5 h-5 text-gray-700 dark:text-gray-200" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Page suivante (→)</p>
+              </TooltipContent>
+            </Tooltip>
         </div>
       </div>
 
@@ -103,24 +126,39 @@ export default function NavigationControls({
 
         <ThemeToggle />
 
-        {onZoom && (
-          <button
-            onClick={onZoom}
-            className="p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-            aria-label="Agrandir l'image"
-          >
-            <ZoomIn className="w-5 h-5 text-gray-700 dark:text-gray-200" />
-          </button>
-        )}
+          {onZoom && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={onZoom}
+                  className="p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                  aria-label="Agrandir l'image"
+                >
+                  <ZoomIn className="w-5 h-5 text-gray-700 dark:text-gray-200" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Agrandir l'image (cliquez sur l'image)</p>
+              </TooltipContent>
+            </Tooltip>
+          )}
 
-        <button
-          onClick={() => document.documentElement.requestFullscreen()}
-          className="p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-          aria-label="Plein écran"
-        >
-          <Maximize2 className="w-5 h-5 text-gray-700 dark:text-gray-200" />
-        </button>
-      </div>
-    </header>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                onClick={() => document.documentElement.requestFullscreen()}
+                className="p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                aria-label="Plein écran"
+              >
+                <Maximize2 className="w-5 h-5 text-gray-700 dark:text-gray-200" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Mode plein écran (F11)</p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
+      </header>
+    </TooltipProvider>
   )
 }
