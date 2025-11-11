@@ -48,19 +48,36 @@ export default function ReportViewer({ initialPage }: ReportViewerProps) {
     onSwipedLeft: () => {
       if (currentPage < TOTAL_PAGES) {
         nextPage()
-        toast.success(`Page ${currentPage + 1}/${TOTAL_PAGES}`)
+        toast.success(`Page ${currentPage + 1}/${TOTAL_PAGES}`, {
+          duration: 1000,
+          position: 'bottom-center',
+        })
+      } else {
+        toast.info('Dernière page', {
+          duration: 800,
+          position: 'bottom-center',
+        })
       }
     },
     onSwipedRight: () => {
       if (currentPage > 1) {
         prevPage()
-        toast.success(`Page ${currentPage - 1}/${TOTAL_PAGES}`)
+        toast.success(`Page ${currentPage - 1}/${TOTAL_PAGES}`, {
+          duration: 1000,
+          position: 'bottom-center',
+        })
+      } else {
+        toast.info('Première page', {
+          duration: 800,
+          position: 'bottom-center',
+        })
       }
     },
     trackMouse: false,
     trackTouch: true,
-    delta: 50,
-    preventScrollOnSwipe: false,
+    delta: 30,
+    preventScrollOnSwipe: true,
+    swipeDuration: 500,
   })
 
   useEffect(() => {

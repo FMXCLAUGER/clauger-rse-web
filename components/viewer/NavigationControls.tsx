@@ -35,16 +35,17 @@ export default function NavigationControls({
       <header
         role="navigation"
         aria-label="Navigation du rapport"
-        className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center justify-between shadow-sm"
+        className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-3 md:px-4 py-3 flex flex-wrap items-center justify-between gap-3 shadow-sm"
       >
-        <div className="flex items-center gap-4">
+        {/* Ligne 1: Navigation principale */}
+        <div className="flex items-center gap-2 md:gap-4 flex-1">
           <Tooltip>
             <TooltipTrigger asChild>
               <Link
                 href="/"
-                className="flex items-center gap-2 text-primary dark:text-primary/90 hover:text-primary/80 dark:hover:text-primary/70 transition-colors"
+                className="flex items-center gap-2 text-primary dark:text-primary/90 hover:text-primary/80 dark:hover:text-primary/70 transition-colors min-w-[48px] min-h-[48px] p-3"
               >
-                <Home className="w-5 h-5" />
+                <Home className="w-6 h-6" />
                 <span className="hidden md:inline text-sm font-medium">Accueil</span>
               </Link>
             </TooltipTrigger>
@@ -53,18 +54,18 @@ export default function NavigationControls({
             </TooltipContent>
           </Tooltip>
 
-          <div className="h-6 w-px bg-gray-300 dark:bg-gray-600" />
+          <div className="h-6 w-px bg-gray-300 dark:bg-gray-600 hidden sm:block" />
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 md:gap-3">
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
                   onClick={onPrev}
                   disabled={currentPage === 1}
-                  className="p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  className="p-4 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors min-w-[48px] min-h-[48px] flex items-center justify-center"
                   aria-label="Page précédente"
                 >
-                  <ChevronLeft className="w-5 h-5 text-gray-700 dark:text-gray-200" />
+                  <ChevronLeft className="w-6 h-6 text-gray-700 dark:text-gray-200" />
                 </button>
               </TooltipTrigger>
               <TooltipContent>
@@ -72,8 +73,9 @@ export default function NavigationControls({
               </TooltipContent>
             </Tooltip>
 
-            <div className="text-sm font-medium min-w-[100px] text-center text-gray-900 dark:text-gray-100">
-              Page <span className="text-primary dark:text-primary/90 font-bold">{currentPage}</span> / {totalPages}
+            <div className="text-sm font-medium min-w-[80px] sm:min-w-[100px] text-center text-gray-900 dark:text-gray-100 px-2">
+              <span className="text-primary dark:text-primary/90 font-bold">{currentPage}</span>
+              <span className="hidden xs:inline"> / {totalPages}</span>
             </div>
 
             <Tooltip>
@@ -81,10 +83,10 @@ export default function NavigationControls({
                 <button
                   onClick={onNext}
                   disabled={currentPage === totalPages}
-                  className="p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  className="p-4 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors min-w-[48px] min-h-[48px] flex items-center justify-center"
                   aria-label="Page suivante"
                 >
-                  <ChevronRight className="w-5 h-5 text-gray-700 dark:text-gray-200" />
+                  <ChevronRight className="w-6 h-6 text-gray-700 dark:text-gray-200" />
                 </button>
               </TooltipTrigger>
               <TooltipContent>
@@ -94,60 +96,57 @@ export default function NavigationControls({
         </div>
       </div>
 
-      <div className="hidden md:flex items-center gap-4">
-        <div className="w-64 bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
-          <div
-            className="bg-primary dark:bg-primary/90 h-full transition-all duration-300"
-            style={{ width: `${progress}%` }}
-            role="progressbar"
-            aria-valuenow={currentPage}
-            aria-valuemin={1}
-            aria-valuemax={totalPages}
-            aria-label={`Progression: page ${currentPage} sur ${totalPages}`}
-          />
-        </div>
+        {/* Ligne 2: Contrôles secondaires (responsive) */}
+        <div className="flex items-center gap-2 md:gap-3">
+          {/* Recherche - Visible sur mobile */}
+          {onSearch && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={onSearch}
+                  className="flex items-center gap-2 px-4 py-4 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors min-w-[48px] min-h-[48px]"
+                  aria-label="Rechercher dans le rapport"
+                  aria-keyshortcuts="Control+K Meta+K"
+                >
+                  <Search className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                  <span className="hidden lg:inline text-sm text-gray-600 dark:text-gray-300">
+                    Rechercher
+                  </span>
+                  <kbd className="hidden lg:inline-flex items-center gap-0.5 px-2 py-1 text-xs font-mono bg-gray-200 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded">
+                    {isMac ? '⌘' : 'Ctrl'}K
+                  </kbd>
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Rechercher ({isMac ? '⌘' : 'Ctrl'}+K)</p>
+              </TooltipContent>
+            </Tooltip>
+          )}
 
-        {onSearch && (
-          <button
-            onClick={onSearch}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
-            aria-label="Rechercher dans le rapport"
-            aria-keyshortcuts="Control+K Meta+K"
-          >
-            <Search className="w-4 h-4 text-gray-600 dark:text-gray-300" />
-            <span className="hidden lg:inline text-sm text-gray-600 dark:text-gray-300">
-              Rechercher
-            </span>
-            <kbd className="hidden lg:inline-flex items-center gap-0.5 px-2 py-1 text-xs font-mono bg-gray-200 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded">
-              {isMac ? '⌘' : 'Ctrl'}K
-            </kbd>
-          </button>
-        )}
-
-        <ThemeToggle />
-
+          {/* Zoom - Visible sur mobile */}
           {onZoom && (
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
                   onClick={onZoom}
-                  className="p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                  className="p-4 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors min-w-[48px] min-h-[48px] flex items-center justify-center"
                   aria-label="Agrandir l'image"
                 >
                   <ZoomIn className="w-5 h-5 text-gray-700 dark:text-gray-200" />
                 </button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Agrandir l'image (cliquez sur l'image)</p>
+                <p>Agrandir l'image</p>
               </TooltipContent>
             </Tooltip>
           )}
 
+          {/* Plein écran - Caché sur mobile */}
           <Tooltip>
             <TooltipTrigger asChild>
               <button
                 onClick={() => document.documentElement.requestFullscreen()}
-                className="p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                className="p-4 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors min-w-[48px] min-h-[48px] hidden sm:flex items-center justify-center"
                 aria-label="Plein écran"
               >
                 <Maximize2 className="w-5 h-5 text-gray-700 dark:text-gray-200" />
@@ -157,6 +156,23 @@ export default function NavigationControls({
               <p>Mode plein écran (F11)</p>
             </TooltipContent>
           </Tooltip>
+
+          <ThemeToggle />
+        </div>
+
+        {/* Barre de progression - Desktop uniquement */}
+        <div className="hidden lg:block w-full mt-2">
+          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+            <div
+              className="bg-primary dark:bg-primary/90 h-full transition-all duration-300"
+              style={{ width: `${progress}%` }}
+              role="progressbar"
+              aria-valuenow={currentPage}
+              aria-valuemin={1}
+              aria-valuemax={totalPages}
+              aria-label={`Progression: page ${currentPage} sur ${totalPages}`}
+            />
+          </div>
         </div>
       </header>
     </TooltipProvider>
