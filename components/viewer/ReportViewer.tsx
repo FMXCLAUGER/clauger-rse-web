@@ -5,6 +5,7 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import Image from "next/image"
 import { useSwipeable } from "react-swipeable"
 import { PAGES, TOTAL_PAGES } from "@/lib/constants"
+import { reportPageSchema } from "@/lib/validations/searchParams"
 import NavigationControls from "./NavigationControls"
 import ThumbnailSidebar from "./ThumbnailSidebar"
 import ImageLightbox from "@/components/lightbox/ImageLightbox"
@@ -21,7 +22,9 @@ export default function ReportViewer({ initialPage }: ReportViewerProps) {
   const searchParams = useSearchParams()
   const [lightboxOpen, setLightboxOpen] = useState(false)
 
-  const currentPage = parseInt(searchParams.get("page") || String(initialPage), 10)
+  const pageParam = searchParams.get("page")
+  const result = reportPageSchema.safeParse({ page: pageParam || String(initialPage) })
+  const currentPage = result.success ? result.data.page : initialPage
   const currentImage = PAGES[currentPage - 1]
 
   const goToPage = useCallback(
