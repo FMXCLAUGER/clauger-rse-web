@@ -1,3 +1,5 @@
+import imageMetadata from '@/public/images-metadata.json'
+
 export const TOTAL_PAGES = 36
 
 export const RAPPORT_DATA = {
@@ -43,12 +45,21 @@ export const RAPPORT_DATA = {
   ],
 }
 
-export const PAGES = Array.from({ length: TOTAL_PAGES }, (_, i) => ({
-  id: i + 1,
-  src: `/images/rapport/page ${i + 1}.png`,
-  alt: `Page ${i + 1} du rapport RSE`,
-  title: `Page ${i + 1}`,
-}))
+export const PAGES = Array.from({ length: TOTAL_PAGES }, (_, i) => {
+  const id = i + 1
+  const key = `page-${id}` as keyof typeof imageMetadata
+  const metadata = imageMetadata[key]
+
+  return {
+    id,
+    src: metadata?.webp || `/images/rapport/page ${id}.png`,
+    alt: `Page ${id} du rapport RSE`,
+    title: `Page ${id}`,
+    blurDataURL: metadata?.blurDataURL,
+    width: metadata?.width,
+    height: metadata?.height,
+  }
+})
 
 export const SOMMAIRE = [
   { page: 2, title: "Le mot du président", section: "intro" },

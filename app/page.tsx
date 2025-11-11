@@ -1,12 +1,31 @@
 import Link from "next/link"
+import Image from "next/image"
 import { ArrowRight, BarChart3, BookOpen, Search } from "lucide-react"
-import { RAPPORT_DATA } from "@/lib/constants"
+import { RAPPORT_DATA, PAGES } from "@/lib/constants"
+import { JsonLd } from "@/components/seo/JsonLd"
+import { getOrganizationSchema, getWebSiteSchema } from "@/lib/jsonld"
 
 export default function HomePage() {
+  const heroImage = PAGES[0]
+
   return (
-    <main className="min-h-screen">
+    <>
+      <JsonLd data={getOrganizationSchema()} />
+      <JsonLd data={getWebSiteSchema()} />
+      <main id="main-content" className="min-h-screen dark:bg-gray-950">
       <section className="relative h-screen bg-gradient-to-br from-primary via-primary/90 to-primary/70 text-white">
-        <div className="absolute inset-0 bg-[url('/images/rapport/page 1.png')] bg-cover bg-center opacity-20" />
+        <div className="absolute inset-0 opacity-20">
+          <Image
+            src={heroImage.src}
+            alt="Couverture du rapport RSE Clauger 2025"
+            fill
+            className="object-cover object-center"
+            priority
+            quality={85}
+            placeholder={heroImage.blurDataURL ? "blur" : "empty"}
+            blurDataURL={heroImage.blurDataURL}
+          />
+        </div>
 
         <div className="relative container mx-auto px-4 h-full flex flex-col items-center justify-center text-center">
           <div className="mb-8 inline-block">
@@ -44,53 +63,53 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-gray-50 dark:bg-gray-900">
         <div className="container mx-auto px-4">
-          <h2 className="font-montserrat text-4xl font-bold text-center mb-4">
+          <h2 className="font-montserrat text-4xl font-bold text-center mb-4 text-gray-900 dark:text-gray-100">
             Chiffres Clés 2024
           </h2>
-          <p className="text-center text-gray-600 mb-12">
+          <p className="text-center text-gray-600 dark:text-gray-400 mb-12">
             Notre engagement en chiffres
           </p>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto">
-            <div className="bg-white rounded-2xl p-6 text-center shadow-lg hover:shadow-xl transition-shadow">
-              <div className="text-4xl font-bold text-primary mb-2">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 text-center shadow-lg hover:shadow-xl transition-shadow">
+              <div className="text-4xl font-bold text-primary dark:text-primary/90 mb-2">
                 {RAPPORT_DATA.kpis.collaborateurs.toLocaleString()}+
               </div>
-              <div className="text-sm text-gray-600">Collaborateurs</div>
+              <div className="text-sm text-gray-600 dark:text-gray-300">Collaborateurs</div>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 text-center shadow-lg hover:shadow-xl transition-shadow">
-              <div className="text-4xl font-bold text-primary mb-2">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 text-center shadow-lg hover:shadow-xl transition-shadow">
+              <div className="text-4xl font-bold text-primary dark:text-primary/90 mb-2">
                 {RAPPORT_DATA.kpis.experienceAnnees}+
               </div>
-              <div className="text-sm text-gray-600">Années d&apos;expérience</div>
+              <div className="text-sm text-gray-600 dark:text-gray-300">Années d&apos;expérience</div>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 text-center shadow-lg hover:shadow-xl transition-shadow">
-              <div className="text-4xl font-bold text-primary mb-2">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 text-center shadow-lg hover:shadow-xl transition-shadow">
+              <div className="text-4xl font-bold text-primary dark:text-primary/90 mb-2">
                 {(RAPPORT_DATA.kpis.emissionsCarbone / 1000).toFixed(0)}k
               </div>
-              <div className="text-sm text-gray-600">teqCO₂ (Bilan carbone)</div>
+              <div className="text-sm text-gray-600 dark:text-gray-300">teqCO₂ (Bilan carbone)</div>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 text-center shadow-lg hover:shadow-xl transition-shadow">
-              <div className="text-4xl font-bold text-primary mb-2">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 text-center shadow-lg hover:shadow-xl transition-shadow">
+              <div className="text-4xl font-bold text-primary dark:text-primary/90 mb-2">
                 {(RAPPORT_DATA.kpis.budgetFormation / 1000).toFixed(0)}k€
               </div>
-              <div className="text-sm text-gray-600">Budget formation</div>
+              <div className="text-sm text-gray-600 dark:text-gray-300">Budget formation</div>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="py-20">
+      <section className="py-20 dark:bg-gray-950">
         <div className="container mx-auto px-4">
-          <h2 className="font-montserrat text-4xl font-bold text-center mb-4">
+          <h2 className="font-montserrat text-4xl font-bold text-center mb-4 text-gray-900 dark:text-gray-100">
             Nos 3 Enjeux Durables
           </h2>
-          <p className="text-center text-gray-600 mb-12">
+          <p className="text-center text-gray-600 dark:text-gray-400 mb-12">
             Une démarche structurée autour de piliers clés
           </p>
 
@@ -98,29 +117,29 @@ export default function HomePage() {
             {RAPPORT_DATA.enjeux.map((enjeu) => (
               <div
                 key={enjeu.id}
-                className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-2"
+                className="group bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-2"
               >
                 <div className={`w-20 h-20 ${enjeu.color} rounded-2xl flex items-center justify-center text-4xl mb-6 group-hover:scale-110 transition-transform`}>
                   {enjeu.icon}
                 </div>
 
-                <h3 className="font-montserrat text-2xl font-bold mb-3">
+                <h3 className="font-montserrat text-2xl font-bold mb-3 text-gray-900 dark:text-gray-100">
                   {enjeu.title}
                 </h3>
 
-                <p className="text-gray-600 mb-4 text-sm">
+                <p className="text-gray-600 dark:text-gray-400 mb-4 text-sm">
                   {enjeu.subtitle}
                 </p>
 
-                <div className="flex items-center justify-between pt-4 border-t">
+                <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
                   <div>
-                    <div className="text-3xl font-bold text-primary">{enjeu.note}</div>
-                    <div className="text-xs text-gray-500">Note / 10</div>
+                    <div className="text-3xl font-bold text-primary dark:text-primary/90">{enjeu.note}</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">Note / 10</div>
                   </div>
 
                   <Link
                     href={`/dashboard/${enjeu.id}`}
-                    className="text-sm text-primary hover:underline flex items-center gap-1"
+                    className="text-sm text-primary dark:text-primary/90 hover:underline flex items-center gap-1"
                   >
                     En savoir plus
                     <ArrowRight className="w-4 h-4" />
@@ -132,62 +151,63 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-gray-50 dark:bg-gray-900">
         <div className="container mx-auto px-4">
-          <h2 className="font-montserrat text-4xl font-bold text-center mb-12">
+          <h2 className="font-montserrat text-4xl font-bold text-center mb-12 text-gray-900 dark:text-gray-100">
             Accès Rapides
           </h2>
 
           <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
             <Link
               href="/rapport?page=1"
-              className="group bg-white rounded-xl p-8 text-center shadow-lg hover:shadow-xl transition-all hover:-translate-y-1"
+              className="group bg-white dark:bg-gray-800 rounded-xl p-8 text-center shadow-lg hover:shadow-xl transition-all hover:-translate-y-1"
             >
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 transition-colors">
-                <BookOpen className="w-8 h-8 text-primary" />
+              <div className="w-16 h-16 bg-primary/10 dark:bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 dark:group-hover:bg-primary/30 transition-colors">
+                <BookOpen className="w-8 h-8 text-primary dark:text-primary/90" />
               </div>
-              <h3 className="font-semibold text-lg mb-2">Voir le rapport complet</h3>
-              <p className="text-sm text-gray-600">Naviguez dans les 36 pages du rapport</p>
+              <h3 className="font-semibold text-lg mb-2 text-gray-900 dark:text-gray-100">Voir le rapport complet</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Naviguez dans les 36 pages du rapport</p>
             </Link>
 
             <Link
               href="/dashboard"
-              className="group bg-white rounded-xl p-8 text-center shadow-lg hover:shadow-xl transition-all hover:-translate-y-1"
+              className="group bg-white dark:bg-gray-800 rounded-xl p-8 text-center shadow-lg hover:shadow-xl transition-all hover:-translate-y-1"
             >
-              <div className="w-16 h-16 bg-secondary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-secondary/20 transition-colors">
-                <BarChart3 className="w-8 h-8 text-secondary" />
+              <div className="w-16 h-16 bg-secondary/10 dark:bg-secondary/20 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-secondary/20 dark:group-hover:bg-secondary/30 transition-colors">
+                <BarChart3 className="w-8 h-8 text-secondary dark:text-secondary/90" />
               </div>
-              <h3 className="font-semibold text-lg mb-2">Tableaux de bord</h3>
-              <p className="text-sm text-gray-600">Visualisations interactives des données</p>
+              <h3 className="font-semibold text-lg mb-2 text-gray-900 dark:text-gray-100">Tableaux de bord</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Visualisations interactives des données</p>
             </Link>
 
             <Link
               href="/recherche"
-              className="group bg-white rounded-xl p-8 text-center shadow-lg hover:shadow-xl transition-all hover:-translate-y-1"
+              className="group bg-white dark:bg-gray-800 rounded-xl p-8 text-center shadow-lg hover:shadow-xl transition-all hover:-translate-y-1"
             >
-              <div className="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-accent/20 transition-colors">
-                <Search className="w-8 h-8 text-accent" />
+              <div className="w-16 h-16 bg-accent/10 dark:bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-accent/20 dark:group-hover:bg-accent/30 transition-colors">
+                <Search className="w-8 h-8 text-accent dark:text-accent/90" />
               </div>
-              <h3 className="font-semibold text-lg mb-2">Rechercher</h3>
-              <p className="text-sm text-gray-600">Recherche full-text dans tout le rapport</p>
+              <h3 className="font-semibold text-lg mb-2 text-gray-900 dark:text-gray-100">Rechercher</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Recherche full-text dans tout le rapport</p>
             </Link>
           </div>
         </div>
       </section>
 
-      <footer className="bg-primary text-white py-12">
+      <footer className="bg-primary dark:bg-gray-900 text-white py-12 border-t border-primary-foreground/10 dark:border-gray-700">
         <div className="container mx-auto px-4 text-center">
           <div className="mb-4">
             <h3 className="font-montserrat text-2xl font-bold mb-2">Clauger</h3>
-            <p className="text-white/80 text-sm">
+            <p className="text-white/80 dark:text-gray-300 text-sm">
               {RAPPORT_DATA.baseline}
             </p>
           </div>
-          <div className="text-sm text-white/60">
+          <div className="text-sm text-white/60 dark:text-gray-400">
             © 2025 Clauger. Tous droits réservés.
           </div>
         </div>
       </footer>
     </main>
+    </>
   )
 }

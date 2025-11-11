@@ -4,34 +4,43 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "node scripts/optimize-images.js",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "extract-text": "node scripts/extract-text.js"
+    "optimize-images": "node scripts/optimize-images.js",
+    "extract-text": "node scripts/extract-text.js",
+    "analyze": "ANALYZE=true next build"
   },
   "dependencies": {
-    "next": "14.2.18",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "yet-another-react-lightbox": "^3.22.0",
-    "recharts": "^2.15.0",
-    "flexsearch": "^0.7.43",
     "@annotorious/react": "^3.0.13",
-    "lucide-react": "^0.468.0",
+    "@radix-ui/react-slot": "^1.2.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "tailwind-merge": "^2.6.0"
+    "cmdk": "^1.1.1",
+    "flexsearch": "^0.7.43",
+    "lucide-react": "^0.468.0",
+    "next": "14.2.18",
+    "next-themes": "^0.4.6",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "recharts": "^2.15.0",
+    "tailwind-merge": "^2.6.0",
+    "yet-another-react-lightbox": "^3.22.0"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@next/bundle-analyzer": "^16.0.1",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "autoprefixer": "^10.4.20",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.18",
+    "glob": "^11.0.3",
     "postcss": "^8",
+    "sharp": "^0.34.5",
     "tailwindcss": "^3.4.1",
     "tesseract.js": "^5.1.1",
-    "eslint": "^8",
-    "eslint-config-next": "14.2.18"
+    "typescript": "^5"
   }
 }

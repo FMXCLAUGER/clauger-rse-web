@@ -1,11 +1,12 @@
 "use client"
 
-import { useCallback, useEffect } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import Image from "next/image"
 import { PAGES, TOTAL_PAGES } from "@/lib/constants"
 import NavigationControls from "./NavigationControls"
 import ThumbnailSidebar from "./ThumbnailSidebar"
+import ImageLightbox from "@/components/lightbox/ImageLightbox"
 import { useKeyboardNavigation } from "@/hooks/useKeyboardNavigation"
 
 interface ReportViewerProps {
@@ -16,6 +17,7 @@ export default function ReportViewer({ initialPage }: ReportViewerProps) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
+  const [lightboxOpen, setLightboxOpen] = useState(false)
 
   const currentPage = parseInt(searchParams.get("page") || String(initialPage), 10)
   const currentImage = PAGES[currentPage - 1]
@@ -55,7 +57,7 @@ export default function ReportViewer({ initialPage }: ReportViewerProps) {
   }, [currentPage])
 
   return (
-    <div className="flex h-full bg-gray-100">
+    <div className="flex h-full bg-gray-100 dark:bg-gray-950">
       <ThumbnailSidebar
         pages={PAGES}
         currentPage={currentPage}
@@ -68,24 +70,59 @@ export default function ReportViewer({ initialPage }: ReportViewerProps) {
           totalPages={TOTAL_PAGES}
           onPrev={prevPage}
           onNext={nextPage}
+          onZoom={() => setLightboxOpen(true)}
+          onSearch={() => {
+            const event = new KeyboardEvent('keydown', {
+              key: 'k',
+              metaKey: true,
+              ctrlKey: true,
+              bubbles: true
+            })
+            document.dispatchEvent(event)
+          }}
         />
 
-        <div className="flex-1 relative bg-gray-200 p-4 md:p-8 overflow-auto">
+        <main id="main-content" className="flex-1 relative bg-gray-200 dark:bg-gray-900 p-4 md:p-8 overflow-auto">
+          <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+            Page {currentPage} sur {TOTAL_PAGES}
+          </div>
+
           <div className="relative w-full h-full flex items-center justify-center">
             <div className="relative max-w-full max-h-full">
-              <Image
-                src={currentImage.src}
-                alt={currentImage.alt}
-                width={1200}
-                height={1600}
-                className="w-auto h-auto max-w-full max-h-[calc(100vh-200px)] object-contain shadow-2xl"
-                priority={currentPage <= 2}
-                quality={90}
-              />
+              <button
+                onClick={() => setLightboxOpen(true)}
+                className="relative block transition-transform hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-lg"
+                aria-label="Agrandir l'image"
+              >
+                <Image
+                  src={currentImage.src}
+                  alt={`Page ${currentPage} du rapport RSE Clauger 2025`}
+                  width={currentImage.width || 1200}
+                  height={currentImage.height || 1600}
+                  className="w-auto h-auto max-w-full max-h-[calc(100vh-200px)] object-contain shadow-2xl dark:shadow-gray-800 cursor-zoom-in"
+                  priority={currentPage <= 2}
+                  quality={85}
+                  placeholder={currentImage.blurDataURL ? "blur" : "empty"}
+                  blurDataURL={currentImage.blurDataURL}
+                />
+              </button>
             </div>
           </div>
-        </div>
+        </main>
       </div>
+
+      <ImageLightbox
+        slides={PAGES.map((page) => ({
+          src: page.src,
+          alt: page.alt,
+          width: page.width,
+          height: page.height,
+          blurDataURL: page.blurDataURL,
+        }))}
+        open={lightboxOpen}
+        onClose={() => setLightboxOpen(false)}
+        index={currentPage - 1}
+      />
     </div>
   )
 }
