@@ -59,6 +59,8 @@ export const RAPPORT_DATA = {
       icon: "🌍",
       note: 4.8,
       color: "bg-secondary",
+      colorHex: "#10B981",
+      accentColorHex: "#F8B500",
     },
     {
       id: "social",
@@ -67,6 +69,8 @@ export const RAPPORT_DATA = {
       icon: "👥",
       note: 7.4,
       color: "bg-accent",
+      colorHex: "#0088CC",
+      accentColorHex: "#0088CC",
     },
     {
       id: "gouvernance",
@@ -75,6 +79,8 @@ export const RAPPORT_DATA = {
       icon: "⚖️",
       note: 6.2,
       color: "bg-primary",
+      colorHex: "#6366F1",
+      accentColorHex: "#0088CC",
     },
   ],
 }
