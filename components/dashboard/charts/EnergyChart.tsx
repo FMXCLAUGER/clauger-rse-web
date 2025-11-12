@@ -16,33 +16,33 @@ interface EnergyChartProps {
   data: Array<{ site: string; consumption: number; renewable: number }>
 }
 
-const COLORS = ["#3B82F6", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6"]
+const COLORS = ["#0088CC", "#F8B500", "#10B981", "#EF4444", "#F59E0B"]
 
 export function EnergyChart({ data }: EnergyChartProps) {
   return (
     <ResponsiveContainer width="100%" height={300}>
       <BarChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-        <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
+        <CartesianGrid stroke="#E5E7EB" className="dark:stroke-gray-700" strokeDasharray="3 3" />
         <XAxis
           dataKey="site"
-          className="text-gray-600 dark:text-gray-400"
-          tick={{ fill: "currentColor" }}
+          tick={{ fill: "#666666", fontSize: 12 }}
         />
         <YAxis
-          label={{ value: "MWh", angle: -90, position: "insideLeft" }}
-          className="text-gray-600 dark:text-gray-400"
-          tick={{ fill: "currentColor" }}
+          label={{ value: "MWh", angle: -90, position: "insideLeft", fill: "#666666" }}
+          tick={{ fill: "#666666", fontSize: 12 }}
         />
         <Tooltip
           contentStyle={{
-            backgroundColor: "var(--background)",
-            border: "1px solid var(--border)",
-            borderRadius: "8px",
+            backgroundColor: "#FFFFFF",
+            border: "1px solid #E5E7EB",
+            borderRadius: "12px",
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
           }}
-          labelStyle={{ color: "var(--foreground)" }}
+          labelStyle={{ color: "#333333", fontWeight: 600 }}
+          itemStyle={{ color: "#666666" }}
         />
-        <Legend />
-        <Bar dataKey="consumption" name="Consommation" radius={[8, 8, 0, 0]}>
+        <Legend wrapperStyle={{ paddingTop: "20px" }} />
+        <Bar dataKey="consumption" name="Consommation" radius={[8, 8, 0, 0]} strokeWidth={2.5}>
           {data.map((entry, index) => (
             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
           ))}
@@ -53,6 +53,7 @@ export function EnergyChart({ data }: EnergyChartProps) {
           fill="#10B981"
           opacity={0.7}
           radius={[8, 8, 0, 0]}
+          strokeWidth={2.5}
         />
       </BarChart>
     </ResponsiveContainer>

@@ -6,7 +6,7 @@ interface BoardCompositionChartProps {
   data: Array<{ category: string; count: number; percentage: number }>
 }
 
-const COLORS = ["#3B82F6", "#EC4899", "#10B981", "#F59E0B"]
+const COLORS = ["#0088CC", "#F8B500", "#10B981", "#F59E0B"]
 
 export function BoardCompositionChart({ data }: BoardCompositionChartProps) {
   return (
@@ -21,6 +21,7 @@ export function BoardCompositionChart({ data }: BoardCompositionChartProps) {
           outerRadius={120}
           fill="#8884d8"
           dataKey="count"
+          strokeWidth={2.5}
         >
           {data.map((entry, index) => (
             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -28,15 +29,18 @@ export function BoardCompositionChart({ data }: BoardCompositionChartProps) {
         </Pie>
         <Tooltip
           contentStyle={{
-            backgroundColor: "var(--background)",
-            border: "1px solid var(--border)",
-            borderRadius: "8px",
+            backgroundColor: "#FFFFFF",
+            border: "1px solid #E5E7EB",
+            borderRadius: "12px",
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
           }}
+          labelStyle={{ color: "#333333", fontWeight: 600 }}
+          itemStyle={{ color: "#666666" }}
           formatter={(value: number, name: string, props: any) =>
             `${value} (${props.payload.percentage.toFixed(1)}%)`
           }
         />
-        <Legend />
+        <Legend wrapperStyle={{ paddingTop: "20px" }} />
       </PieChart>
     </ResponsiveContainer>
   )

@@ -37,8 +37,8 @@ export default function DashboardPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
+    <div className="min-h-screen bg-[#F9FAFB] dark:bg-gray-950">
+      <div className="container mx-auto px-6 md:px-8 lg:px-10 py-8 max-w-[1440px]">
         {/* Header */}
         <div className="mb-8">
           <Link
@@ -105,74 +105,88 @@ export default function DashboardPage() {
         {activeTab === "environment" && (
           <div id="dashboard-content" className="space-y-6 animate-in fade-in duration-300">
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-              <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 md:gap-5 lg:gap-6 mb-6">
+              <div className="lg:col-span-4 bg-white dark:bg-gray-800 rounded-xl p-6 border border-[#E5E7EB] dark:border-gray-700 shadow-[0_1px_3px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_12px_rgba(0,136,204,0.15)] transition-all">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm font-medium text-[#666666] dark:text-gray-400 uppercase tracking-wider">
                     Émissions totales 2025
                   </span>
-                  <TrendingUp className="w-5 h-5 text-green-500" />
+                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-success to-[#10B981]/70 flex items-center justify-center">
+                    <TrendingUp className="w-5 h-5 text-white" strokeWidth={2.5} />
+                  </div>
                 </div>
-                <p className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-                  1,480 <span className="text-lg">tCO2e</span>
+                <p className="text-[2.25rem] font-bold text-[#0088CC] dark:text-[#0099DD] tabular-nums leading-none">
+                  1,480 <span className="text-base font-medium text-[#666666] dark:text-gray-400">tCO2e</span>
                 </p>
-                <p className="text-sm text-green-600 mt-1">-24.8% vs 2020</p>
+                <p className="text-sm font-medium text-success mt-2">-24.8% vs 2020</p>
               </div>
-              <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+              <div className="lg:col-span-4 bg-white dark:bg-gray-800 rounded-xl p-6 border border-[#E5E7EB] dark:border-gray-700 shadow-[0_1px_3px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_12px_rgba(0,136,204,0.15)] transition-all">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm font-medium text-[#666666] dark:text-gray-400 uppercase tracking-wider">
                     Énergie renouvelable
                   </span>
-                  <Leaf className="w-5 h-5 text-green-500" />
+                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-success to-[#10B981]/70 flex items-center justify-center">
+                    <Leaf className="w-5 h-5 text-white" strokeWidth={2.5} />
+                  </div>
                 </div>
-                <p className="text-3xl font-bold text-gray-900 dark:text-gray-100">58.6%</p>
-                <p className="text-sm text-gray-500 mt-1">Objectif 2025: 70%</p>
+                <p className="text-[2.25rem] font-bold text-[#0088CC] dark:text-[#0099DD] tabular-nums leading-none">58.6%</p>
+                <p className="text-sm font-medium text-[#666666] dark:text-gray-400 mt-2">Objectif 2025: 70%</p>
               </div>
-              <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+              <div className="lg:col-span-4 bg-white dark:bg-gray-800 rounded-xl p-6 border border-[#E5E7EB] dark:border-gray-700 shadow-[0_1px_3px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_12px_rgba(0,136,204,0.15)] transition-all">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm font-medium text-[#666666] dark:text-gray-400 uppercase tracking-wider">
                     Taux de recyclage
                   </span>
-                  <TrendingUp className="w-5 h-5 text-green-500" />
+                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-success to-[#10B981]/70 flex items-center justify-center">
+                    <TrendingUp className="w-5 h-5 text-white" strokeWidth={2.5} />
+                  </div>
                 </div>
-                <p className="text-3xl font-bold text-gray-900 dark:text-gray-100">67.8%</p>
-                <p className="text-sm text-green-600 mt-1">+12.3% vs 2020</p>
+                <p className="text-[2.25rem] font-bold text-[#0088CC] dark:text-[#0099DD] tabular-nums leading-none">67.8%</p>
+                <p className="text-sm font-medium text-success mt-2">+12.3% vs 2020</p>
               </div>
             </div>
 
             {/* Charts Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <ChartCard
-                title="Évolution des émissions CO2"
-                description="Émissions par scope (2020-2025)"
-                icon={<TrendingUp className="w-6 h-6" />}
-              >
-                <EmissionsChart data={environmentData.emissions} />
-              </ChartCard>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              <div className="lg:col-span-6">
+                <ChartCard
+                  title="Évolution des émissions CO2"
+                  description="Émissions par scope (2020-2025)"
+                  icon={<TrendingUp className="w-6 h-6" />}
+                >
+                  <EmissionsChart data={environmentData.emissions} />
+                </ChartCard>
+              </div>
 
-              <ChartCard
-                title="Consommation énergétique"
-                description="Par site et part renouvelable"
-                icon={<Leaf className="w-6 h-6" />}
-              >
-                <EnergyChart data={environmentData.energy} />
-              </ChartCard>
+              <div className="lg:col-span-6">
+                <ChartCard
+                  title="Consommation énergétique"
+                  description="Par site et part renouvelable"
+                  icon={<Leaf className="w-6 h-6" />}
+                >
+                  <EnergyChart data={environmentData.energy} />
+                </ChartCard>
+              </div>
 
-              <ChartCard
-                title="Gestion des déchets"
-                description="Répartition par type de traitement"
-                icon={<TrendingUp className="w-6 h-6" />}
-              >
-                <WasteChart data={environmentData.waste} />
-              </ChartCard>
+              <div className="lg:col-span-6">
+                <ChartCard
+                  title="Gestion des déchets"
+                  description="Répartition par type de traitement"
+                  icon={<TrendingUp className="w-6 h-6" />}
+                >
+                  <WasteChart data={environmentData.waste} />
+                </ChartCard>
+              </div>
 
-              <ChartCard
-                title="Progression objectifs"
-                description="Cibles environnementales 2025"
-                icon={<Leaf className="w-6 h-6" />}
-              >
-                <TargetsProgress data={environmentData.targets} />
-              </ChartCard>
+              <div className="lg:col-span-6">
+                <ChartCard
+                  title="Progression objectifs"
+                  description="Cibles environnementales 2025"
+                  icon={<Leaf className="w-6 h-6" />}
+                >
+                  <TargetsProgress data={environmentData.targets} />
+                </ChartCard>
+              </div>
             </div>
           </div>
         )}
@@ -181,74 +195,88 @@ export default function DashboardPage() {
         {activeTab === "social" && (
           <div id="dashboard-content" className="space-y-6 animate-in fade-in duration-300">
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-              <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 md:gap-5 lg:gap-6 mb-6">
+              <div className="lg:col-span-4 bg-white dark:bg-gray-800 rounded-xl p-6 border border-[#E5E7EB] dark:border-gray-700 shadow-[0_1px_3px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_12px_rgba(0,136,204,0.15)] transition-all">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm font-medium text-[#666666] dark:text-gray-400 uppercase tracking-wider">
                     Effectifs totaux
                   </span>
-                  <Users className="w-5 h-5 text-blue-500" />
+                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-[#0088CC]/70 flex items-center justify-center">
+                    <Users className="w-5 h-5 text-white" strokeWidth={2.5} />
+                  </div>
                 </div>
-                <p className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+                <p className="text-[2.25rem] font-bold text-[#0088CC] dark:text-[#0099DD] tabular-nums leading-none">
                   {formatNumber(1523)}
                 </p>
-                <p className="text-sm text-blue-600 mt-1">+22.3% vs 2020</p>
+                <p className="text-sm font-medium text-primary mt-2">+22.3% vs 2020</p>
               </div>
-              <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+              <div className="lg:col-span-4 bg-white dark:bg-gray-800 rounded-xl p-6 border border-[#E5E7EB] dark:border-gray-700 shadow-[0_1px_3px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_12px_rgba(0,136,204,0.15)] transition-all">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm font-medium text-[#666666] dark:text-gray-400 uppercase tracking-wider">
                     Femmes au CA
                   </span>
-                  <Users className="w-5 h-5 text-pink-500" />
+                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-[#0088CC]/70 flex items-center justify-center">
+                    <Users className="w-5 h-5 text-white" strokeWidth={2.5} />
+                  </div>
                 </div>
-                <p className="text-3xl font-bold text-gray-900 dark:text-gray-100">33.3%</p>
-                <p className="text-sm text-gray-500 mt-1">508 femmes</p>
+                <p className="text-[2.25rem] font-bold text-[#0088CC] dark:text-[#0099DD] tabular-nums leading-none">33.3%</p>
+                <p className="text-sm font-medium text-[#666666] dark:text-gray-400 mt-2">508 femmes</p>
               </div>
-              <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+              <div className="lg:col-span-4 bg-white dark:bg-gray-800 rounded-xl p-6 border border-[#E5E7EB] dark:border-gray-700 shadow-[0_1px_3px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_12px_rgba(0,136,204,0.15)] transition-all">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm font-medium text-[#666666] dark:text-gray-400 uppercase tracking-wider">
                     Formation/employé
                   </span>
-                  <TrendingUp className="w-5 h-5 text-blue-500" />
+                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-[#0088CC]/70 flex items-center justify-center">
+                    <TrendingUp className="w-5 h-5 text-white" strokeWidth={2.5} />
+                  </div>
                 </div>
-                <p className="text-3xl font-bold text-gray-900 dark:text-gray-100">20.5h</p>
-                <p className="text-sm text-blue-600 mt-1">+62% vs 2020</p>
+                <p className="text-[2.25rem] font-bold text-[#0088CC] dark:text-[#0099DD] tabular-nums leading-none">20.5h</p>
+                <p className="text-sm font-medium text-primary mt-2">+62% vs 2020</p>
               </div>
             </div>
 
             {/* Charts Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <ChartCard
-                title="Évolution des effectifs"
-                description="Répartition hommes/femmes (2020-2025)"
-                icon={<Users className="w-6 h-6" />}
-              >
-                <WorkforceChart data={socialData.workforce} />
-              </ChartCard>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              <div className="lg:col-span-6">
+                <ChartCard
+                  title="Évolution des effectifs"
+                  description="Répartition hommes/femmes (2020-2025)"
+                  icon={<Users className="w-6 h-6" />}
+                >
+                  <WorkforceChart data={socialData.workforce} />
+                </ChartCard>
+              </div>
 
-              <ChartCard
-                title="Pyramide des âges"
-                description="Distribution par tranche d'âge"
-                icon={<Users className="w-6 h-6" />}
-              >
-                <AgeDistributionChart data={socialData.ageDistribution} />
-              </ChartCard>
+              <div className="lg:col-span-6">
+                <ChartCard
+                  title="Pyramide des âges"
+                  description="Distribution par tranche d'âge"
+                  icon={<Users className="w-6 h-6" />}
+                >
+                  <AgeDistributionChart data={socialData.ageDistribution} />
+                </ChartCard>
+              </div>
 
-              <ChartCard
-                title="Heures de formation"
-                description="Évolution et moyenne par employé"
-                icon={<TrendingUp className="w-6 h-6" />}
-              >
-                <TrainingChart data={socialData.training} />
-              </ChartCard>
+              <div className="lg:col-span-6">
+                <ChartCard
+                  title="Heures de formation"
+                  description="Évolution et moyenne par employé"
+                  icon={<TrendingUp className="w-6 h-6" />}
+                >
+                  <TrainingChart data={socialData.training} />
+                </ChartCard>
+              </div>
 
-              <ChartCard
-                title="Accidents du travail"
-                description="Nombre et taux de fréquence"
-                icon={<TrendingUp className="w-6 h-6" />}
-              >
-                <AccidentsChart data={socialData.accidents} />
-              </ChartCard>
+              <div className="lg:col-span-6">
+                <ChartCard
+                  title="Accidents du travail"
+                  description="Nombre et taux de fréquence"
+                  icon={<TrendingUp className="w-6 h-6" />}
+                >
+                  <AccidentsChart data={socialData.accidents} />
+                </ChartCard>
+              </div>
             </div>
           </div>
         )}
@@ -257,60 +285,70 @@ export default function DashboardPage() {
         {activeTab === "governance" && (
           <div id="dashboard-content" className="space-y-6 animate-in fade-in duration-300">
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-              <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 md:gap-5 lg:gap-6 mb-6">
+              <div className="lg:col-span-4 bg-white dark:bg-gray-800 rounded-xl p-6 border border-[#E5E7EB] dark:border-gray-700 shadow-[0_1px_3px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_12px_rgba(0,136,204,0.15)] transition-all">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm font-medium text-[#666666] dark:text-gray-400 uppercase tracking-wider">
                     Budget RSE 2025
                   </span>
-                  <Scale className="w-5 h-5 text-purple-500" />
+                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-secondary to-[#F8B500]/70 flex items-center justify-center">
+                    <Scale className="w-5 h-5 text-white" strokeWidth={2.5} />
+                  </div>
                 </div>
-                <p className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+                <p className="text-[2.25rem] font-bold text-[#0088CC] dark:text-[#0099DD] tabular-nums leading-none">
                   {formatCurrency(8100000)}
                 </p>
-                <p className="text-sm text-purple-600 mt-1">+18% vs 2024</p>
+                <p className="text-sm font-medium text-secondary mt-2">+18% vs 2024</p>
               </div>
-              <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+              <div className="lg:col-span-4 bg-white dark:bg-gray-800 rounded-xl p-6 border border-[#E5E7EB] dark:border-gray-700 shadow-[0_1px_3px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_12px_rgba(0,136,204,0.15)] transition-all">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm font-medium text-[#666666] dark:text-gray-400 uppercase tracking-wider">
                     Conformité CSRD
                   </span>
-                  <Scale className="w-5 h-5 text-green-500" />
+                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-success to-[#10B981]/70 flex items-center justify-center">
+                    <Scale className="w-5 h-5 text-white" strokeWidth={2.5} />
+                  </div>
                 </div>
-                <p className="text-3xl font-bold text-gray-900 dark:text-gray-100">92%</p>
-                <p className="text-sm text-green-600 mt-1">Certifié</p>
+                <p className="text-[2.25rem] font-bold text-[#0088CC] dark:text-[#0099DD] tabular-nums leading-none">92%</p>
+                <p className="text-sm font-medium text-success mt-2">Certifié</p>
               </div>
-              <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+              <div className="lg:col-span-4 bg-white dark:bg-gray-800 rounded-xl p-6 border border-[#E5E7EB] dark:border-gray-700 shadow-[0_1px_3px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_12px_rgba(0,136,204,0.15)] transition-all">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm font-medium text-[#666666] dark:text-gray-400 uppercase tracking-wider">
                     Indépendants CA
                   </span>
-                  <Users className="w-5 h-5 text-purple-500" />
+                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-secondary to-[#F8B500]/70 flex items-center justify-center">
+                    <Users className="w-5 h-5 text-white" strokeWidth={2.5} />
+                  </div>
                 </div>
-                <p className="text-3xl font-bold text-gray-900 dark:text-gray-100">41.7%</p>
-                <p className="text-sm text-gray-500 mt-1">5 membres</p>
+                <p className="text-[2.25rem] font-bold text-[#0088CC] dark:text-[#0099DD] tabular-nums leading-none">41.7%</p>
+                <p className="text-sm font-medium text-[#666666] dark:text-gray-400 mt-2">5 membres</p>
               </div>
             </div>
 
             {/* Charts Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <ChartCard
-                title="Composition du conseil"
-                description="Diversité et expertise"
-                icon={<Scale className="w-6 h-6" />}
-              >
-                <BoardCompositionChart data={governanceData.board} />
-              </ChartCard>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              <div className="lg:col-span-6">
+                <ChartCard
+                  title="Composition du conseil"
+                  description="Diversité et expertise"
+                  icon={<Scale className="w-6 h-6" />}
+                >
+                  <BoardCompositionChart data={governanceData.board} />
+                </ChartCard>
+              </div>
 
-              <ChartCard
-                title="Budget par pilier"
-                description="Répartition des investissements RSE"
-                icon={<TrendingUp className="w-6 h-6" />}
-              >
-                <BudgetChart data={governanceData.budget} />
-              </ChartCard>
+              <div className="lg:col-span-6">
+                <ChartCard
+                  title="Budget par pilier"
+                  description="Répartition des investissements RSE"
+                  icon={<TrendingUp className="w-6 h-6" />}
+                >
+                  <BudgetChart data={governanceData.budget} />
+                </ChartCard>
+              </div>
 
-              <div className="lg:col-span-2">
+              <div className="lg:col-span-12">
                 <ChartCard
                   title="Scores de conformité"
                   description="Standards et certifications"

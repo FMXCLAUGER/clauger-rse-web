@@ -20,45 +20,53 @@ interface KeyFiguresSectionProps {
 
 export function KeyFiguresSection({ kpis }: KeyFiguresSectionProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-      <KeyFigureCard
-        icon={Users}
-        title="Collaborateurs"
-        value={kpis.collaborateurs}
-        unit="+"
-        delay={0}
-        sparklineData={kpis.trends.collaborateurs}
-        formatter={(val) => val.toLocaleString()}
-      />
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 md:gap-5 lg:gap-6 max-w-[1440px] mx-auto">
+      <div className="lg:col-span-3">
+        <KeyFigureCard
+          icon={Users}
+          title="Collaborateurs"
+          value={kpis.collaborateurs}
+          unit="+"
+          delay={0}
+          sparklineData={kpis.trends.collaborateurs}
+          formatter={(val) => val.toLocaleString()}
+        />
+      </div>
 
-      <KeyFigureCard
-        icon={Award}
-        title="Années d'expérience"
-        value={kpis.experienceAnnees}
-        unit="+"
-        delay={100}
-        sparklineData={kpis.trends.experienceAnnees}
-      />
+      <div className="lg:col-span-3">
+        <KeyFigureCard
+          icon={Award}
+          title="Années d'expérience"
+          value={kpis.experienceAnnees}
+          unit="+"
+          delay={100}
+          sparklineData={kpis.trends.experienceAnnees}
+        />
+      </div>
 
-      <KeyFigureCard
-        icon={Leaf}
-        title="teqCO₂ (Bilan carbone)"
-        value={kpis.emissionsCarbone}
-        unit="k"
-        delay={200}
-        sparklineData={kpis.trends.emissionsCarbone}
-        formatter={(val) => (val / 1000).toFixed(0)}
-      />
+      <div className="lg:col-span-3">
+        <KeyFigureCard
+          icon={Leaf}
+          title="teqCO₂ (Bilan carbone)"
+          value={kpis.emissionsCarbone}
+          unit="k"
+          delay={200}
+          sparklineData={kpis.trends.emissionsCarbone}
+          formatter={(val) => (val / 1000).toFixed(0)}
+        />
+      </div>
 
-      <KeyFigureCard
-        icon={GraduationCap}
-        title="Budget formation"
-        value={kpis.budgetFormation}
-        unit="k€"
-        delay={300}
-        sparklineData={kpis.trends.budgetFormation}
-        formatter={(val) => (val / 1000).toFixed(0)}
-      />
+      <div className="lg:col-span-3">
+        <KeyFigureCard
+          icon={GraduationCap}
+          title="Budget formation"
+          value={kpis.budgetFormation}
+          unit="k€"
+          delay={300}
+          sparklineData={kpis.trends.budgetFormation}
+          formatter={(val) => (val / 1000).toFixed(0)}
+        />
+      </div>
     </div>
   )
 }

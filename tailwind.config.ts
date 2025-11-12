@@ -10,9 +10,9 @@ const config: Config = {
   theme: {
     container: {
       center: true,
-      padding: "2rem",
+      padding: "2.5rem",
       screens: {
-        "2xl": "1400px",
+        "2xl": "1440px",
       },
     },
     extend: {
@@ -25,8 +25,8 @@ const config: Config = {
           foreground: "#ffffff",
         },
         secondary: {
-          DEFAULT: "#2D8659",
-          foreground: "#ffffff",
+          DEFAULT: "#F8B500",
+          foreground: "#333333",
         },
         accent: {
           DEFAULT: "#F8B500",
@@ -40,6 +40,25 @@ const config: Config = {
           DEFAULT: "hsl(var(--muted))",
           foreground: "hsl(var(--muted-foreground))",
         },
+        success: {
+          DEFAULT: "#10B981",
+          foreground: "#ffffff",
+        },
+        warning: {
+          DEFAULT: "#F59E0B",
+          foreground: "#ffffff",
+        },
+        danger: {
+          DEFAULT: "#EF4444",
+          foreground: "#ffffff",
+        },
+        text: {
+          DEFAULT: "#333333",
+          light: "#666666",
+        },
+        page: {
+          DEFAULT: "#F9FAFB",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -48,6 +67,12 @@ const config: Config = {
       },
       ringWidth: {
         '3': '3px',
+      },
+      gridTemplateColumns: {
+        '12': 'repeat(12, minmax(0, 1fr))',
+      },
+      gap: {
+        '6': '1.5rem',
       },
     },
   },

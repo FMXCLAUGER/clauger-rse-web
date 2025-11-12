@@ -1,4 +1,27 @@
 export const CLAUGER_COLORS = {
+  brand: {
+    primary: '#0088CC',
+    secondary: '#F8B500',
+    success: '#10B981',
+    warning: '#F59E0B',
+    danger: '#EF4444',
+  },
+  text: {
+    primary: '#333333',
+    secondary: '#666666',
+    light: '#999999',
+    white: '#FFFFFF',
+  },
+  background: {
+    page: '#F9FAFB',
+    card: '#FFFFFF',
+    cardDark: '#1F2937',
+  },
+  border: {
+    light: '#E5E7EB',
+    DEFAULT: '#D1D5DB',
+    dark: '#9CA3AF',
+  },
   sidebar: {
     background: '#FFFFFF',
     border: '#E5E7EB',
@@ -45,6 +68,25 @@ export const CLAUGER_COLORS = {
     text: '#FFFFFF',
     kbdBackground: '#0088CC',
     kbdText: '#FFFFFF',
+  },
+  dashboard: {
+    kpiCard: {
+      background: '#FFFFFF',
+      border: '#E5E7EB',
+      shadow: '0 1px 3px rgba(0, 0, 0, 0.08)',
+      shadowHover: '0 4px 12px rgba(0, 136, 204, 0.15)',
+      labelColor: '#666666',
+      valueColor: '#0088CC',
+      iconGradientStart: '#0088CC',
+      iconGradientEnd: '#F8B500',
+    },
+    chart: {
+      primary: '#0088CC',
+      secondary: '#F8B500',
+      tertiary: '#10B981',
+      gridLines: '#E5E7EB',
+      textColor: '#666666',
+    },
   },
 } as const
 

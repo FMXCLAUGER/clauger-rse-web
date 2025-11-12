@@ -26,50 +26,50 @@ export function TrainingChart({ data }: TrainingChartProps) {
   return (
     <ResponsiveContainer width="100%" height={300}>
       <ComposedChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-        <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
+        <CartesianGrid stroke="#E5E7EB" className="dark:stroke-gray-700" strokeDasharray="3 3" />
         <XAxis
           dataKey="year"
-          className="text-gray-600 dark:text-gray-400"
-          tick={{ fill: "currentColor" }}
+          tick={{ fill: "#666666", fontSize: 12 }}
         />
         <YAxis
           yAxisId="left"
-          label={{ value: "Heures totales", angle: -90, position: "insideLeft" }}
-          className="text-gray-600 dark:text-gray-400"
-          tick={{ fill: "currentColor" }}
+          label={{ value: "Heures totales", angle: -90, position: "insideLeft", fill: "#666666" }}
+          tick={{ fill: "#666666", fontSize: 12 }}
         />
         <YAxis
           yAxisId="right"
           orientation="right"
-          label={{ value: "Heures/employé", angle: 90, position: "insideRight" }}
-          className="text-gray-600 dark:text-gray-400"
-          tick={{ fill: "currentColor" }}
+          label={{ value: "Heures/employé", angle: 90, position: "insideRight", fill: "#666666" }}
+          tick={{ fill: "#666666", fontSize: 12 }}
         />
         <Tooltip
           contentStyle={{
-            backgroundColor: "var(--background)",
-            border: "1px solid var(--border)",
-            borderRadius: "8px",
+            backgroundColor: "#FFFFFF",
+            border: "1px solid #E5E7EB",
+            borderRadius: "12px",
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
           }}
-          labelStyle={{ color: "var(--foreground)" }}
+          labelStyle={{ color: "#333333", fontWeight: 600 }}
+          itemStyle={{ color: "#666666" }}
         />
-        <Legend />
+        <Legend wrapperStyle={{ paddingTop: "20px" }} />
         <Bar
           yAxisId="left"
           dataKey="hours"
-          fill="#3B82F6"
+          fill="#0088CC"
           name="Heures totales"
           radius={[8, 8, 0, 0]}
+          strokeWidth={2.5}
         />
         <Line
           yAxisId="right"
           type="monotone"
           dataKey="avgHours"
           stroke="#10B981"
-          strokeWidth={2}
+          strokeWidth={2.5}
           name="Heures/employé"
           dot={{ fill: "#10B981", r: 4 }}
-          activeDot={{ r: 6 }}
+          activeDot={{ r: 7, fill: "#10B981", stroke: "#FFFFFF", strokeWidth: 2 }}
         />
       </ComposedChart>
     </ResponsiveContainer>

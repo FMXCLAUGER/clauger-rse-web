@@ -37,6 +37,7 @@ export function WasteChart({ data }: WasteChartProps) {
           outerRadius={120}
           fill="#8884d8"
           dataKey="value"
+          strokeWidth={2.5}
         >
           {chartData.map((entry, index) => (
             <Cell key={`cell-${index}`} fill={entry.color} />
@@ -44,13 +45,16 @@ export function WasteChart({ data }: WasteChartProps) {
         </Pie>
         <Tooltip
           contentStyle={{
-            backgroundColor: "var(--background)",
-            border: "1px solid var(--border)",
-            borderRadius: "8px",
+            backgroundColor: "#FFFFFF",
+            border: "1px solid #E5E7EB",
+            borderRadius: "12px",
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
           }}
+          labelStyle={{ color: "#333333", fontWeight: 600 }}
+          itemStyle={{ color: "#666666" }}
           formatter={(value: number) => `${value.toFixed(1)}%`}
         />
-        <Legend />
+        <Legend wrapperStyle={{ paddingTop: "20px" }} />
       </PieChart>
     </ResponsiveContainer>
   )
