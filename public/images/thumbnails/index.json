@@ -1,0 +1,445 @@
+{
+  "metadata": {
+    "totalThumbnails": 36,
+    "width": 100,
+    "height": 150,
+    "format": "webp",
+    "quality": 80,
+    "generatedAt": "2025-11-12T15:34:43.770Z",
+    "processingTime": 4878
+  },
+  "thumbnails": [
+    {
+      "pageNumber": 1,
+      "filename": "page-1.webp",
+      "originalImage": "page 1.png",
+      "width": 100,
+      "height": 150,
+      "size": 3054,
+      "originalSize": {
+        "width": 2481,
+        "height": 3508
+      }
+    },
+    {
+      "pageNumber": 2,
+      "filename": "page-2.webp",
+      "originalImage": "page 2.png",
+      "width": 100,
+      "height": 150,
+      "size": 3672,
+      "originalSize": {
+        "width": 4961,
+        "height": 3508
+      }
+    },
+    {
+      "pageNumber": 3,
+      "filename": "page-3.webp",
+      "originalImage": "page 3.png",
+      "width": 100,
+      "height": 150,
+      "size": 4364,
+      "originalSize": {
+        "width": 4961,
+        "height": 3508
+      }
+    },
+    {
+      "pageNumber": 4,
+      "filename": "page-4.webp",
+      "originalImage": "page 4.png",
+      "width": 100,
+      "height": 150,
+      "size": 2842,
+      "originalSize": {
+        "width": 4961,
+        "height": 3508
+      }
+    },
+    {
+      "pageNumber": 5,
+      "filename": "page-5.webp",
+      "originalImage": "page 5.png",
+      "width": 100,
+      "height": 150,
+      "size": 2990,
+      "originalSize": {
+        "width": 4961,
+        "height": 3508
+      }
+    },
+    {
+      "pageNumber": 6,
+      "filename": "page-6.webp",
+      "originalImage": "page 6.png",
+      "width": 100,
+      "height": 150,
+      "size": 2102,
+      "originalSize": {
+        "width": 4961,
+        "height": 3508
+      }
+    },
+    {
+      "pageNumber": 7,
+      "filename": "page-7.webp",
+      "originalImage": "page 7.png",
+      "width": 100,
+      "height": 150,
+      "size": 2050,
+      "originalSize": {
+        "width": 4961,
+        "height": 3508
+      }
+    },
+    {
+      "pageNumber": 8,
+      "filename": "page-8.webp",
+      "originalImage": "page 8.png",
+      "width": 100,
+      "height": 150,
+      "size": 1502,
+      "originalSize": {
+        "width": 4961,
+        "height": 3508
+      }
+    },
+    {
+      "pageNumber": 9,
+      "filename": "page-9.webp",
+      "originalImage": "page 9.png",
+      "width": 100,
+      "height": 150,
+      "size": 3016,
+      "originalSize": {
+        "width": 4961,
+        "height": 3508
+      }
+    },
+    {
+      "pageNumber": 10,
+      "filename": "page-10.webp",
+      "originalImage": "page 10.png",
+      "width": 100,
+      "height": 150,
+      "size": 2374,
+      "originalSize": {
+        "width": 4961,
+        "height": 3508
+      }
+    },
+    {
+      "pageNumber": 11,
+      "filename": "page-11.webp",
+      "originalImage": "page 11.png",
+      "width": 100,
+      "height": 150,
+      "size": 3914,
+      "originalSize": {
+        "width": 4961,
+        "height": 3508
+      }
+    },
+    {
+      "pageNumber": 12,
+      "filename": "page-12.webp",
+      "originalImage": "page 12.png",
+      "width": 100,
+      "height": 150,
+      "size": 2692,
+      "originalSize": {
+        "width": 4961,
+        "height": 3508
+      }
+    },
+    {
+      "pageNumber": 13,
+      "filename": "page-13.webp",
+      "originalImage": "page 13.png",
+      "width": 100,
+      "height": 150,
+      "size": 3374,
+      "originalSize": {
+        "width": 4961,
+        "height": 3508
+      }
+    },
+    {
+      "pageNumber": 14,
+      "filename": "page-14.webp",
+      "originalImage": "page 14.png",
+      "width": 100,
+      "height": 150,
+      "size": 2884,
+      "originalSize": {
+        "width": 4961,
+        "height": 3508
+      }
+    },
+    {
+      "pageNumber": 15,
+      "filename": "page-15.webp",
+      "originalImage": "page 15.png",
+      "width": 100,
+      "height": 150,
+      "size": 3290,
+      "originalSize": {
+        "width": 4961,
+        "height": 3508
+      }
+    },
+    {
+      "pageNumber": 16,
+      "filename": "page-16.webp",
+      "originalImage": "page 16.png",
+      "width": 100,
+      "height": 150,
+      "size": 3620,
+      "originalSize": {
+        "width": 4961,
+        "height": 3508
+      }
+    },
+    {
+      "pageNumber": 17,
+      "filename": "page-17.webp",
+      "originalImage": "page 17.png",
+      "width": 100,
+      "height": 150,
+      "size": 3002,
+      "originalSize": {
+        "width": 4961,
+        "height": 3508
+      }
+    },
+    {
+      "pageNumber": 18,
+      "filename": "page-18.webp",
+      "originalImage": "page 18.png",
+      "width": 100,
+      "height": 150,
+      "size": 2390,
+      "originalSize": {
+        "width": 4961,
+        "height": 3508
+      }
+    },
+    {
+      "pageNumber": 19,
+      "filename": "page-19.webp",
+      "originalImage": "page 19.png",
+      "width": 100,
+      "height": 150,
+      "size": 3286,
+      "originalSize": {
+        "width": 4961,
+        "height": 3508
+      }
+    },
+    {
+      "pageNumber": 20,
+      "filename": "page-20.webp",
+      "originalImage": "page 20.png",
+      "width": 100,
+      "height": 150,
+      "size": 3054,
+      "originalSize": {
+        "width": 4961,
+        "height": 3508
+      }
+    },
+    {
+      "pageNumber": 21,
+      "filename": "page-21.webp",
+      "originalImage": "page 21.png",
+      "width": 100,
+      "height": 150,
+      "size": 3132,
+      "originalSize": {
+        "width": 4961,
+        "height": 3508
+      }
+    },
+    {
+      "pageNumber": 22,
+      "filename": "page-22.webp",
+      "originalImage": "page 22.png",
+      "width": 100,
+      "height": 150,
+      "size": 2998,
+      "originalSize": {
+        "width": 4961,
+        "height": 3508
+      }
+    },
+    {
+      "pageNumber": 23,
+      "filename": "page-23.webp",
+      "originalImage": "page 23.png",
+      "width": 100,
+      "height": 150,
+      "size": 4246,
+      "originalSize": {
+        "width": 4961,
+        "height": 3508
+      }
+    },
+    {
+      "pageNumber": 24,
+      "filename": "page-24.webp",
+      "originalImage": "page 24.png",
+      "width": 100,
+      "height": 150,
+      "size": 2896,
+      "originalSize": {
+        "width": 4961,
+        "height": 3508
+      }
+    },
+    {
+      "pageNumber": 25,
+      "filename": "page-25.webp",
+      "originalImage": "page 25.png",
+      "width": 100,
+      "height": 150,
+      "size": 3134,
+      "originalSize": {
+        "width": 4961,
+        "height": 3508
+      }
+    },
+    {
+      "pageNumber": 26,
+      "filename": "page-26.webp",
+      "originalImage": "page 26.png",
+      "width": 100,
+      "height": 150,
+      "size": 2858,
+      "originalSize": {
+        "width": 4961,
+        "height": 3508
+      }
+    },
+    {
+      "pageNumber": 27,
+      "filename": "page-27.webp",
+      "originalImage": "page 27.png",
+      "width": 100,
+      "height": 150,
+      "size": 2984,
+      "originalSize": {
+        "width": 4961,
+        "height": 3508
+      }
+    },
+    {
+      "pageNumber": 28,
+      "filename": "page-28.webp",
+      "originalImage": "page 28.png",
+      "width": 100,
+      "height": 150,
+      "size": 2458,
+      "originalSize": {
+        "width": 4961,
+        "height": 3508
+      }
+    },
+    {
+      "pageNumber": 29,
+      "filename": "page-29.webp",
+      "originalImage": "page 29.png",
+      "width": 100,
+      "height": 150,
+      "size": 2688,
+      "originalSize": {
+        "width": 4961,
+        "height": 3508
+      }
+    },
+    {
+      "pageNumber": 30,
+      "filename": "page-30.webp",
+      "originalImage": "page 30.png",
+      "width": 100,
+      "height": 150,
+      "size": 3006,
+      "originalSize": {
+        "width": 4961,
+        "height": 3508
+      }
+    },
+    {
+      "pageNumber": 31,
+      "filename": "page-31.webp",
+      "originalImage": "page 31.png",
+      "width": 100,
+      "height": 150,
+      "size": 2614,
+      "originalSize": {
+        "width": 4961,
+        "height": 3508
+      }
+    },
+    {
+      "pageNumber": 32,
+      "filename": "page-32.webp",
+      "originalImage": "page 32.png",
+      "width": 100,
+      "height": 150,
+      "size": 3274,
+      "originalSize": {
+        "width": 4961,
+        "height": 3508
+      }
+    },
+    {
+      "pageNumber": 33,
+      "filename": "page-33.webp",
+      "originalImage": "page 33.png",
+      "width": 100,
+      "height": 150,
+      "size": 2784,
+      "originalSize": {
+        "width": 4961,
+        "height": 3508
+      }
+    },
+    {
+      "pageNumber": 34,
+      "filename": "page-34.webp",
+      "originalImage": "page 34.png",
+      "width": 100,
+      "height": 150,
+      "size": 2878,
+      "originalSize": {
+        "width": 4961,
+        "height": 3508
+      }
+    },
+    {
+      "pageNumber": 35,
+      "filename": "page-35.webp",
+      "originalImage": "page 35.png",
+      "width": 100,
+      "height": 150,
+      "size": 2810,
+      "originalSize": {
+        "width": 4961,
+        "height": 3508
+      }
+    },
+    {
+      "pageNumber": 36,
+      "filename": "page-36.webp",
+      "originalImage": "page 36.png",
+      "width": 100,
+      "height": 150,
+      "size": 2998,
+      "originalSize": {
+        "width": 4961,
+        "height": 3508
+      }
+    }
+  ]
+}

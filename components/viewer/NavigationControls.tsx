@@ -223,7 +223,16 @@ export default function NavigationControls({
                   color: CLAUGER_COLORS.tooltip.text,
                 }}
               >
-                <p>Rechercher ({isMac ? '⌘' : 'Ctrl'}+K)</p>
+                <div className="flex flex-col gap-1">
+                  <p className="font-medium">Rechercher dans le rapport</p>
+                  <div className="flex items-center gap-2 text-xs opacity-90">
+                    <kbd className="px-1.5 py-0.5 rounded bg-white/10">
+                      {isMac ? '⌘' : 'Ctrl'}+K
+                    </kbd>
+                    <span>ou</span>
+                    <kbd className="px-1.5 py-0.5 rounded bg-white/10">/</kbd>
+                  </div>
+                </div>
               </TooltipContent>
             </Tooltip>
           )}

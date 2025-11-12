@@ -15,6 +15,8 @@
     "test:e2e:headed": "playwright test --headed",
     "optimize-images": "node scripts/optimize-images.js",
     "extract-text": "node scripts/extract-text.js",
+    "reprocess-ocr": "node scripts/reprocess-ocr.js",
+    "generate-thumbnails": "node scripts/generate-thumbnails.js",
     "analyze": "ANALYZE=true next build"
   },
   "dependencies": {

@@ -28,7 +28,7 @@ export interface SearchResult {
   snippet: string
   score: number
   confidence: number
-  highlightedSnippet?: string
+  highlightedSnippet: string
 }
 
 export interface SearchOptions {

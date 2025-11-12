@@ -3,7 +3,7 @@ import { Inter, Montserrat } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme/ThemeProvider"
 import { SkipLink } from "@/components/a11y/SkipLink"
-import { SearchModal } from "@/components/search/SearchModal"
+import { SearchModalWithSuspense } from "@/components/search/SearchModalWithSuspense"
 import { Toaster } from "sonner"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Analytics } from "@vercel/analytics/react"
@@ -94,7 +94,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <SearchModal />
+          <SearchModalWithSuspense />
           {children}
           <Toaster
             position="top-right"
