@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useState, useRef } from "react"
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import Image from "next/image"
 import { useSwipeable } from "react-swipeable"
@@ -29,6 +29,7 @@ export default function ReportViewer({ initialPage }: ReportViewerProps) {
   const [focusModeOpen, setFocusModeOpen] = useState(false)
   const [zoomLevel, setZoomLevel] = useState<ZoomLevel>(100)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const hasShownResumeToast = useRef(false)
 
   const pageParam = searchParams.get("page")
   const result = reportPageSchema.safeParse({ page: pageParam || String(initialPage) })
@@ -52,7 +53,7 @@ export default function ReportViewer({ initialPage }: ReportViewerProps) {
   )
 
   useEffect(() => {
-    if (savedState) {
+    if (savedState && !hasShownResumeToast.current) {
       setZoomLevel(savedState.zoomLevel)
       setSidebarCollapsed(savedState.sidebarCollapsed)
       if (savedState.lastPage > 1 && savedState.lastPage !== currentPage) {
@@ -64,8 +65,9 @@ export default function ReportViewer({ initialPage }: ReportViewerProps) {
           },
         })
       }
+      hasShownResumeToast.current = true
     }
-  }, [savedState, currentPage, goToPage])
+  }, [savedState])
 
   useEffect(() => {
     saveState(currentPage, zoomLevel, sidebarCollapsed)
