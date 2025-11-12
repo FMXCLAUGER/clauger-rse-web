@@ -2,6 +2,7 @@ import { streamText } from 'ai'
 import { anthropic } from '@ai-sdk/anthropic'
 import { ContextBuilder } from '@/lib/ai/context-builder'
 import { buildSystemMessageWithCaching } from '@/lib/ai/prompts'
+import { getThinkingConfig } from '@/lib/ai/thinking-mode'
 
 // Configuration Node.js Runtime (nécessaire pour fs/path)
 // export const runtime = 'edge' // ❌ Incompatible avec fs
@@ -65,18 +66,46 @@ export async function POST(req: Request) {
     // 5. Construire le message système avec prompt caching
     const systemMessages = buildSystemMessageWithCaching(context.systemContext)
 
+    // 5.5. Déterminer si Extended Thinking est nécessaire
+    const thinkingConfig = getThinkingConfig(userQuery)
+    if (thinkingConfig.enabled) {
+      console.log('[Chat API] Extended Thinking activé:', {
+        budget: thinkingConfig.budget_tokens
+      })
+    }
+
     // 6. Appeler Claude avec streaming et prompt caching
     const result = await streamText({
       model: anthropic('claude-sonnet-4-5-20250929'),
       system: systemMessages,
       messages: messages,
-      maxTokens: 2048,
-      temperature: 0.3, // Réponses plus factuelles
-      // Options avancées
-      onFinish: async ({ text, usage }) => {
+      maxTokens: thinkingConfig.enabled ? 4096 : 2048,
+      temperature: 0.3,
+      experimental_providerMetadata: {
+        anthropic: {
+          ...(thinkingConfig.enabled && {
+            thinking: {
+              type: 'enabled',
+              budget_tokens: thinkingConfig.budget_tokens
+            }
+          }),
+          cacheControl: {
+            type: 'ephemeral'
+          }
+        }
+      },
+      onFinish: async ({ text, usage, experimental_providerMetadata }) => {
+        const cacheMetrics = experimental_providerMetadata?.anthropic || {}
+        const cacheReadTokens = typeof cacheMetrics.cacheReadInputTokens === 'number'
+          ? cacheMetrics.cacheReadInputTokens
+          : 0
         console.log('[Chat API] Réponse générée:', {
           textLength: text.length,
-          usage: usage
+          usage: usage,
+          thinkingUsed: thinkingConfig.enabled,
+          cacheHit: cacheReadTokens > 0,
+          cacheReadTokens,
+          cacheCreationTokens: cacheMetrics.cacheCreationInputTokens
         })
       }
     })

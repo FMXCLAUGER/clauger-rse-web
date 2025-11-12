@@ -61,7 +61,7 @@ export function ChatbotModal({ isOpen, onClose }: ChatbotModalProps) {
   }, [isOpen, onClose])
 
   // Gestion de l'envoi du message
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (input.trim() && !isLoading) {
       handleSubmit(e)

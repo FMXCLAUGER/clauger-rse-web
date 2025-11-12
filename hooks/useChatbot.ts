@@ -4,6 +4,7 @@ import { useChat } from 'ai/react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { WELCOME_MESSAGE } from '@/lib/ai/prompts'
+import { chatRateLimiter } from '@/lib/ai/rate-limiter'
 
 interface UseChatbotOptions {
   currentPage?: number
@@ -90,8 +91,33 @@ export function useChatbot(options: UseChatbotOptions = {}) {
     }
   }
 
+  // Wrapper pour handleSubmit avec rate limiting
+  const handleSubmitWithRateLimit = async (e?: React.FormEvent<HTMLFormElement>) => {
+    e?.preventDefault()
+
+    const rateLimitResult = await chatRateLimiter.checkAndConsume()
+
+    if (!rateLimitResult.allowed) {
+      toast.error('Trop de requêtes', {
+        description: `Veuillez patienter ${rateLimitResult.retryAfter}s avant de réessayer.`
+      })
+      return
+    }
+
+    chat.handleSubmit(e)
+  }
+
   // Fonction pour envoyer une question suggérée
-  const sendSuggestedQuestion = (question: string) => {
+  const sendSuggestedQuestion = async (question: string) => {
+    const rateLimitResult = await chatRateLimiter.checkAndConsume()
+
+    if (!rateLimitResult.allowed) {
+      toast.error('Trop de requêtes', {
+        description: `Veuillez patienter ${rateLimitResult.retryAfter}s avant de réessayer.`
+      })
+      return
+    }
+
     chat.setInput(question)
     // Petit délai pour que l'input soit mis à jour
     setTimeout(() => {
@@ -120,6 +146,9 @@ export function useChatbot(options: UseChatbotOptions = {}) {
   return {
     // Props du useChat original
     ...chat,
+
+    // Remplacer handleSubmit par la version avec rate limiting
+    handleSubmit: handleSubmitWithRateLimit,
 
     // Fonctions personnalisées
     sendSuggestedQuestion,

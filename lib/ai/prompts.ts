@@ -177,8 +177,7 @@ Réponds maintenant aux questions de l'utilisateur en te basant sur ce contexte.
 
 /**
  * Helper pour construire le message système avec prompt caching
- * Note: AI SDK v4 ne supporte pas le prompt caching (fonctionnalité v5)
- * Cette fonction retourne maintenant un simple string pour compatibilité v4
+ * Pour AI SDK v4, on retourne juste la string et on passe le caching via experimental_providerMetadata au top level
  */
 export function buildSystemMessageWithCaching(rseContext: string): string {
   return `${SYSTEM_PROMPT}
