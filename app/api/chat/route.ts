@@ -76,8 +76,7 @@ export async function POST(req: Request) {
       onFinish: async ({ text, usage }) => {
         console.log('[Chat API] Réponse générée:', {
           textLength: text.length,
-          usage: usage,
-          cacheHit: usage?.cacheReadInputTokens ? 'Oui' : 'Non'
+          usage: usage
         })
       }
     })

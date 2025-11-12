@@ -105,7 +105,7 @@ export class RSEContextParser {
 
     // Regex pour capturer les sections de niveau 1 (## titre)
     const sectionRegex = /^##\s+([IVXLCDM]+\.\s+.+?)$/gm
-    const matches = [...content.matchAll(sectionRegex)]
+    const matches = Array.from(content.matchAll(sectionRegex))
 
     for (let i = 0; i < matches.length; i++) {
       const match = matches[i]
@@ -136,7 +136,7 @@ export class RSEContextParser {
 
     // Regex pour capturer les sous-sections (###)
     const subsectionRegex = /^###\s+(.+?)$/gm
-    const matches = [...sectionContent.matchAll(subsectionRegex)]
+    const matches = Array.from(sectionContent.matchAll(subsectionRegex))
 
     for (let i = 0; i < matches.length; i++) {
       const match = matches[i]
@@ -170,7 +170,7 @@ export class RSEContextParser {
 
     // Recherche de tous les patterns de notation
     const scoreRegex = /\*\*Note\s*:\s*(\d+(?:[.,]\d+)?)\s*\/\s*10\*\*/g
-    const subsectionTitles = [...content.matchAll(/^###\s+(.+?)$/gm)]
+    const subsectionTitles = Array.from(content.matchAll(/^###\s+(.+?)$/gm))
 
     let match
     let scoreIndex = 0

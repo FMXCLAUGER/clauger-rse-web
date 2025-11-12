@@ -221,7 +221,7 @@ export class ContextBuilder {
       .split(/\s+/)
       .filter(word => word.length > 3 && !stopWords.includes(word))
 
-    return [...new Set(words)] // Dédupliquation
+    return Array.from(new Set(words)) // Dédupliquation
   }
 
   /**
@@ -262,7 +262,8 @@ export class ContextBuilder {
           failed: 0,
           language: 'fra',
           avgConfidence: 0,
-          processingTime: 0
+          processingTime: 0,
+          timestamp: new Date().toISOString()
         },
         pages: []
       }

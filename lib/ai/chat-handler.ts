@@ -39,7 +39,7 @@ export function extractPageReferences(content: string): number[] {
   }
 
   // Dédupliquation et tri
-  return [...new Set(pages)].sort((a, b) => a - b)
+  return Array.from(new Set(pages)).sort((a, b) => a - b)
 }
 
 /**
