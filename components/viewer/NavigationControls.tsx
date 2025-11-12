@@ -1,10 +1,14 @@
 "use client"
 
-import { ChevronLeft, ChevronRight, Home, Search, ZoomIn, Maximize2, FileDown } from "lucide-react"
+import { ChevronLeft, ChevronRight, Home, Search, ZoomIn, Maximize2, FileDown, Focus } from "lucide-react"
 import Link from "next/link"
 import { useState, useEffect } from "react"
 import { ThemeToggle } from "@/components/theme/ThemeToggle"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { CLAUGER_COLORS } from "@/lib/design/clauger-colors"
+import { ZoomControls } from "./ZoomControls"
+
+import type { ZoomLevel } from "@/lib/design/clauger-colors"
 
 interface NavigationControlsProps {
   currentPage: number
@@ -14,6 +18,10 @@ interface NavigationControlsProps {
   onZoom?: () => void
   onDownloadPDF?: () => void
   onSearch?: () => void
+  zoomLevel?: ZoomLevel
+  onZoomIn?: () => void
+  onZoomOut?: () => void
+  onToggleFocus?: () => void
 }
 
 export default function NavigationControls({
@@ -24,6 +32,10 @@ export default function NavigationControls({
   onZoom,
   onDownloadPDF,
   onSearch,
+  zoomLevel,
+  onZoomIn,
+  onZoomOut,
+  onToggleFocus,
 }: NavigationControlsProps) {
   const progress = (currentPage / totalPages) * 100
   const [isMac, setIsMac] = useState(false)
@@ -37,7 +49,14 @@ export default function NavigationControls({
       <header
         role="navigation"
         aria-label="Navigation du rapport"
-        className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-3 md:px-4 py-3 flex flex-wrap items-center justify-between gap-3 shadow-sm"
+        className="sticky top-0 z-40 px-3 md:px-4 py-3 flex flex-wrap items-center justify-between gap-3 border-b"
+        style={{
+          background: CLAUGER_COLORS.navigation.headerBg,
+          backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
+          borderColor: CLAUGER_COLORS.navigation.headerBorder,
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
+        }}
       >
         {/* Ligne 1: Navigation principale */}
         <div className="flex items-center gap-2 md:gap-4 flex-1">
@@ -45,13 +64,29 @@ export default function NavigationControls({
             <TooltipTrigger asChild>
               <Link
                 href="/"
-                className="flex items-center gap-2 text-primary dark:text-primary/90 hover:text-primary/80 dark:hover:text-primary/70 transition-colors min-w-[48px] min-h-[48px] p-3"
+                className="flex items-center gap-2 rounded-lg transition-all w-10 h-10 justify-center md:w-auto md:px-3"
+                style={{ color: CLAUGER_COLORS.navigation.buttonColor }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = CLAUGER_COLORS.navigation.buttonBgHover
+                  e.currentTarget.style.color = CLAUGER_COLORS.navigation.buttonColorHover
+                  e.currentTarget.style.transform = 'scale(1.1)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent'
+                  e.currentTarget.style.color = CLAUGER_COLORS.navigation.buttonColor
+                  e.currentTarget.style.transform = 'scale(1)'
+                }}
               >
-                <Home className="w-6 h-6" />
+                <Home className="w-5 h-5" />
                 <span className="hidden md:inline text-sm font-medium">Accueil</span>
               </Link>
             </TooltipTrigger>
-            <TooltipContent>
+            <TooltipContent
+              style={{
+                backgroundColor: CLAUGER_COLORS.tooltip.background,
+                color: CLAUGER_COLORS.tooltip.text,
+              }}
+            >
               <p>Retour à la page d'accueil</p>
             </TooltipContent>
           </Tooltip>
@@ -64,13 +99,36 @@ export default function NavigationControls({
                 <button
                   onClick={onPrev}
                   disabled={currentPage === 1}
-                  className="p-4 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors min-w-[48px] min-h-[48px] flex items-center justify-center"
+                  className="w-10 h-10 rounded-lg transition-all flex items-center justify-center disabled:cursor-not-allowed"
+                  style={{
+                    color: CLAUGER_COLORS.navigation.buttonColor,
+                    opacity: currentPage === 1 ? 0.3 : 1,
+                  }}
+                  onMouseEnter={(e) => {
+                    if (currentPage !== 1) {
+                      e.currentTarget.style.backgroundColor = CLAUGER_COLORS.navigation.buttonBgHover
+                      e.currentTarget.style.color = CLAUGER_COLORS.navigation.buttonColorHover
+                      e.currentTarget.style.transform = 'scale(1.1)'
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (currentPage !== 1) {
+                      e.currentTarget.style.backgroundColor = 'transparent'
+                      e.currentTarget.style.color = CLAUGER_COLORS.navigation.buttonColor
+                      e.currentTarget.style.transform = 'scale(1)'
+                    }
+                  }}
                   aria-label="Page précédente"
                 >
-                  <ChevronLeft className="w-6 h-6 text-gray-700 dark:text-gray-200" />
+                  <ChevronLeft className="w-5 h-5" />
                 </button>
               </TooltipTrigger>
-              <TooltipContent>
+              <TooltipContent
+                style={{
+                  backgroundColor: CLAUGER_COLORS.tooltip.background,
+                  color: CLAUGER_COLORS.tooltip.text,
+                }}
+              >
                 <p>Page précédente (←)</p>
               </TooltipContent>
             </Tooltip>
@@ -85,13 +143,36 @@ export default function NavigationControls({
                 <button
                   onClick={onNext}
                   disabled={currentPage === totalPages}
-                  className="p-4 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors min-w-[48px] min-h-[48px] flex items-center justify-center"
+                  className="w-10 h-10 rounded-lg transition-all flex items-center justify-center disabled:cursor-not-allowed"
+                  style={{
+                    color: CLAUGER_COLORS.navigation.buttonColor,
+                    opacity: currentPage === totalPages ? 0.3 : 1,
+                  }}
+                  onMouseEnter={(e) => {
+                    if (currentPage !== totalPages) {
+                      e.currentTarget.style.backgroundColor = CLAUGER_COLORS.navigation.buttonBgHover
+                      e.currentTarget.style.color = CLAUGER_COLORS.navigation.buttonColorHover
+                      e.currentTarget.style.transform = 'scale(1.1)'
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (currentPage !== totalPages) {
+                      e.currentTarget.style.backgroundColor = 'transparent'
+                      e.currentTarget.style.color = CLAUGER_COLORS.navigation.buttonColor
+                      e.currentTarget.style.transform = 'scale(1)'
+                    }
+                  }}
                   aria-label="Page suivante"
                 >
-                  <ChevronRight className="w-6 h-6 text-gray-700 dark:text-gray-200" />
+                  <ChevronRight className="w-5 h-5" />
                 </button>
               </TooltipTrigger>
-              <TooltipContent>
+              <TooltipContent
+                style={{
+                  backgroundColor: CLAUGER_COLORS.tooltip.background,
+                  color: CLAUGER_COLORS.tooltip.text,
+                }}
+              >
                 <p>Page suivante (→)</p>
               </TooltipContent>
             </Tooltip>
@@ -106,20 +187,42 @@ export default function NavigationControls({
               <TooltipTrigger asChild>
                 <button
                   onClick={onSearch}
-                  className="flex items-center gap-2 px-4 py-4 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors min-w-[48px] min-h-[48px]"
+                  className="flex items-center gap-2 rounded-lg transition-all w-10 h-10 justify-center lg:w-auto lg:px-3"
+                  style={{ color: CLAUGER_COLORS.navigation.buttonColor }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = CLAUGER_COLORS.navigation.buttonBgHover
+                    e.currentTarget.style.color = CLAUGER_COLORS.navigation.buttonColorHover
+                    e.currentTarget.style.transform = 'scale(1.1)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent'
+                    e.currentTarget.style.color = CLAUGER_COLORS.navigation.buttonColor
+                    e.currentTarget.style.transform = 'scale(1)'
+                  }}
                   aria-label="Rechercher dans le rapport"
                   aria-keyshortcuts="Control+K Meta+K"
                 >
-                  <Search className="w-5 h-5 text-gray-600 dark:text-gray-300" />
-                  <span className="hidden lg:inline text-sm text-gray-600 dark:text-gray-300">
+                  <Search className="w-5 h-5" />
+                  <span className="hidden lg:inline text-sm">
                     Rechercher
                   </span>
-                  <kbd className="hidden lg:inline-flex items-center gap-0.5 px-2 py-1 text-xs font-mono bg-gray-200 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded">
+                  <kbd
+                    className="hidden lg:inline-flex items-center gap-0.5 px-2 py-1 text-xs font-mono rounded"
+                    style={{
+                      backgroundColor: CLAUGER_COLORS.tooltip.kbdBackground,
+                      color: CLAUGER_COLORS.tooltip.kbdText,
+                    }}
+                  >
                     {isMac ? '⌘' : 'Ctrl'}K
                   </kbd>
                 </button>
               </TooltipTrigger>
-              <TooltipContent>
+              <TooltipContent
+                style={{
+                  backgroundColor: CLAUGER_COLORS.tooltip.background,
+                  color: CLAUGER_COLORS.tooltip.text,
+                }}
+              >
                 <p>Rechercher ({isMac ? '⌘' : 'Ctrl'}+K)</p>
               </TooltipContent>
             </Tooltip>
@@ -131,32 +234,107 @@ export default function NavigationControls({
               <TooltipTrigger asChild>
                 <button
                   onClick={onDownloadPDF}
-                  className="p-4 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors min-w-[48px] min-h-[48px] flex items-center justify-center"
+                  className="w-10 h-10 rounded-lg transition-all flex items-center justify-center"
+                  style={{ color: CLAUGER_COLORS.navigation.buttonColor }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = CLAUGER_COLORS.navigation.buttonBgHover
+                    e.currentTarget.style.color = CLAUGER_COLORS.navigation.buttonColorHover
+                    e.currentTarget.style.transform = 'scale(1.1)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent'
+                    e.currentTarget.style.color = CLAUGER_COLORS.navigation.buttonColor
+                    e.currentTarget.style.transform = 'scale(1)'
+                  }}
                   aria-label="Télécharger en PDF"
                 >
-                  <FileDown className="w-5 h-5 text-gray-700 dark:text-gray-200" />
+                  <FileDown className="w-5 h-5" />
                 </button>
               </TooltipTrigger>
-              <TooltipContent>
+              <TooltipContent
+                style={{
+                  backgroundColor: CLAUGER_COLORS.tooltip.background,
+                  color: CLAUGER_COLORS.tooltip.text,
+                }}
+              >
                 <p>Télécharger en PDF</p>
               </TooltipContent>
             </Tooltip>
           )}
 
-          {/* Zoom - Visible sur mobile */}
+          {/* Zoom Controls */}
+          {zoomLevel !== undefined && onZoomIn && onZoomOut && (
+            <ZoomControls
+              zoomLevel={zoomLevel}
+              onZoomIn={onZoomIn}
+              onZoomOut={onZoomOut}
+            />
+          )}
+
+          {/* Lightbox Zoom - Visible sur mobile */}
           {onZoom && (
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
                   onClick={onZoom}
-                  className="p-4 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors min-w-[48px] min-h-[48px] flex items-center justify-center"
-                  aria-label="Agrandir l'image"
+                  className="w-10 h-10 rounded-lg transition-all flex items-center justify-center"
+                  style={{ color: CLAUGER_COLORS.navigation.buttonColor }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = CLAUGER_COLORS.navigation.buttonBgHover
+                    e.currentTarget.style.color = CLAUGER_COLORS.navigation.buttonColorHover
+                    e.currentTarget.style.transform = 'scale(1.1)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent'
+                    e.currentTarget.style.color = CLAUGER_COLORS.navigation.buttonColor
+                    e.currentTarget.style.transform = 'scale(1)'
+                  }}
+                  aria-label="Ouvrir le zoom lightbox"
                 >
-                  <ZoomIn className="w-5 h-5 text-gray-700 dark:text-gray-200" />
+                  <ZoomIn className="w-5 h-5" />
                 </button>
               </TooltipTrigger>
-              <TooltipContent>
-                <p>Agrandir l'image</p>
+              <TooltipContent
+                style={{
+                  backgroundColor: CLAUGER_COLORS.tooltip.background,
+                  color: CLAUGER_COLORS.tooltip.text,
+                }}
+              >
+                <p>Zoom détaillé</p>
+              </TooltipContent>
+            </Tooltip>
+          )}
+
+          {/* Mode Focus */}
+          {onToggleFocus && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={onToggleFocus}
+                  className="w-10 h-10 rounded-lg transition-all flex items-center justify-center"
+                  style={{ color: CLAUGER_COLORS.navigation.buttonColor }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = CLAUGER_COLORS.navigation.buttonBgHover
+                    e.currentTarget.style.color = CLAUGER_COLORS.navigation.buttonColorHover
+                    e.currentTarget.style.transform = 'scale(1.1)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent'
+                    e.currentTarget.style.color = CLAUGER_COLORS.navigation.buttonColor
+                    e.currentTarget.style.transform = 'scale(1)'
+                  }}
+                  aria-label="Mode focus"
+                >
+                  <Focus className="w-5 h-5" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent
+                style={{
+                  backgroundColor: CLAUGER_COLORS.tooltip.background,
+                  color: CLAUGER_COLORS.tooltip.text,
+                }}
+              >
+                <p>Mode focus (F)</p>
               </TooltipContent>
             </Tooltip>
           )}
@@ -166,13 +344,29 @@ export default function NavigationControls({
             <TooltipTrigger asChild>
               <button
                 onClick={() => document.documentElement.requestFullscreen()}
-                className="p-4 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors min-w-[48px] min-h-[48px] hidden sm:flex items-center justify-center"
+                className="w-10 h-10 rounded-lg transition-all hidden sm:flex items-center justify-center"
+                style={{ color: CLAUGER_COLORS.navigation.buttonColor }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = CLAUGER_COLORS.navigation.buttonBgHover
+                  e.currentTarget.style.color = CLAUGER_COLORS.navigation.buttonColorHover
+                  e.currentTarget.style.transform = 'scale(1.1)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent'
+                  e.currentTarget.style.color = CLAUGER_COLORS.navigation.buttonColor
+                  e.currentTarget.style.transform = 'scale(1)'
+                }}
                 aria-label="Plein écran"
               >
-                <Maximize2 className="w-5 h-5 text-gray-700 dark:text-gray-200" />
+                <Maximize2 className="w-5 h-5" />
               </button>
             </TooltipTrigger>
-            <TooltipContent>
+            <TooltipContent
+              style={{
+                backgroundColor: CLAUGER_COLORS.tooltip.background,
+                color: CLAUGER_COLORS.tooltip.text,
+              }}
+            >
               <p>Mode plein écran (F11)</p>
             </TooltipContent>
           </Tooltip>
@@ -182,10 +376,16 @@ export default function NavigationControls({
 
         {/* Barre de progression - Desktop uniquement */}
         <div className="hidden lg:block w-full mt-2">
-          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+          <div
+            className="w-full rounded-full h-2 overflow-hidden"
+            style={{ backgroundColor: CLAUGER_COLORS.progress.background }}
+          >
             <div
-              className="bg-primary dark:bg-primary/90 h-full transition-all duration-300"
-              style={{ width: `${progress}%` }}
+              className="h-full transition-all duration-300"
+              style={{
+                width: `${progress}%`,
+                backgroundColor: CLAUGER_COLORS.progress.fill,
+              }}
               role="progressbar"
               aria-valuenow={currentPage}
               aria-valuemin={1}

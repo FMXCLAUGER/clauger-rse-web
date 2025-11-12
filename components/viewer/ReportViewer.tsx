@@ -10,7 +10,10 @@ import NavigationControls from "./NavigationControls"
 import ThumbnailSidebar from "./ThumbnailSidebar"
 import ImageLightbox from "@/components/lightbox/ImageLightbox"
 import { PageSelectionModal } from "@/components/export/PageSelectionModal"
+import { FocusMode } from "./FocusMode"
 import { useKeyboardNavigation } from "@/hooks/useKeyboardNavigation"
+import { useReadingState } from "@/hooks/useReadingState"
+import { ZOOM_LEVELS, type ZoomLevel } from "@/lib/design/clauger-colors"
 import { toast } from "sonner"
 
 interface ReportViewerProps {
@@ -23,6 +26,9 @@ export default function ReportViewer({ initialPage }: ReportViewerProps) {
   const searchParams = useSearchParams()
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [pdfModalOpen, setPdfModalOpen] = useState(false)
+  const [focusModeOpen, setFocusModeOpen] = useState(false)
+  const [zoomLevel, setZoomLevel] = useState<ZoomLevel>(100)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
   const pageParam = searchParams.get("page")
   const result = reportPageSchema.safeParse({ page: pageParam || String(initialPage) })
@@ -39,6 +45,32 @@ export default function ReportViewer({ initialPage }: ReportViewerProps) {
     [pathname, router, searchParams]
   )
 
+  const { savedState, saveState, hasResumePoint } = useReadingState(
+    currentPage,
+    zoomLevel,
+    sidebarCollapsed
+  )
+
+  useEffect(() => {
+    if (savedState) {
+      setZoomLevel(savedState.zoomLevel)
+      setSidebarCollapsed(savedState.sidebarCollapsed)
+      if (savedState.lastPage > 1 && savedState.lastPage !== currentPage) {
+        toast.info(`Reprendre à la page ${savedState.lastPage}`, {
+          duration: 5000,
+          action: {
+            label: 'Reprendre',
+            onClick: () => goToPage(savedState.lastPage),
+          },
+        })
+      }
+    }
+  }, [savedState, currentPage, goToPage])
+
+  useEffect(() => {
+    saveState(currentPage, zoomLevel, sidebarCollapsed)
+  }, [currentPage, zoomLevel, sidebarCollapsed, saveState])
+
   const nextPage = useCallback(() => {
     if (currentPage < TOTAL_PAGES) goToPage(currentPage + 1)
   }, [currentPage, goToPage])
@@ -47,7 +79,37 @@ export default function ReportViewer({ initialPage }: ReportViewerProps) {
     if (currentPage > 1) goToPage(currentPage - 1)
   }, [currentPage, goToPage])
 
-  useKeyboardNavigation(prevPage, nextPage)
+  const zoomIn = useCallback(() => {
+    const currentIndex = ZOOM_LEVELS.indexOf(zoomLevel)
+    if (currentIndex < ZOOM_LEVELS.length - 1) {
+      setZoomLevel(ZOOM_LEVELS[currentIndex + 1])
+    }
+  }, [zoomLevel])
+
+  const zoomOut = useCallback(() => {
+    const currentIndex = ZOOM_LEVELS.indexOf(zoomLevel)
+    if (currentIndex > 0) {
+      setZoomLevel(ZOOM_LEVELS[currentIndex - 1])
+    }
+  }, [zoomLevel])
+
+  const zoomReset = useCallback(() => {
+    setZoomLevel(100)
+  }, [])
+
+  const toggleFocusMode = useCallback(() => {
+    setFocusModeOpen((prev) => !prev)
+  }, [])
+
+  useKeyboardNavigation({
+    onPrev: prevPage,
+    onNext: nextPage,
+    onZoomIn: zoomIn,
+    onZoomOut: zoomOut,
+    onZoomReset: zoomReset,
+    onToggleFocus: toggleFocusMode,
+    enabled: !focusModeOpen,
+  })
 
   const swipeHandlers = useSwipeable({
     onSwipedLeft: () => {
@@ -105,6 +167,7 @@ export default function ReportViewer({ initialPage }: ReportViewerProps) {
         pages={PAGES}
         currentPage={currentPage}
         onSelectPage={goToPage}
+        resumePageId={savedState?.lastPage}
       />
 
       <div className="flex-1 flex flex-col">
@@ -124,6 +187,10 @@ export default function ReportViewer({ initialPage }: ReportViewerProps) {
             })
             document.dispatchEvent(event)
           }}
+          zoomLevel={zoomLevel}
+          onZoomIn={zoomIn}
+          onZoomOut={zoomOut}
+          onToggleFocus={toggleFocusMode}
         />
 
         <main id="main-content" className="flex-1 relative bg-gray-200 dark:bg-gray-900 p-4 md:p-8 overflow-auto">
@@ -132,7 +199,10 @@ export default function ReportViewer({ initialPage }: ReportViewerProps) {
           </div>
 
           <div {...swipeHandlers} className="relative w-full h-full flex items-center justify-center touch-pan-y">
-            <div className="relative max-w-full max-h-full">
+            <div
+              className="relative max-w-full max-h-full transition-transform duration-200"
+              style={{ transform: `scale(${zoomLevel / 100})` }}
+            >
               <button
                 onClick={() => setLightboxOpen(true)}
                 className="relative block transition-transform hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-lg"
@@ -173,6 +243,32 @@ export default function ReportViewer({ initialPage }: ReportViewerProps) {
         onClose={() => setPdfModalOpen(false)}
         currentPage={currentPage}
       />
+
+      <FocusMode
+        isOpen={focusModeOpen}
+        onClose={() => setFocusModeOpen(false)}
+        currentPage={currentPage}
+        totalPages={TOTAL_PAGES}
+        onPrev={prevPage}
+        onNext={nextPage}
+      >
+        <div
+          className="relative max-w-full max-h-full transition-transform duration-200"
+          style={{ transform: `scale(${zoomLevel / 100})` }}
+        >
+          <Image
+            src={currentImage.src}
+            alt={`Page ${currentPage} du rapport RSE Clauger 2025`}
+            width={currentImage.width || 1200}
+            height={currentImage.height || 1600}
+            className="w-auto h-auto max-w-[90vw] max-h-[90vh] object-contain shadow-2xl"
+            priority
+            quality={90}
+            placeholder={currentImage.blurDataURL ? "blur" : "empty"}
+            blurDataURL={currentImage.blurDataURL}
+          />
+        </div>
+      </FocusMode>
     </div>
   )
 }

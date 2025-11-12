@@ -17,7 +17,7 @@ describe('useKeyboardNavigation', () => {
 
   describe('basic functionality', () => {
     it('should call onPrev when ArrowLeft is pressed', () => {
-      renderHook(() => useKeyboardNavigation(onPrev, onNext))
+      renderHook(() => useKeyboardNavigation({ onPrev, onNext }))
 
       const event = createKeyboardEvent('ArrowLeft')
       window.dispatchEvent(event)
@@ -27,7 +27,7 @@ describe('useKeyboardNavigation', () => {
     })
 
     it('should call onNext when ArrowRight is pressed', () => {
-      renderHook(() => useKeyboardNavigation(onPrev, onNext))
+      renderHook(() => useKeyboardNavigation({ onPrev, onNext }))
 
       const event = createKeyboardEvent('ArrowRight')
       window.dispatchEvent(event)
@@ -37,7 +37,7 @@ describe('useKeyboardNavigation', () => {
     })
 
     it('should handle multiple ArrowLeft presses', () => {
-      renderHook(() => useKeyboardNavigation(onPrev, onNext))
+      renderHook(() => useKeyboardNavigation({ onPrev, onNext }))
 
       window.dispatchEvent(createKeyboardEvent('ArrowLeft'))
       window.dispatchEvent(createKeyboardEvent('ArrowLeft'))
@@ -47,7 +47,7 @@ describe('useKeyboardNavigation', () => {
     })
 
     it('should handle multiple ArrowRight presses', () => {
-      renderHook(() => useKeyboardNavigation(onPrev, onNext))
+      renderHook(() => useKeyboardNavigation({ onPrev, onNext }))
 
       window.dispatchEvent(createKeyboardEvent('ArrowRight'))
       window.dispatchEvent(createKeyboardEvent('ArrowRight'))
@@ -56,7 +56,7 @@ describe('useKeyboardNavigation', () => {
     })
 
     it('should handle alternating arrow key presses', () => {
-      renderHook(() => useKeyboardNavigation(onPrev, onNext))
+      renderHook(() => useKeyboardNavigation({ onPrev, onNext }))
 
       window.dispatchEvent(createKeyboardEvent('ArrowLeft'))
       window.dispatchEvent(createKeyboardEvent('ArrowRight'))
@@ -67,7 +67,7 @@ describe('useKeyboardNavigation', () => {
     })
 
     it('should prevent default behavior for ArrowLeft', () => {
-      renderHook(() => useKeyboardNavigation(onPrev, onNext))
+      renderHook(() => useKeyboardNavigation({ onPrev, onNext }))
 
       const event = createKeyboardEvent('ArrowLeft')
       const preventDefaultSpy = jest.spyOn(event, 'preventDefault')
@@ -77,7 +77,7 @@ describe('useKeyboardNavigation', () => {
     })
 
     it('should prevent default behavior for ArrowRight', () => {
-      renderHook(() => useKeyboardNavigation(onPrev, onNext))
+      renderHook(() => useKeyboardNavigation({ onPrev, onNext }))
 
       const event = createKeyboardEvent('ArrowRight')
       const preventDefaultSpy = jest.spyOn(event, 'preventDefault')
@@ -89,7 +89,7 @@ describe('useKeyboardNavigation', () => {
 
   describe('enabled/disabled state', () => {
     it('should work when enabled is true (default)', () => {
-      renderHook(() => useKeyboardNavigation(onPrev, onNext, true))
+      renderHook(() => useKeyboardNavigation({ onPrev, onNext, enabled: true }))
 
       window.dispatchEvent(createKeyboardEvent('ArrowLeft'))
 
@@ -97,7 +97,7 @@ describe('useKeyboardNavigation', () => {
     })
 
     it('should work when enabled parameter is omitted', () => {
-      renderHook(() => useKeyboardNavigation(onPrev, onNext))
+      renderHook(() => useKeyboardNavigation({ onPrev, onNext }))
 
       window.dispatchEvent(createKeyboardEvent('ArrowRight'))
 
@@ -105,7 +105,7 @@ describe('useKeyboardNavigation', () => {
     })
 
     it('should not respond to keys when disabled', () => {
-      renderHook(() => useKeyboardNavigation(onPrev, onNext, false))
+      renderHook(() => useKeyboardNavigation({ onPrev, onNext, enabled: false }))
 
       window.dispatchEvent(createKeyboardEvent('ArrowLeft'))
       window.dispatchEvent(createKeyboardEvent('ArrowRight'))
@@ -116,7 +116,7 @@ describe('useKeyboardNavigation', () => {
 
     it('should start working when enabled changes from false to true', () => {
       const { rerender } = renderHook(
-        ({ enabled }) => useKeyboardNavigation(onPrev, onNext, enabled),
+        ({ enabled }) => useKeyboardNavigation({ onPrev, onNext, enabled }),
         { initialProps: { enabled: false } }
       )
 
@@ -131,7 +131,7 @@ describe('useKeyboardNavigation', () => {
 
     it('should stop working when enabled changes from true to false', () => {
       const { rerender } = renderHook(
-        ({ enabled }) => useKeyboardNavigation(onPrev, onNext, enabled),
+        ({ enabled }) => useKeyboardNavigation({ onPrev, onNext, enabled }),
         { initialProps: { enabled: true } }
       )
 
@@ -147,7 +147,7 @@ describe('useKeyboardNavigation', () => {
 
   describe('input element filtering', () => {
     it('should ignore arrow keys when focused on an input element', () => {
-      renderHook(() => useKeyboardNavigation(onPrev, onNext))
+      renderHook(() => useKeyboardNavigation({ onPrev, onNext }))
 
       const input = document.createElement('input')
       document.body.appendChild(input)
@@ -166,7 +166,7 @@ describe('useKeyboardNavigation', () => {
     })
 
     it('should ignore arrow keys when focused on a textarea element', () => {
-      renderHook(() => useKeyboardNavigation(onPrev, onNext))
+      renderHook(() => useKeyboardNavigation({ onPrev, onNext }))
 
       const textarea = document.createElement('textarea')
       document.body.appendChild(textarea)
@@ -185,7 +185,7 @@ describe('useKeyboardNavigation', () => {
     })
 
     it('should respond to arrow keys when focused on other elements', () => {
-      renderHook(() => useKeyboardNavigation(onPrev, onNext))
+      renderHook(() => useKeyboardNavigation({ onPrev, onNext }))
 
       const button = document.createElement('button')
       document.body.appendChild(button)
@@ -206,7 +206,7 @@ describe('useKeyboardNavigation', () => {
 
   describe('other keys', () => {
     it('should not respond to other keys', () => {
-      renderHook(() => useKeyboardNavigation(onPrev, onNext))
+      renderHook(() => useKeyboardNavigation({ onPrev, onNext }))
 
       const keys = ['Enter', 'Space', 'Escape', 'a', 'ArrowUp', 'ArrowDown', 'Tab']
 
@@ -219,7 +219,7 @@ describe('useKeyboardNavigation', () => {
     })
 
     it('should not prevent default for other keys', () => {
-      renderHook(() => useKeyboardNavigation(onPrev, onNext))
+      renderHook(() => useKeyboardNavigation({ onPrev, onNext }))
 
       const event = createKeyboardEvent('Enter')
       const preventDefaultSpy = jest.spyOn(event, 'preventDefault')
@@ -231,7 +231,7 @@ describe('useKeyboardNavigation', () => {
 
   describe('cleanup', () => {
     it('should remove event listener on unmount', () => {
-      const { unmount } = renderHook(() => useKeyboardNavigation(onPrev, onNext))
+      const { unmount } = renderHook(() => useKeyboardNavigation({ onPrev, onNext }))
 
       window.dispatchEvent(createKeyboardEvent('ArrowLeft'))
       expect(onPrev).toHaveBeenCalledTimes(1)
@@ -245,7 +245,7 @@ describe('useKeyboardNavigation', () => {
     it('should clean up and re-add listener when callbacks change', () => {
       const newOnPrev = jest.fn()
       const { rerender } = renderHook(
-        ({ prev }) => useKeyboardNavigation(prev, onNext),
+        ({ prev }) => useKeyboardNavigation({ onPrev: prev, onNext }),
         { initialProps: { prev: onPrev } }
       )
 
@@ -263,7 +263,7 @@ describe('useKeyboardNavigation', () => {
 
   describe('edge cases', () => {
     it('should handle rapid key presses', () => {
-      renderHook(() => useKeyboardNavigation(onPrev, onNext))
+      renderHook(() => useKeyboardNavigation({ onPrev, onNext }))
 
       for (let i = 0; i < 10; i++) {
         window.dispatchEvent(createKeyboardEvent('ArrowLeft'))
@@ -280,7 +280,7 @@ describe('useKeyboardNavigation', () => {
         callCount++
       })
 
-      renderHook(() => useKeyboardNavigation(callbackWithSideEffect, onNext))
+      renderHook(() => useKeyboardNavigation({ onPrev: callbackWithSideEffect, onNext }))
 
       window.dispatchEvent(createKeyboardEvent('ArrowLeft'))
       expect(callbackWithSideEffect).toHaveBeenCalledTimes(1)

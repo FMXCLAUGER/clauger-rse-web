@@ -1,10 +1,24 @@
 import { useEffect } from "react"
 
-export function useKeyboardNavigation(
-  onPrev: () => void,
-  onNext: () => void,
-  enabled = true
-) {
+interface KeyboardNavigationOptions {
+  onPrev?: () => void
+  onNext?: () => void
+  onZoomIn?: () => void
+  onZoomOut?: () => void
+  onZoomReset?: () => void
+  onToggleFocus?: () => void
+  enabled?: boolean
+}
+
+export function useKeyboardNavigation({
+  onPrev,
+  onNext,
+  onZoomIn,
+  onZoomOut,
+  onZoomReset,
+  onToggleFocus,
+  enabled = true,
+}: KeyboardNavigationOptions) {
   useEffect(() => {
     if (!enabled) return
 
@@ -16,16 +30,37 @@ export function useKeyboardNavigation(
       switch (e.key) {
         case "ArrowLeft":
           e.preventDefault()
-          onPrev()
+          onPrev?.()
           break
         case "ArrowRight":
           e.preventDefault()
-          onNext()
+          onNext?.()
+          break
+        case "f":
+        case "F":
+          if (!e.ctrlKey && !e.metaKey) {
+            e.preventDefault()
+            onToggleFocus?.()
+          }
+          break
+        case "+":
+        case "=":
+          e.preventDefault()
+          onZoomIn?.()
+          break
+        case "-":
+        case "_":
+          e.preventDefault()
+          onZoomOut?.()
+          break
+        case "0":
+          e.preventDefault()
+          onZoomReset?.()
           break
       }
     }
 
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [onPrev, onNext, enabled])
+  }, [onPrev, onNext, onZoomIn, onZoomOut, onZoomReset, onToggleFocus, enabled])
 }
