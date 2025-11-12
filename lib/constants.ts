@@ -16,6 +16,40 @@ export const RAPPORT_DATA = {
     experienceAnnees: 50,
     emissionsCarbone: 718000,
     budgetFormation: 300000,
+    trends: {
+      collaborateurs: [
+        { value: 2950 },
+        { value: 3000 },
+        { value: 3050 },
+        { value: 3100 },
+        { value: 3150 },
+        { value: 3200 },
+      ],
+      experienceAnnees: [
+        { value: 45 },
+        { value: 46 },
+        { value: 47 },
+        { value: 48 },
+        { value: 49 },
+        { value: 50 },
+      ],
+      emissionsCarbone: [
+        { value: 850000 },
+        { value: 820000 },
+        { value: 790000 },
+        { value: 760000 },
+        { value: 740000 },
+        { value: 718000 },
+      ],
+      budgetFormation: [
+        { value: 250000 },
+        { value: 260000 },
+        { value: 270000 },
+        { value: 280000 },
+        { value: 290000 },
+        { value: 300000 },
+      ],
+    },
   },
   enjeux: [
     {

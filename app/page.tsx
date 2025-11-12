@@ -5,6 +5,7 @@ import { JsonLd } from "@/components/seo/JsonLd"
 import { getOrganizationSchema, getWebSiteSchema } from "@/lib/jsonld"
 import { EnjeuxSection } from "@/components/enjeux/EnjeuxSection"
 import { HeroSection } from "@/components/hero/HeroSection"
+import { KeyFiguresSection } from "@/components/KeyFiguresSection"
 
 export default function HomePage() {
   const heroImage = PAGES[0]
@@ -30,35 +31,7 @@ export default function HomePage() {
             Notre engagement en chiffres
           </p>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 text-center shadow-lg hover:shadow-xl transition-shadow">
-              <div className="text-4xl font-bold text-primary dark:text-primary/90 mb-2">
-                {RAPPORT_DATA.kpis.collaborateurs.toLocaleString()}+
-              </div>
-              <div className="text-sm text-gray-600 dark:text-gray-300">Collaborateurs</div>
-            </div>
-
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 text-center shadow-lg hover:shadow-xl transition-shadow">
-              <div className="text-4xl font-bold text-primary dark:text-primary/90 mb-2">
-                {RAPPORT_DATA.kpis.experienceAnnees}+
-              </div>
-              <div className="text-sm text-gray-600 dark:text-gray-300">Années d&apos;expérience</div>
-            </div>
-
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 text-center shadow-lg hover:shadow-xl transition-shadow">
-              <div className="text-4xl font-bold text-primary dark:text-primary/90 mb-2">
-                {(RAPPORT_DATA.kpis.emissionsCarbone / 1000).toFixed(0)}k
-              </div>
-              <div className="text-sm text-gray-600 dark:text-gray-300">teqCO₂ (Bilan carbone)</div>
-            </div>
-
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 text-center shadow-lg hover:shadow-xl transition-shadow">
-              <div className="text-4xl font-bold text-primary dark:text-primary/90 mb-2">
-                {(RAPPORT_DATA.kpis.budgetFormation / 1000).toFixed(0)}k€
-              </div>
-              <div className="text-sm text-gray-600 dark:text-gray-300">Budget formation</div>
-            </div>
-          </div>
+          <KeyFiguresSection kpis={RAPPORT_DATA.kpis} />
         </div>
       </section>
 
