@@ -29,7 +29,7 @@ export function KeyFiguresSection({ kpis }: KeyFiguresSectionProps) {
           unit="+"
           delay={0}
           sparklineData={kpis.trends.collaborateurs}
-          formatter={(val) => val.toLocaleString()}
+          formatter={(val) => val.toLocaleString('fr-FR')}
         />
       </div>
 

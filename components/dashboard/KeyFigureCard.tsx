@@ -27,7 +27,7 @@ export function KeyFigureCard({
   unit,
   delay = 0,
   sparklineData,
-  formatter = (val) => val.toLocaleString(),
+  formatter = (val) => val.toLocaleString('fr-FR'),
   trend,
 }: KeyFigureCardProps) {
   const { ref, isVisible } = useIntersectionObserver({ threshold: 0.2 })

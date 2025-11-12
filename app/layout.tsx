@@ -4,6 +4,7 @@ import "./globals.css"
 import { ThemeProvider } from "@/components/theme/ThemeProvider"
 import { SkipLink } from "@/components/a11y/SkipLink"
 import { SearchModalWithSuspense } from "@/components/search/SearchModalWithSuspense"
+import { ChatbotWithSuspense } from "@/components/chatbot/ChatbotWithSuspense"
 import { Toaster } from "sonner"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Analytics } from "@vercel/analytics/react"
@@ -95,6 +96,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <SearchModalWithSuspense />
+          <ChatbotWithSuspense />
           {children}
           <Toaster
             position="top-right"
