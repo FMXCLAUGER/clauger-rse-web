@@ -4,6 +4,7 @@ import jsPDF from "jspdf"
 import html2canvas from "html2canvas"
 import Papa from "papaparse"
 import { environmentData, socialData, governanceData } from "@/lib/data/rse-data"
+import { PAGES } from "@/lib/constants"
 
 // Export dashboard as PDF
 export async function exportDashboardPDF(dashboardId: string, dashboardName: string) {
@@ -118,4 +119,94 @@ export function exportAllDataCSV() {
   document.body.appendChild(link)
   link.click()
   document.body.removeChild(link)
+}
+
+export async function exportReportPagesPDF(selectedPages: number[], filename?: string) {
+  if (selectedPages.length === 0) {
+    throw new Error("Aucune page sélectionnée")
+  }
+
+  selectedPages.sort((a, b) => a - b)
+
+  let pdf: jsPDF
+
+  for (let i = 0; i < selectedPages.length; i++) {
+    const pageNum = selectedPages[i]
+
+    try {
+      const imagePath = PAGES[pageNum - 1].src
+      const img = await loadImage(imagePath)
+
+      const isLandscape = img.width > img.height
+      const orientation = isLandscape ? 'landscape' : 'portrait'
+
+      if (i === 0) {
+        pdf = new jsPDF({
+          orientation,
+          unit: "mm",
+          format: "a4",
+        })
+
+        pdf.setProperties({
+          title: "Rapport RSE 2023 - Clauger",
+          author: "Clauger",
+          subject: "Rapport de Responsabilité Sociétale des Entreprises",
+          creator: "Clauger RSE Web Application",
+        })
+      } else {
+        pdf.addPage("a4", orientation)
+      }
+
+      const pageWidth = orientation === 'portrait' ? 210 : 297
+      const pageHeight = orientation === 'portrait' ? 297 : 210
+      const margin = 10
+      const footerHeight = 10
+      const availableHeight = pageHeight - margin * 2 - footerHeight
+
+      const imgAspectRatio = img.width / img.height
+      const availableAspectRatio = (pageWidth - margin * 2) / availableHeight
+
+      let imgWidth, imgHeight, imgX, imgY
+
+      if (imgAspectRatio > availableAspectRatio) {
+        imgWidth = pageWidth - margin * 2
+        imgHeight = imgWidth / imgAspectRatio
+        imgX = margin
+        imgY = margin
+      } else {
+        imgHeight = availableHeight
+        imgWidth = imgHeight * imgAspectRatio
+        imgX = (pageWidth - imgWidth) / 2
+        imgY = margin
+      }
+
+      pdf.addImage(img, "WEBP", imgX, imgY, imgWidth, imgHeight)
+
+      pdf.setFontSize(9)
+      pdf.setTextColor(128, 128, 128)
+      const pageText = `Page ${pageNum}/${selectedPages.length === 1 ? '36' : selectedPages[selectedPages.length - 1]}`
+      const textWidth = pdf.getTextWidth(pageText)
+      pdf.text(pageText, (pageWidth - textWidth) / 2, pageHeight - 7)
+
+    } catch (error) {
+      console.error(`Erreur lors du chargement de la page ${pageNum}:`, error)
+      throw new Error(`Impossible de charger la page ${pageNum}`)
+    }
+  }
+
+  const defaultFilename = selectedPages.length === 1
+    ? `rapport-page-${selectedPages[0]}`
+    : `rapport-pages-${selectedPages[0]}-a-${selectedPages[selectedPages.length - 1]}`
+
+  pdf.save(`${filename || defaultFilename}-${new Date().toISOString().split("T")[0]}.pdf`)
+}
+
+function loadImage(src: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.crossOrigin = "anonymous"
+    img.onload = () => resolve(img)
+    img.onerror = () => reject(new Error(`Failed to load image: ${src}`))
+    img.src = src
+  })
 }

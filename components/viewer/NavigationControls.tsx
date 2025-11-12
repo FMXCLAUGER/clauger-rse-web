@@ -1,6 +1,6 @@
 "use client"
 
-import { ChevronLeft, ChevronRight, Home, Search, ZoomIn, Maximize2 } from "lucide-react"
+import { ChevronLeft, ChevronRight, Home, Search, ZoomIn, Maximize2, FileDown } from "lucide-react"
 import Link from "next/link"
 import { useState, useEffect } from "react"
 import { ThemeToggle } from "@/components/theme/ThemeToggle"
@@ -12,6 +12,7 @@ interface NavigationControlsProps {
   onPrev: () => void
   onNext: () => void
   onZoom?: () => void
+  onDownloadPDF?: () => void
   onSearch?: () => void
 }
 
@@ -21,6 +22,7 @@ export default function NavigationControls({
   onPrev,
   onNext,
   onZoom,
+  onDownloadPDF,
   onSearch,
 }: NavigationControlsProps) {
   const progress = (currentPage / totalPages) * 100
@@ -119,6 +121,24 @@ export default function NavigationControls({
               </TooltipTrigger>
               <TooltipContent>
                 <p>Rechercher ({isMac ? '⌘' : 'Ctrl'}+K)</p>
+              </TooltipContent>
+            </Tooltip>
+          )}
+
+          {/* Télécharger PDF */}
+          {onDownloadPDF && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={onDownloadPDF}
+                  className="p-4 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors min-w-[48px] min-h-[48px] flex items-center justify-center"
+                  aria-label="Télécharger en PDF"
+                >
+                  <FileDown className="w-5 h-5 text-gray-700 dark:text-gray-200" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Télécharger en PDF</p>
               </TooltipContent>
             </Tooltip>
           )}

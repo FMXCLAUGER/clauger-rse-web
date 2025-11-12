@@ -9,6 +9,7 @@ import { reportPageSchema } from "@/lib/validations/searchParams"
 import NavigationControls from "./NavigationControls"
 import ThumbnailSidebar from "./ThumbnailSidebar"
 import ImageLightbox from "@/components/lightbox/ImageLightbox"
+import { PageSelectionModal } from "@/components/export/PageSelectionModal"
 import { useKeyboardNavigation } from "@/hooks/useKeyboardNavigation"
 import { toast } from "sonner"
 
@@ -21,6 +22,7 @@ export default function ReportViewer({ initialPage }: ReportViewerProps) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const [lightboxOpen, setLightboxOpen] = useState(false)
+  const [pdfModalOpen, setPdfModalOpen] = useState(false)
 
   const pageParam = searchParams.get("page")
   const result = reportPageSchema.safeParse({ page: pageParam || String(initialPage) })
@@ -112,6 +114,7 @@ export default function ReportViewer({ initialPage }: ReportViewerProps) {
           onPrev={prevPage}
           onNext={nextPage}
           onZoom={() => setLightboxOpen(true)}
+          onDownloadPDF={() => setPdfModalOpen(true)}
           onSearch={() => {
             const event = new KeyboardEvent('keydown', {
               key: 'k',
@@ -163,6 +166,12 @@ export default function ReportViewer({ initialPage }: ReportViewerProps) {
         open={lightboxOpen}
         onClose={() => setLightboxOpen(false)}
         index={currentPage - 1}
+      />
+
+      <PageSelectionModal
+        isOpen={pdfModalOpen}
+        onClose={() => setPdfModalOpen(false)}
+        currentPage={currentPage}
       />
     </div>
   )
