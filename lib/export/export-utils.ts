@@ -128,7 +128,7 @@ export async function exportReportPagesPDF(selectedPages: number[], filename?: s
 
   selectedPages.sort((a, b) => a - b)
 
-  let pdf: jsPDF
+  let pdf!: jsPDF
 
   for (let i = 0; i < selectedPages.length; i++) {
     const pageNum = selectedPages[i]
