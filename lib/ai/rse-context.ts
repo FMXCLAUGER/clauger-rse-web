@@ -39,7 +39,7 @@ export interface RSEContext {
 export class RSEContextParser {
   private static readonly ANALYSIS_PATH = path.join(
     process.cwd(),
-    '../Analyse RSE/ANALYSE_EXHAUSTIVE_RSE_CLAUGER_2025.md'
+    'public/data/rse-analysis.md'
   )
 
   /**
