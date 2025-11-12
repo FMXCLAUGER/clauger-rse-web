@@ -8,6 +8,7 @@ import { ChatMessage } from './ChatMessage'
 import { TypingIndicator } from './ChatSkeleton'
 import { WelcomeScreen } from './SuggestedQuestions'
 import { cn } from '@/lib/utils'
+import { trackSessionStarted } from '@/lib/analytics/tracker'
 
 interface ChatbotModalProps {
   isOpen: boolean
@@ -59,6 +60,16 @@ export function ChatbotModal({ isOpen, onClose }: ChatbotModalProps) {
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [isOpen, onClose])
+
+  // Track modal open
+  useEffect(() => {
+    if (isOpen) {
+      trackSessionStarted({
+        url: window.location.href,
+        currentPage
+      })
+    }
+  }, [isOpen, currentPage])
 
   // Gestion de l'envoi du message
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {

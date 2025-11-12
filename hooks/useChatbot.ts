@@ -5,6 +5,11 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { WELCOME_MESSAGE } from '@/lib/ai/prompts'
 import { chatRateLimiter } from '@/lib/ai/rate-limiter'
+import {
+  trackSessionStarted,
+  trackRateLimitExceeded,
+  trackSessionEnded
+} from '@/lib/analytics/tracker'
 
 interface UseChatbotOptions {
   currentPage?: number
@@ -51,8 +56,14 @@ export function useChatbot(options: UseChatbotOptions = {}) {
     if (!isInitialized) {
       loadHistory()
       setIsInitialized(true)
+
+      // Track session started
+      trackSessionStarted({
+        url: window.location.href,
+        currentPage
+      })
     }
-  }, [isInitialized])
+  }, [isInitialized, currentPage])
 
   // Fonction pour charger l'historique depuis localStorage
   const loadHistory = () => {
@@ -98,8 +109,18 @@ export function useChatbot(options: UseChatbotOptions = {}) {
     const rateLimitResult = await chatRateLimiter.checkAndConsume()
 
     if (!rateLimitResult.allowed) {
+      const retryAfter: number = rateLimitResult.retryAfter ?? 0
+      const remainingTokens: number = rateLimitResult.remainingTokens ?? 0
+
+      // Track rate limit exceeded
+      trackRateLimitExceeded({
+        retryAfter,
+        remainingTokens,
+        requestCount: stats.messageCount
+      })
+
       toast.error('Trop de requêtes', {
-        description: `Veuillez patienter ${rateLimitResult.retryAfter}s avant de réessayer.`
+        description: `Veuillez patienter ${retryAfter}s avant de réessayer.`
       })
       return
     }
@@ -112,8 +133,18 @@ export function useChatbot(options: UseChatbotOptions = {}) {
     const rateLimitResult = await chatRateLimiter.checkAndConsume()
 
     if (!rateLimitResult.allowed) {
+      const retryAfter: number = rateLimitResult.retryAfter ?? 0
+      const remainingTokens: number = rateLimitResult.remainingTokens ?? 0
+
+      // Track rate limit exceeded
+      trackRateLimitExceeded({
+        retryAfter,
+        remainingTokens,
+        requestCount: stats.messageCount
+      })
+
       toast.error('Trop de requêtes', {
-        description: `Veuillez patienter ${rateLimitResult.retryAfter}s avant de réessayer.`
+        description: `Veuillez patienter ${retryAfter}s avant de réessayer.`
       })
       return
     }
@@ -142,6 +173,24 @@ export function useChatbot(options: UseChatbotOptions = {}) {
     assistantMessages: chat.messages.filter(m => m.role === 'assistant').length,
     isNewConversation
   }
+
+  // Track session end on unmount
+  useEffect(() => {
+    return () => {
+      // Only track if there was actual activity
+      if (chat.messages.length > 0) {
+        trackSessionEnded({
+          duration: Date.now() - (performance.timing?.navigationStart || Date.now()),
+          messageCount: chat.messages.length,
+          userMessageCount: chat.messages.filter(m => m.role === 'user').length,
+          assistantMessageCount: chat.messages.filter(m => m.role === 'assistant').length,
+          thinkingUsed: false, // We don't track this client-side
+          cacheHits: 0, // We don't track this client-side
+          errors: 0 // We don't track this client-side
+        })
+      }
+    }
+  }, [chat.messages])
 
   return {
     // Props du useChat original

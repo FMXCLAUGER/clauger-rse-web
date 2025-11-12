@@ -3,6 +3,14 @@ import { anthropic } from '@ai-sdk/anthropic'
 import { ContextBuilder } from '@/lib/ai/context-builder'
 import { buildSystemMessageWithCaching } from '@/lib/ai/prompts'
 import { getThinkingConfig } from '@/lib/ai/thinking-mode'
+import {
+  trackMessageSent,
+  trackContextBuilt,
+  trackThinkingActivated,
+  trackCacheMetrics,
+  trackResponseCompleted,
+  trackError
+} from '@/lib/analytics/tracker'
 
 // Configuration Node.js Runtime (nécessaire pour fs/path)
 // export const runtime = 'edge' // ❌ Incompatible avec fs
@@ -48,6 +56,15 @@ export async function POST(req: Request) {
     const lastMessage = messages[messages.length - 1]
     const userQuery = lastMessage?.content || ''
 
+    const startTime = Date.now()
+
+    // Track message sent
+    trackMessageSent({
+      queryLength: userQuery.length,
+      messageCount: messages.length,
+      currentPage
+    })
+
     console.log('[Chat API] Nouvelle requête:', {
       userQuery: userQuery.substring(0, 100),
       currentPage,
@@ -55,7 +72,22 @@ export async function POST(req: Request) {
     })
 
     // 4. Construire le contexte RSE adaptatif
+    const contextBuildStart = Date.now()
     const context = await ContextBuilder.buildAdaptiveContext(userQuery, currentPage)
+
+    const contextBuildDuration = Date.now() - contextBuildStart
+
+    // Track context built
+    trackContextBuilt({
+      sources: context.metadata.sources,
+      sourceCount: context.metadata.sources.length,
+      contextLength: context.metadata.contextLength,
+      estimatedTokens: context.metadata.estimatedTokens,
+      buildDuration: contextBuildDuration,
+      includeFullAnalysis: context.metadata.sources.includes('full_analysis'),
+      includeScores: context.metadata.sources.includes('scores'),
+      includeRecommendations: context.metadata.sources.includes('recommendations')
+    })
 
     console.log('[Chat API] Contexte construit:', {
       sources: context.metadata.sources,
@@ -69,6 +101,15 @@ export async function POST(req: Request) {
     // 5.5. Déterminer si Extended Thinking est nécessaire
     const thinkingConfig = getThinkingConfig(userQuery)
     if (thinkingConfig.enabled) {
+      // Track thinking activation
+      trackThinkingActivated({
+        enabled: true,
+        budgetTokens: thinkingConfig.budget_tokens,
+        queryLength: userQuery.length,
+        hasIndicator: userQuery.includes('###'),
+        complexityScore: 0
+      })
+
       console.log('[Chat API] Extended Thinking activé:', {
         budget: thinkingConfig.budget_tokens
       })
@@ -99,6 +140,41 @@ export async function POST(req: Request) {
         const cacheReadTokens = typeof cacheMetrics.cacheReadInputTokens === 'number'
           ? cacheMetrics.cacheReadInputTokens
           : 0
+        const cacheCreationTokens = typeof cacheMetrics.cacheCreationInputTokens === 'number'
+          ? cacheMetrics.cacheCreationInputTokens
+          : 0
+        const inputTokens = usage.promptTokens || 0
+        const outputTokens = usage.completionTokens || 0
+        const totalTokens = usage.totalTokens || 0
+        const duration = Date.now() - startTime
+
+        // Calculate cache savings (assuming $3/million input tokens for Claude)
+        const inputCostPerToken = 3 / 1_000_000
+        const estimatedSavings = cacheReadTokens * inputCostPerToken * 0.9 // 90% discount on cached tokens
+
+        // Track cache metrics
+        trackCacheMetrics({
+          cacheHit: cacheReadTokens > 0,
+          cacheReadTokens,
+          cacheCreationTokens,
+          cacheReadPercentage: inputTokens > 0 ? (cacheReadTokens / (inputTokens + cacheReadTokens)) * 100 : 0,
+          inputTokens,
+          totalInputTokens: inputTokens + cacheReadTokens,
+          estimatedSavings
+        })
+
+        // Track response completed
+        trackResponseCompleted({
+          responseLength: text.length,
+          inputTokens,
+          outputTokens,
+          totalTokens,
+          thinkingUsed: thinkingConfig.enabled,
+          thinkingTokens: thinkingConfig.enabled ? (usage as any).thinkingTokens : undefined,
+          duration,
+          tokensPerSecond: duration > 0 ? (outputTokens / (duration / 1000)) : 0
+        })
+
         console.log('[Chat API] Réponse générée:', {
           textLength: text.length,
           usage: usage,
@@ -114,6 +190,14 @@ export async function POST(req: Request) {
     return result.toDataStreamResponse()
   } catch (error: any) {
     console.error('[Chat API] Erreur:', error)
+
+    // Track error
+    trackError({
+      errorType: error.name || 'UnknownError',
+      errorStatus: error.status,
+      errorMessage: error.message || 'Unknown error occurred',
+      phase: error.status === 401 || error.status === 429 ? 'authentication' : 'processing'
+    })
 
     // Gestion des erreurs Anthropic spécifiques
     if (error.status === 401) {
