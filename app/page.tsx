@@ -1,10 +1,10 @@
 import Link from "next/link"
-import Image from "next/image"
-import { ArrowRight, BarChart3, BookOpen, Search } from "lucide-react"
+import { BarChart3, BookOpen, Search } from "lucide-react"
 import { RAPPORT_DATA, PAGES } from "@/lib/constants"
 import { JsonLd } from "@/components/seo/JsonLd"
 import { getOrganizationSchema, getWebSiteSchema } from "@/lib/jsonld"
 import { EnjeuxSection } from "@/components/enjeux/EnjeuxSection"
+import { HeroSection } from "@/components/hero/HeroSection"
 
 export default function HomePage() {
   const heroImage = PAGES[0]
@@ -14,55 +14,12 @@ export default function HomePage() {
       <JsonLd data={getOrganizationSchema()} />
       <JsonLd data={getWebSiteSchema()} />
       <main id="main-content" className="min-h-screen dark:bg-gray-950">
-      <section className="relative h-dvh bg-gradient-to-br from-primary via-primary/90 to-primary/70 text-white">
-        <div className="absolute inset-0 opacity-20">
-          <Image
-            src={heroImage.src}
-            alt="Couverture du rapport RSE Clauger 2025"
-            fill
-            className="object-cover object-center"
-            priority
-            quality={85}
-            placeholder={heroImage.blurDataURL ? "blur" : "empty"}
-            blurDataURL={heroImage.blurDataURL}
-          />
-        </div>
-
-        <div className="relative container mx-auto px-4 h-full flex flex-col items-center justify-center text-center">
-          <div className="mb-8 inline-block">
-            <span className="text-sm font-semibold tracking-wider uppercase bg-white/20 px-4 py-2 rounded-full backdrop-blur-sm">
-              1er Rapport Durable
-            </span>
-          </div>
-
-          <h1 className="font-montserrat text-5xl md:text-7xl font-bold mb-6">
-            {RAPPORT_DATA.title}
-          </h1>
-
-          <p className="text-xl md:text-2xl mb-8 text-white/90 max-w-3xl">
-            {RAPPORT_DATA.baseline}
-          </p>
-
-          <div className="flex items-center gap-4 mb-12">
-            <div className="bg-white/10 backdrop-blur-md rounded-2xl px-8 py-4 border border-white/20">
-              <div className="text-6xl font-bold text-white">{RAPPORT_DATA.notation.global}</div>
-              <div className="text-sm text-white/80 mt-1">Note globale / 100</div>
-            </div>
-            <div className="text-left text-sm text-white/80">
-              <div>Niveau : <span className="font-semibold text-white">Structuré</span></div>
-              <div className="text-xs mt-1">Émergent → Intermédiaire</div>
-            </div>
-          </div>
-
-          <Link
-            href="/rapport?page=1"
-            className="group inline-flex items-center gap-3 bg-white text-primary px-8 py-4 rounded-xl font-semibold text-lg hover:bg-white/90 transition-all hover:scale-105 hover:shadow-2xl"
-          >
-            Explorer le rapport
-            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-          </Link>
-        </div>
-      </section>
+      <HeroSection
+        title={RAPPORT_DATA.title}
+        baseline={RAPPORT_DATA.baseline}
+        score={RAPPORT_DATA.notation.global}
+        heroImage={heroImage}
+      />
 
       <section className="py-20 bg-gray-50 dark:bg-gray-900">
         <div className="container mx-auto px-4">

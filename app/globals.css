@@ -11,12 +11,12 @@
     --border: 214.3 31.8% 91.4%;
     --radius: 0.5rem;
 
-    --primary: 210 63% 24%;
+    --primary: 200 100% 40%;
     --primary-foreground: 0 0% 100%;
     --secondary: 151 50% 35%;
     --secondary-foreground: 0 0% 100%;
-    --accent: 25 85% 52%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 44 100% 49%;
+    --accent-foreground: 0 0% 20%;
 
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
@@ -31,12 +31,12 @@
     --muted-foreground: 215 20.2% 65.1%;
     --border: 217.2 32.6% 17.5%;
 
-    --primary: 210 63% 35%;
+    --primary: 200 100% 50%;
     --primary-foreground: 0 0% 100%;
     --secondary: 151 50% 40%;
     --secondary-foreground: 0 0% 100%;
-    --accent: 25 85% 60%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 44 100% 60%;
+    --accent-foreground: 0 0% 10%;
 
     --card: 217.2 32.6% 10%;
     --card-foreground: 210 40% 98%;
@@ -94,6 +94,51 @@
     display: none;
   }
 
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes bounceScroll {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(10px);
+    }
+  }
+
+  .animate-fadeInUp {
+    animation: fadeInUp 0.8s ease-out forwards;
+    opacity: 0;
+  }
+
+  .animate-bounceScroll {
+    animation: bounceScroll 2s ease-in-out infinite;
+  }
+
+  .animation-delay-200 {
+    animation-delay: 200ms;
+  }
+
+  .animation-delay-400 {
+    animation-delay: 400ms;
+  }
+
+  .animation-delay-600 {
+    animation-delay: 600ms;
+  }
+
+  .animation-delay-800 {
+    animation-delay: 800ms;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -105,8 +150,12 @@
     }
 
     .animate-spin,
-    .animate-pulse {
+    .animate-pulse,
+    .animate-fadeInUp,
+    .animate-bounceScroll {
       animation: none !important;
+      opacity: 1 !important;
+      transform: none !important;
     }
   }
 }
