@@ -13,6 +13,7 @@ import {
 } from '@/lib/analytics/tracker'
 import { InputSanitizer } from '@/lib/security/input-sanitizer'
 import { logger } from '@/lib/security/secure-logger'
+import { ModelRouter } from '@/lib/ai/model-router'
 
 // Configuration Node.js Runtime (nécessaire pour fs/path)
 // export const runtime = 'edge' // ❌ Incompatible avec fs
@@ -83,13 +84,27 @@ export async function POST(req: Request) {
 
     const safeUserQuery = validation.sanitizedInput!
 
+    // 3.6 Déterminer le modèle optimal basé sur la complexité de la requête
+    const routingDecision = ModelRouter.selectModel(messages, currentPage)
+
+    logger.info('Model routing decision', {
+      selectedModel: routingDecision.model.id,
+      complexityLevel: routingDecision.complexity.level,
+      complexityScore: routingDecision.complexity.score,
+      estimatedCost: routingDecision.estimatedCost,
+      potentialSavings: routingDecision.potentialSavings
+    })
+
     const startTime = Date.now()
 
-    // Track message sent
+    // Track message sent with routing info
     trackMessageSent({
       queryLength: safeUserQuery.length,
       messageCount: messages.length,
-      currentPage
+      currentPage,
+      modelUsed: routingDecision.model.id,
+      complexityScore: routingDecision.complexity.score,
+      estimatedCost: routingDecision.estimatedCost
     })
 
     logger.info('Chat request received', {
@@ -98,9 +113,13 @@ export async function POST(req: Request) {
       currentPage
     })
 
-    // 4. Construire le contexte RSE adaptatif
+    // 4. Construire le contexte RSE optimisé basé sur la complexité
     const contextBuildStart = Date.now()
-    const context = await ContextBuilder.buildAdaptiveContext(safeUserQuery, currentPage)
+    const context = await ContextBuilder.buildOptimizedContext(
+      safeUserQuery,
+      currentPage,
+      routingDecision.complexity.level
+    )
 
     const contextBuildDuration = Date.now() - contextBuildStart
 
@@ -142,9 +161,9 @@ export async function POST(req: Request) {
       })
     }
 
-    // 6. Appeler Claude avec streaming et prompt caching
+    // 6. Appeler Claude avec streaming et prompt caching (modèle sélectionné dynamiquement)
     const result = await streamText({
-      model: anthropic('claude-sonnet-4-5-20250929'),
+      model: anthropic(routingDecision.model.id),
       system: systemMessages,
       messages: messages,
       maxTokens: thinkingConfig.enabled ? 4096 : 2048,
@@ -175,8 +194,8 @@ export async function POST(req: Request) {
         const totalTokens = usage.totalTokens || 0
         const duration = Date.now() - startTime
 
-        // Calculate cache savings (assuming $3/million input tokens for Claude)
-        const inputCostPerToken = 3 / 1_000_000
+        // Calculate cache savings using actual model pricing
+        const inputCostPerToken = routingDecision.model.inputCost / 1_000_000
         const estimatedSavings = cacheReadTokens * inputCostPerToken * 0.9 // 90% discount on cached tokens
 
         // Track cache metrics

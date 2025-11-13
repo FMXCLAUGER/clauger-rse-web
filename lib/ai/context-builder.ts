@@ -1,4 +1,5 @@
 import { knowledgeBase } from './knowledge-base'
+import { SemanticChunker } from './semantic-chunker'
 import type { OCRData } from '@/lib/search/types'
 
 /**
@@ -241,6 +242,76 @@ export class ContextBuilder {
       searchQuery: intent.needsSearch ? userQuery : undefined,
       currentPage
     })
+  }
+
+  static async buildOptimizedContext(
+    userQuery: string,
+    currentPage?: number,
+    complexity?: 'simple' | 'medium' | 'complex'
+  ): Promise<BuiltContext> {
+    if (complexity === 'complex') {
+      return this.buildAdaptiveContext(userQuery, currentPage)
+    }
+
+    const sources: string[] = []
+    const relevantSections: string[] = []
+
+    const fullAnalysis = await knowledgeBase.getFullAnalysisText()
+    const scores = await knowledgeBase.getScores()
+    const recommendations = await knowledgeBase.getRecommendations()
+
+    if (complexity === 'simple') {
+      sources.push('Contexte optimisé (semantic chunking - simple)')
+
+      const { context: optimizedContext, metadata } = await SemanticChunker.optimizeContext(
+        fullAnalysis,
+        userQuery,
+        'simple'
+      )
+
+      relevantSections.push(optimizedContext)
+      relevantSections.push(scores)
+
+      sources.push('Scores RSE')
+      sources.push(`Réduction tokens: -${metadata.reduction}%`)
+    } else if (complexity === 'medium') {
+      sources.push('Contexte optimisé (semantic chunking - medium)')
+
+      const { context: optimizedContext, metadata } = await SemanticChunker.optimizeContext(
+        fullAnalysis,
+        userQuery,
+        'medium'
+      )
+
+      relevantSections.push(optimizedContext)
+      relevantSections.push(scores)
+      relevantSections.push(recommendations)
+
+      sources.push('Scores + Recommandations RSE')
+      sources.push(`Réduction tokens: -${metadata.reduction}%`)
+    }
+
+    if (currentPage) {
+      const ocrData = await this.loadOCRData()
+      const pageData = ocrData.pages.find(p => p.pageNumber === currentPage)
+
+      if (pageData) {
+        relevantSections.push(`\n## Contenu de la page ${currentPage} du rapport\n${pageData.text}`)
+        sources.push(`Page ${currentPage} du rapport PDF`)
+      }
+    }
+
+    const finalContext = relevantSections.join('\n\n---\n\n')
+
+    return {
+      systemContext: finalContext,
+      relevantSections,
+      metadata: {
+        sources,
+        contextLength: finalContext.length,
+        estimatedTokens: Math.ceil(finalContext.length / 4)
+      }
+    }
   }
 
   /**
