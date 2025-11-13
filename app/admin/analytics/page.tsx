@@ -10,7 +10,7 @@ import {
 } from 'recharts'
 import {
   Activity, Database, Zap, Clock, TrendingUp, AlertCircle,
-  Download, RefreshCw
+  Download, RefreshCw, Shield, RotateCw
 } from 'lucide-react'
 import { exportMetrics, clearAllEvents } from '@/lib/analytics'
 
@@ -157,6 +157,47 @@ export default function AnalyticsPage() {
           icon={<AlertCircle className="w-6 h-6" />}
         />
       </div>
+
+      {/* Resilience Stats (Phase 3) */}
+      <Card className="p-6">
+        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+          <Shield className="w-5 h-5" />
+          Métriques de Résilience
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <MetricCard
+            title="Taux de Succès"
+            value={`${summary.resilienceSuccessRate.toFixed(1)}%`}
+            description="Requêtes réussies"
+            trend={summary.resilienceSuccessRate >= 95 ? 'up' : 'down'}
+            trendValue={summary.resilienceSuccessRate >= 95 ? 'Excellent' : 'À surveiller'}
+            icon={<Shield className="w-6 h-6" />}
+          />
+
+          <MetricCard
+            title="Circuit Breaker Opens"
+            value={summary.circuitBreakerOpens}
+            description="Ouvertures du circuit"
+            trend={summary.circuitBreakerOpens === 0 ? 'up' : 'down'}
+            icon={<AlertCircle className="w-6 h-6" />}
+          />
+
+          <MetricCard
+            title="Total Retries"
+            value={summary.totalRetries}
+            description="Tentatives de réessai"
+            icon={<RotateCw className="w-6 h-6" />}
+          />
+
+          <MetricCard
+            title="P95 Latency"
+            value={`${Math.round(summary.p95ResilienceLatency)}ms`}
+            description={`Avg: ${Math.round(summary.avgResilienceLatency)}ms`}
+            trend={summary.p95ResilienceLatency < 3000 ? 'up' : 'down'}
+            icon={<Clock className="w-6 h-6" />}
+          />
+        </div>
+      </Card>
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

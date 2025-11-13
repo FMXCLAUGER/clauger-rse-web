@@ -12,6 +12,7 @@ import type {
   ResponseCompletedEvent,
   CacheMetricsEvent,
   ThinkingActivatedEvent,
+  ResilienceMetricsEvent,
 } from './types'
 import { STORAGE_KEYS, MAX_EVENT_AGE_MS } from './config'
 import { isLocalStorageAvailable } from './config'
@@ -188,6 +189,18 @@ export function calculateSummary(): MetricsSummary {
     (e) => e.eventType === 'chat.rate_limit.exceeded'
   ).length
 
+  // Resilience metrics (Phase 3)
+  const resilienceEvents = events.filter(
+    (e) => e.eventType === 'chat.resilience.metrics'
+  ) as ResilienceMetricsEvent[]
+
+  const latestResilienceEvent = resilienceEvents[resilienceEvents.length - 1]
+  const circuitBreakerOpens = latestResilienceEvent?.properties.circuitOpens || 0
+  const totalRetries = latestResilienceEvent?.properties.totalRetries || 0
+  const resilienceSuccessRate = latestResilienceEvent?.properties.successRate || 100
+  const avgResilienceLatency = latestResilienceEvent?.properties.averageLatency || 0
+  const p95ResilienceLatency = latestResilienceEvent?.properties.p95Latency || 0
+
   return {
     // Cache
     totalCacheHits: cacheHits,
@@ -218,6 +231,13 @@ export function calculateSummary(): MetricsSummary {
 
     // Rate Limiting
     rateLimitExceededCount,
+
+    // Resilience
+    circuitBreakerOpens,
+    totalRetries,
+    resilienceSuccessRate,
+    avgResilienceLatency,
+    p95ResilienceLatency,
   }
 }
 

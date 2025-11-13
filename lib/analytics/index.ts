@@ -53,5 +53,6 @@ export {
   trackSessionStarted,
   trackSessionEnded,
   trackError,
-  trackContextBuilt
+  trackContextBuilt,
+  trackResilienceMetrics
 } from './tracker'

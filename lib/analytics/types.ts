@@ -38,6 +38,9 @@ export type EventType =
   | 'chat.context.built'
   | 'chat.intent.analyzed'
 
+  // Resilience events (Phase 3)
+  | 'chat.resilience.metrics'
+
 export type EventCategory =
   | 'chat'
   | 'cache'
@@ -46,6 +49,7 @@ export type EventCategory =
   | 'session'
   | 'error'
   | 'performance'
+  | 'resilience'
 
 export type EventSeverity = 'info' | 'warning' | 'error'
 
@@ -195,6 +199,34 @@ export interface ContextBuiltEvent extends BaseEvent {
   }
 }
 
+export interface ResilienceMetricsEvent extends BaseEvent {
+  eventType: 'chat.resilience.metrics'
+  eventCategory: 'resilience'
+  properties: {
+    // Circuit breaker
+    circuitState: 'CLOSED' | 'OPEN' | 'HALF_OPEN'
+    circuitOpens: number
+    circuitCloses: number
+
+    // Retry metrics
+    totalRetries: number
+    retriedRequests: number
+
+    // Success metrics
+    totalRequests: number
+    successfulRequests: number
+    failedRequests: number
+    successRate: number
+
+    // Latency metrics
+    averageLatency: number
+    p95Latency: number
+
+    // Recent failures
+    recentFailureCount: number
+  }
+}
+
 // =============================================================================
 // UNION TYPE FOR ALL EVENTS
 // =============================================================================
@@ -209,6 +241,7 @@ export type AnalyticsEvent =
   | SessionEndedEvent
   | ErrorOccurredEvent
   | ContextBuiltEvent
+  | ResilienceMetricsEvent
 
 // =============================================================================
 // METRICS STORAGE
@@ -250,6 +283,13 @@ export interface MetricsSummary {
 
   // Rate Limiting
   rateLimitExceededCount: number
+
+  // Resilience (Phase 3)
+  circuitBreakerOpens: number
+  totalRetries: number
+  resilienceSuccessRate: number
+  avgResilienceLatency: number
+  p95ResilienceLatency: number
 }
 
 // =============================================================================

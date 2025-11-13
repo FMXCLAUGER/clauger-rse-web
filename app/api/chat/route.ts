@@ -9,7 +9,8 @@ import {
   trackThinkingActivated,
   trackCacheMetrics,
   trackResponseCompleted,
-  trackError
+  trackError,
+  trackResilienceMetrics
 } from '@/lib/analytics/tracker'
 import { InputSanitizer } from '@/lib/security/input-sanitizer'
 import { logger } from '@/lib/security/secure-logger'
@@ -248,6 +249,25 @@ export async function POST(req: Request) {
           cacheReadTokens,
           cacheCreationTokens
         })
+
+        // Track resilience metrics after successful response
+        const resilienceMetrics = resilientClient.getMetrics()
+        trackResilienceMetrics({
+          circuitState: resilientClient.getCircuitState(),
+          circuitOpens: resilienceMetrics.circuitOpens,
+          circuitCloses: resilienceMetrics.circuitCloses,
+          totalRetries: resilienceMetrics.retriedRequests,
+          retriedRequests: resilienceMetrics.retriedRequests,
+          totalRequests: resilienceMetrics.totalRequests,
+          successfulRequests: resilienceMetrics.successfulRequests,
+          failedRequests: resilienceMetrics.failedRequests,
+          successRate: resilienceMetrics.totalRequests > 0
+            ? (resilienceMetrics.successfulRequests / resilienceMetrics.totalRequests * 100)
+            : 100,
+          averageLatency: resilienceMetrics.averageLatency,
+          p95Latency: resilienceMetrics.p95Latency,
+          recentFailureCount: 0 // Succès, donc 0 failures récents
+        })
       }
     }),
     `chat-${Date.now()}`
@@ -276,6 +296,24 @@ export async function POST(req: Request) {
       errorStatus: error.status,
       errorMessage: error.message || 'Unknown error occurred',
       phase: error.status === 401 || error.status === 429 ? 'authentication' : 'processing'
+    })
+
+    // Track resilience metrics after error
+    trackResilienceMetrics({
+      circuitState: circuitState,
+      circuitOpens: metrics.circuitOpens,
+      circuitCloses: metrics.circuitCloses,
+      totalRetries: metrics.retriedRequests,
+      retriedRequests: metrics.retriedRequests,
+      totalRequests: metrics.totalRequests,
+      successfulRequests: metrics.successfulRequests,
+      failedRequests: metrics.failedRequests,
+      successRate: metrics.totalRequests > 0
+        ? (metrics.successfulRequests / metrics.totalRequests * 100)
+        : 0,
+      averageLatency: metrics.averageLatency,
+      p95Latency: metrics.p95Latency,
+      recentFailureCount: metrics.failedRequests
     })
 
     // Gestion des erreurs Anthropic spécifiques

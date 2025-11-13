@@ -16,6 +16,7 @@ import type {
   SessionEndedEvent,
   ErrorOccurredEvent,
   ContextBuiltEvent,
+  ResilienceMetricsEvent,
   EventSeverity,
   EventType,
   EventCategory,
@@ -283,6 +284,28 @@ export function trackContextBuilt(
 }
 
 /**
+ * Track les métriques de résilience (Phase 3)
+ */
+export function trackResilienceMetrics(
+  properties: ResilienceMetricsEvent['properties'],
+  requestId?: string
+): void {
+  if (!isAnalyticsEnabled()) return
+
+  const severity: EventSeverity =
+    properties.circuitState === 'OPEN' ? 'warning' :
+    properties.successRate < 90 ? 'warning' :
+    'info'
+
+  const event = {
+    ...createBaseEvent('chat.resilience.metrics' as const, 'resilience', severity, requestId),
+    properties,
+  }
+
+  sendEvent(event as AnalyticsEvent)
+}
+
+/**
  * Calcule les métriques de session en cours
  */
 export function getSessionMetrics(): {
@@ -343,6 +366,7 @@ export const analytics = {
   trackSessionEnded,
   trackError,
   trackContextBuilt,
+  trackResilienceMetrics,
   getSessionMetrics,
   resetSession,
 }
