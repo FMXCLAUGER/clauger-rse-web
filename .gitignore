@@ -41,3 +41,21 @@ IPHONE_MOBILE_ANALYSIS.md
 IPHONE_QUICK_FIXES.md
 MOBILE_ANALYSIS_INDEX.md
 MOBILE_ANALYSIS_SUMMARY.md
+
+# Temporary documentation and reports
+ANALYTICS_VALIDATION_REPORT.md
+CROSS_BROWSER_TEST_GUIDE.md
+OPTIMIZATION_ANALYSIS.md
+OPTION_C_FINAL_REPORT.md
+QUICK_QA_CHECKLIST.md
+SPRINT6_RESULTS.md
+
+# Build and test logs
+build-error.log
+build-output.txt
+build-test.log
+
+# Test debug files
+test-debug.js
+test-pii-logging.js
+test-valid-message.json
