@@ -11,6 +11,8 @@ import {
   trackResponseCompleted,
   trackError
 } from '@/lib/analytics/tracker'
+import { InputSanitizer } from '@/lib/security/input-sanitizer'
+import { logger } from '@/lib/security/secure-logger'
 
 // Configuration Node.js Runtime (nécessaire pour fs/path)
 // export const runtime = 'edge' // ❌ Incompatible avec fs
@@ -56,24 +58,49 @@ export async function POST(req: Request) {
     const lastMessage = messages[messages.length - 1]
     const userQuery = lastMessage?.content || ''
 
+    // 3.5 Validation et sanitization de l'input utilisateur
+    const validation = InputSanitizer.validate(userQuery)
+
+    if (!validation.isValid) {
+      logger.warn('Input validation failed', {
+        error: validation.error,
+        detectedPattern: validation.detectedPattern,
+        queryLength: userQuery.length,
+        messageCount: messages.length
+      })
+
+      return new Response(
+        JSON.stringify({
+          error: 'Votre message contient des caractères ou patterns non autorisés. Veuillez reformuler.',
+          details: validation.error
+        }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' }
+        }
+      )
+    }
+
+    const safeUserQuery = validation.sanitizedInput!
+
     const startTime = Date.now()
 
     // Track message sent
     trackMessageSent({
-      queryLength: userQuery.length,
+      queryLength: safeUserQuery.length,
       messageCount: messages.length,
       currentPage
     })
 
-    console.log('[Chat API] Nouvelle requête:', {
-      userQuery: userQuery.substring(0, 100),
-      currentPage,
-      messageCount: messages.length
+    logger.info('Chat request received', {
+      queryLength: safeUserQuery.length,
+      messageCount: messages.length,
+      currentPage
     })
 
     // 4. Construire le contexte RSE adaptatif
     const contextBuildStart = Date.now()
-    const context = await ContextBuilder.buildAdaptiveContext(userQuery, currentPage)
+    const context = await ContextBuilder.buildAdaptiveContext(safeUserQuery, currentPage)
 
     const contextBuildDuration = Date.now() - contextBuildStart
 
@@ -89,7 +116,7 @@ export async function POST(req: Request) {
       includeRecommendations: context.metadata.sources.includes('recommendations')
     })
 
-    console.log('[Chat API] Contexte construit:', {
+    logger.info('Context built successfully', {
       sources: context.metadata.sources,
       contextLength: context.metadata.contextLength,
       estimatedTokens: context.metadata.estimatedTokens
@@ -110,8 +137,8 @@ export async function POST(req: Request) {
         complexityScore: 0
       })
 
-      console.log('[Chat API] Extended Thinking activé:', {
-        budget: thinkingConfig.budget_tokens
+      logger.info('Extended thinking activated', {
+        budgetTokens: thinkingConfig.budget_tokens
       })
     }
 
@@ -175,13 +202,15 @@ export async function POST(req: Request) {
           tokensPerSecond: duration > 0 ? (outputTokens / (duration / 1000)) : 0
         })
 
-        console.log('[Chat API] Réponse générée:', {
+        logger.info('Response generated successfully', {
           textLength: text.length,
-          usage: usage,
+          inputTokens,
+          outputTokens,
+          totalTokens,
           thinkingUsed: thinkingConfig.enabled,
           cacheHit: cacheReadTokens > 0,
           cacheReadTokens,
-          cacheCreationTokens: cacheMetrics.cacheCreationInputTokens
+          cacheCreationTokens
         })
       }
     })
@@ -189,7 +218,12 @@ export async function POST(req: Request) {
     // 7. Retourner le stream
     return result.toDataStreamResponse()
   } catch (error: any) {
-    console.error('[Chat API] Erreur:', error)
+    logger.error('Chat request failed', {
+      errorType: error.name || 'UnknownError',
+      errorStatus: error.status,
+      errorMessage: error.message || 'Unknown error occurred',
+      phase: error.status === 401 || error.status === 429 ? 'authentication' : 'processing'
+    })
 
     // Track error
     trackError({
