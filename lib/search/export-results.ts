@@ -53,10 +53,13 @@ export class SearchResultsExporter {
   }
 
   exportToMarkdown(results: SearchResult[], query: string): string {
+    // Escape backticks in query to prevent Markdown syntax breaking
+    const escapedQuery = query.replace(/`/g, '\\`')
+
     const markdown = [
       `# Résultats de Recherche`,
       ``,
-      `**Requête :** \`${query}\`  `,
+      `**Requête :** \`${escapedQuery}\`  `,
       `**Date :** ${new Date().toLocaleString('fr-FR')}  `,
       `**Nombre de résultats :** ${results.length}`,
       ``,
@@ -163,7 +166,7 @@ export class SearchResultsExporter {
 
   copyToClipboard(content: string): Promise<void> {
     if (typeof navigator === 'undefined' || !navigator.clipboard) {
-      throw new Error('Clipboard API not available');
+      return Promise.reject(new Error('Clipboard API not available'));
     }
 
     return navigator.clipboard.writeText(content);
