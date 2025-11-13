@@ -9,10 +9,10 @@ export function middleware(request: NextRequest) {
 
   const cspHeader = `
     default-src 'self';
-    script-src 'self' 'nonce-${nonce}' 'strict-dynamic' ${isDev ? "'unsafe-eval'" : ""} ${isPreview ? "'unsafe-inline'" : ""} https://va.vercel-scripts.com;
+    script-src 'self' 'nonce-${nonce}' 'strict-dynamic' ${isDev ? "'unsafe-eval' 'unsafe-inline'" : ""} ${isPreview ? "'unsafe-inline'" : ""} https://va.vercel-scripts.com;
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     img-src 'self' blob: data: https:;
-    font-src 'self' https://fonts.gstatic.com;
+    font-src 'self' https://fonts.gstatic.com https://r2cdn.perplexity.ai;
     connect-src 'self' https://vitals.vercel-insights.com ${isPreview ? "https://vercel.live wss://*.pusher.com wss://*.pusherapp.com" : ""};
     object-src 'none';
     base-uri 'self';
