@@ -169,20 +169,23 @@ export class ModelRouter {
     const lastMessage = messages[messages.length - 1]
 
     // Handle different content types from AI SDK
+    // Using 'unknown' to avoid TypeScript inference issues with Message type
     let userQuery = ''
-    if (typeof lastMessage?.content === 'string') {
-      userQuery = lastMessage.content
-    } else if (Array.isArray(lastMessage?.content)) {
+    const content = lastMessage?.content as unknown
+
+    if (typeof content === 'string') {
+      userQuery = content
+    } else if (Array.isArray(content)) {
       // Content can be an array of content parts
-      userQuery = lastMessage.content
+      userQuery = (content as any[])
         .map((part: any) => part.text || '')
         .join(' ')
     }
 
     const complexity = this.analyzeComplexity(userQuery)
 
-    let selectedModel = CLAUDE_MODELS.SONNET
-    let alternativeModel = CLAUDE_MODELS.HAIKU
+    let selectedModel: typeof CLAUDE_MODELS[keyof typeof CLAUDE_MODELS] = CLAUDE_MODELS.SONNET
+    let alternativeModel: typeof CLAUDE_MODELS[keyof typeof CLAUDE_MODELS] = CLAUDE_MODELS.HAIKU
     let reasoning = ''
 
     if (complexity.level === 'simple') {
@@ -200,13 +203,15 @@ export class ModelRouter {
     }
 
     const conversationLength = messages.reduce((sum, msg) => {
-      let content = ''
-      if (typeof msg?.content === 'string') {
-        content = msg.content
-      } else if (Array.isArray(msg?.content)) {
-        content = msg.content.map((part: any) => part.text || '').join(' ')
+      let contentText = ''
+      const msgContent = msg?.content as unknown
+
+      if (typeof msgContent === 'string') {
+        contentText = msgContent
+      } else if (Array.isArray(msgContent)) {
+        contentText = (msgContent as any[]).map((part: any) => part.text || '').join(' ')
       }
-      return sum + content.length
+      return sum + contentText.length
     }, 0)
 
     // Estimate tokens from character count (not from string)

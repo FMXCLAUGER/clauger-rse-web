@@ -87,6 +87,10 @@ export interface MessageSentEvent extends BaseEvent {
     queryLength: number
     messageCount: number
     currentPage?: number
+    // Phase 2: Model routing analytics
+    modelUsed?: string
+    complexityScore?: number
+    estimatedCost?: number
   }
 }
 
