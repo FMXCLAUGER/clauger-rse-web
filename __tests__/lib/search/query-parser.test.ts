@@ -325,8 +325,11 @@ describe('QueryParser', () => {
       const result = parser.parse('énergie renouvelable -fossile');
 
       expect(result.type).toBe('advanced');
-      expect(result.terms).toHaveLength(2);
-      expect(result.terms[1].isNegated).toBe(true);
+      expect(result.terms).toHaveLength(3); // Three separate terms: "énergie", "renouvelable", "-fossile"
+      expect(result.terms[0].value).toBe('énergie');
+      expect(result.terms[1].value).toBe('renouvelable');
+      expect(result.terms[2].value).toBe('fossile');
+      expect(result.terms[2].isNegated).toBe(true);
     });
 
     it('should parse typical search query 4', () => {

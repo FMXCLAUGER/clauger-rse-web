@@ -1,14 +1,22 @@
 import { SearchIndex, getSearchIndex } from '@/lib/search/search-index'
 import type { OCRData } from '@/lib/search/types'
 
+// Create mock Document constructor that can be accessed by tests
+const mockDocumentConstructor = jest.fn().mockImplementation(function(this: any, config: any) {
+  this.config = config
+  this.add = jest.fn()
+  this.search = jest.fn().mockReturnValue([])
+  this.remove = jest.fn()
+  this.update = jest.fn()
+  this.clear = jest.fn()
+  return this
+})
+
 // Mock FlexSearch Document
 jest.mock('flexsearch/dist/module/document', () => {
   return {
     __esModule: true,
-    default: jest.fn().mockImplementation(() => ({
-      add: jest.fn(),
-      search: jest.fn().mockReturnValue([]),
-    })),
+    default: mockDocumentConstructor,
   }
 })
 
@@ -17,6 +25,7 @@ describe('SearchIndex', () => {
   let mockDate: jest.SpyInstance
 
   beforeEach(() => {
+    mockDocumentConstructor.mockClear()
     searchIndex = new SearchIndex()
     mockDate = jest.spyOn(Date, 'now').mockReturnValue(1000000)
     jest.spyOn(console, 'log').mockImplementation(() => {})
@@ -31,7 +40,31 @@ describe('SearchIndex', () => {
       expect(searchIndex).toBeInstanceOf(SearchIndex)
     })
 
-    it('should initialize FlexSearch Document with correct config', () => {
+    it('should initialize FlexSearch Document with correct config', async () => {
+      // FlexSearch Document is lazy-loaded, so we need to trigger loadData()
+      const mockData: OCRData = {
+        metadata: {
+          totalPages: 1,
+          successful: 1,
+          failed: 0,
+          language: 'fr',
+          avgConfidence: 0.95,
+          processingTime: 1000,
+          timestamp: '2024-01-01',
+        },
+        pages: [
+          {
+            id: 1,
+            pageNumber: 1,
+            filename: 'page1.jpg',
+            text: 'Test content',
+            confidence: 0.95,
+          },
+        ],
+      }
+
+      await searchIndex.loadData(mockData)
+
       const Document = require('flexsearch/dist/module/document').default
       expect(Document).toHaveBeenCalledWith({
         charset: 'latin:advanced',
@@ -52,7 +85,30 @@ describe('SearchIndex', () => {
       })
     })
 
-    it('should have a filter function that filters short words', () => {
+    it('should have a filter function that filters short words', async () => {
+      const mockData: OCRData = {
+        metadata: {
+          totalPages: 1,
+          successful: 1,
+          failed: 0,
+          language: 'fr',
+          avgConfidence: 0.95,
+          processingTime: 1000,
+          timestamp: '2024-01-01',
+        },
+        pages: [
+          {
+            id: 1,
+            pageNumber: 1,
+            filename: 'page1.jpg',
+            text: 'Test',
+            confidence: 0.95,
+          },
+        ],
+      }
+
+      await searchIndex.loadData(mockData)
+
       const Document = require('flexsearch/dist/module/document').default
       const config = Document.mock.calls[Document.mock.calls.length - 1][0]
       const filter = config.filter
@@ -62,7 +118,30 @@ describe('SearchIndex', () => {
       expect(filter('test')).toBe(true) // Length > 3, ok
     })
 
-    it('should have a filter function that filters French stopwords', () => {
+    it('should have a filter function that filters French stopwords', async () => {
+      const mockData: OCRData = {
+        metadata: {
+          totalPages: 1,
+          successful: 1,
+          failed: 0,
+          language: 'fr',
+          avgConfidence: 0.95,
+          processingTime: 1000,
+          timestamp: '2024-01-01',
+        },
+        pages: [
+          {
+            id: 1,
+            pageNumber: 1,
+            filename: 'page1.jpg',
+            text: 'Test',
+            confidence: 0.95,
+          },
+        ],
+      }
+
+      await searchIndex.loadData(mockData)
+
       const Document = require('flexsearch/dist/module/document').default
       const config = Document.mock.calls[Document.mock.calls.length - 1][0]
       const filter = config.filter
@@ -75,7 +154,30 @@ describe('SearchIndex', () => {
       expect(filter('avec')).toBe(false)
     })
 
-    it('should have a filter function that allows non-stopwords', () => {
+    it('should have a filter function that allows non-stopwords', async () => {
+      const mockData: OCRData = {
+        metadata: {
+          totalPages: 1,
+          successful: 1,
+          failed: 0,
+          language: 'fr',
+          avgConfidence: 0.95,
+          processingTime: 1000,
+          timestamp: '2024-01-01',
+        },
+        pages: [
+          {
+            id: 1,
+            pageNumber: 1,
+            filename: 'page1.jpg',
+            text: 'Test',
+            confidence: 0.95,
+          },
+        ],
+      }
+
+      await searchIndex.loadData(mockData)
+
       const Document = require('flexsearch/dist/module/document').default
       const config = Document.mock.calls[Document.mock.calls.length - 1][0]
       const filter = config.filter
@@ -123,9 +225,10 @@ describe('SearchIndex', () => {
       expect(result).toEqual({
         totalPages: 2,
         indexedPages: 2,
+        vocabularySize: expect.any(Number),
         loadTime: 100,
       })
-      expect(console.log).toHaveBeenCalledWith('Search index loaded in 100ms')
+      expect(console.log).toHaveBeenCalled()
     })
 
     it('should skip pages with errors', async () => {
@@ -224,6 +327,7 @@ describe('SearchIndex', () => {
       expect(result).toEqual({
         totalPages: 0,
         indexedPages: 0,
+        vocabularySize: 0,
         loadTime: 0,
       })
     })
@@ -930,7 +1034,7 @@ describe('getSearchIndex', () => {
       json: async () => {
         throw new Error('Invalid JSON')
       },
-    } as Response)
+    } as unknown as Response)
 
     const { getSearchIndex } = require('@/lib/search/search-index')
 

@@ -1,4 +1,30 @@
 import { describe, it, expect, beforeEach, jest } from '@jest/globals'
+
+// Mock ESM modules before any imports that use them
+jest.mock('nanoid')
+jest.mock('@vercel/analytics')
+
+// Mock analytics config to enable localStorage in tests
+jest.mock('@/lib/analytics/config', () => ({
+  isAnalyticsEnabled: () => true,
+  isLocalStorageAvailable: () => true,
+  getAnalyticsConfig: () => ({
+    enabled: true,
+    enableConsoleLog: false,
+    enableLocalStorage: true,
+    enableVercelAnalytics: false,
+    maxStoredEvents: 1000,
+    storageKey: 'clauger_analytics_events',
+  }),
+  STORAGE_KEYS: {
+    EVENTS: 'clauger_analytics_events',
+    SUMMARY: 'clauger_analytics_summary',
+    SESSION_ID: 'clauger_session_id',
+    SESSION_START: 'clauger_session_start',
+  },
+  MAX_EVENT_AGE_MS: 30 * 24 * 60 * 60 * 1000,
+}))
+
 import { trackResilienceMetrics } from '@/lib/analytics/tracker'
 import type { ResilienceMetricsEvent } from '@/lib/analytics/types'
 
@@ -49,7 +75,7 @@ describe('trackResilienceMetrics', () => {
 
     trackResilienceMetrics(metrics)
 
-    const stored = localStorageMock.getItem('clauger_rse_analytics_events')
+    const stored = localStorageMock.getItem('clauger_analytics_events')
     expect(stored).toBeTruthy()
 
     const events = JSON.parse(stored!)
@@ -80,7 +106,7 @@ describe('trackResilienceMetrics', () => {
 
     trackResilienceMetrics(metrics)
 
-    const stored = localStorageMock.getItem('clauger_rse_analytics_events')
+    const stored = localStorageMock.getItem('clauger_analytics_events')
     const events = JSON.parse(stored!)
     const event = events[0]
 
@@ -106,7 +132,7 @@ describe('trackResilienceMetrics', () => {
 
     trackResilienceMetrics(metrics)
 
-    const stored = localStorageMock.getItem('clauger_rse_analytics_events')
+    const stored = localStorageMock.getItem('clauger_analytics_events')
     const events = JSON.parse(stored!)
     const event = events[0]
 
@@ -132,7 +158,7 @@ describe('trackResilienceMetrics', () => {
 
     trackResilienceMetrics(metrics)
 
-    const stored = localStorageMock.getItem('clauger_rse_analytics_events')
+    const stored = localStorageMock.getItem('clauger_analytics_events')
     const events = JSON.parse(stored!)
     const event = events[0]
 
@@ -157,7 +183,7 @@ describe('trackResilienceMetrics', () => {
 
     trackResilienceMetrics(metrics)
 
-    const stored = localStorageMock.getItem('clauger_rse_analytics_events')
+    const stored = localStorageMock.getItem('clauger_analytics_events')
     const events = JSON.parse(stored!)
     const event = events[0]
 
@@ -182,7 +208,7 @@ describe('trackResilienceMetrics', () => {
 
     trackResilienceMetrics(metrics, 'test-request-123')
 
-    const stored = localStorageMock.getItem('clauger_rse_analytics_events')
+    const stored = localStorageMock.getItem('clauger_analytics_events')
     const events = JSON.parse(stored!)
     const event = events[0]
 
@@ -207,7 +233,7 @@ describe('trackResilienceMetrics', () => {
 
     trackResilienceMetrics(metrics)
 
-    const stored = localStorageMock.getItem('clauger_rse_analytics_events')
+    const stored = localStorageMock.getItem('clauger_analytics_events')
     const events = JSON.parse(stored!)
     const event = events[0]
 
@@ -233,7 +259,7 @@ describe('trackResilienceMetrics', () => {
 
     trackResilienceMetrics(metrics)
 
-    const stored = localStorageMock.getItem('clauger_rse_analytics_events')
+    const stored = localStorageMock.getItem('clauger_analytics_events')
     const events = JSON.parse(stored!)
     const event = events[0]
 
@@ -260,7 +286,7 @@ describe('trackResilienceMetrics', () => {
 
     trackResilienceMetrics(metrics)
 
-    const stored = localStorageMock.getItem('clauger_rse_analytics_events')
+    const stored = localStorageMock.getItem('clauger_analytics_events')
     const events = JSON.parse(stored!)
     const event = events[0]
 
@@ -286,7 +312,7 @@ describe('trackResilienceMetrics', () => {
 
     trackResilienceMetrics(metrics)
 
-    const stored = localStorageMock.getItem('clauger_rse_analytics_events')
+    const stored = localStorageMock.getItem('clauger_analytics_events')
     const events = JSON.parse(stored!)
     const event = events[0]
 

@@ -32,6 +32,9 @@ const customJestConfig = {
     '/playwright/',
     '__tests__/utils/',
   ],
+  transformIgnorePatterns: [
+    'node_modules/(?!(nanoid|flexsearch)/)',
+  ],
   coverageThreshold: {
     global: {
       branches: 100,

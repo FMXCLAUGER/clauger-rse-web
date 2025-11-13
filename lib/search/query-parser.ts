@@ -25,6 +25,19 @@ export class QueryParser {
 
     const terms = this.parseAdvancedQuery(trimmed);
 
+    // If no actual search terms were found (only operators), treat as simple
+    const operatorKeywords = ['AND', 'OR', 'NOT'];
+    const hasRealTerms = terms.some(term =>
+      !operatorKeywords.includes(term.value.toUpperCase())
+    );
+
+    if (terms.length === 0 || !hasRealTerms) {
+      return {
+        type: 'simple',
+        terms: [{ value: trimmed, isPhrase: false, isNegated: false }]
+      };
+    }
+
     return {
       type: 'advanced',
       terms
@@ -33,7 +46,8 @@ export class QueryParser {
 
   private isAdvancedQuery(query: string): boolean {
     const advancedPatterns = [
-      /"[^"]+"/,
+      /"[^"]*"/,  // Match phrases with quotes (including empty "")
+      /"/,         // Match unclosed quotes
       /\bAND\b/i,
       /\bOR\b/i,
       /\bNOT\b/i,
@@ -182,8 +196,12 @@ export class QueryParser {
 
         if (index > 0 && term.operator) {
           str += ` ${term.operator} `;
-        } else if (index > 0) {
+        } else if (index > 0 && !term.isNegated) {
+          // Don't add implicit AND before negated terms (NOT keyword)
           str += ' AND ';
+        } else if (index > 0) {
+          // Just a space before NOT
+          str += ' ';
         }
 
         if (term.isNegated) {
