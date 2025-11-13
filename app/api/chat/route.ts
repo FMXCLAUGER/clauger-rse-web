@@ -14,6 +14,22 @@ import {
 import { InputSanitizer } from '@/lib/security/input-sanitizer'
 import { logger } from '@/lib/security/secure-logger'
 import { ModelRouter } from '@/lib/ai/model-router'
+import { ResilientAIClient } from '@/lib/resilience/resilient-ai-client'
+
+const resilientClient = new ResilientAIClient({
+  circuitBreaker: {
+    failureThreshold: 5,
+    resetTimeout: 60000,
+    monitoringPeriod: 60000
+  },
+  retry: {
+    maxRetries: 3,
+    initialDelay: 1000,
+    maxDelay: 30000,
+    backoffMultiplier: 2,
+    jitter: true
+  }
+})
 
 // Configuration Node.js Runtime (nécessaire pour fs/path)
 // export const runtime = 'edge' // ❌ Incompatible avec fs
@@ -161,27 +177,28 @@ export async function POST(req: Request) {
       })
     }
 
-    // 6. Appeler Claude avec streaming et prompt caching (modèle sélectionné dynamiquement)
-    const result = await streamText({
-      model: anthropic(routingDecision.model.id),
-      system: systemMessages,
-      messages: messages,
-      maxTokens: thinkingConfig.enabled ? 4096 : 2048,
-      temperature: 0.3,
-      experimental_providerMetadata: {
-        anthropic: {
-          ...(thinkingConfig.enabled && {
-            thinking: {
-              type: 'enabled',
-              budget_tokens: thinkingConfig.budget_tokens
+    // 6. Appeler Claude avec streaming, prompt caching et resilience (modèle sélectionné dynamiquement)
+    const result = await resilientClient.executeWithResilience(
+      async () => streamText({
+        model: anthropic(routingDecision.model.id),
+        system: systemMessages,
+        messages: messages,
+        maxTokens: thinkingConfig.enabled ? 4096 : 2048,
+        temperature: 0.3,
+        experimental_providerMetadata: {
+          anthropic: {
+            ...(thinkingConfig.enabled && {
+              thinking: {
+                type: 'enabled',
+                budget_tokens: thinkingConfig.budget_tokens
+              }
+            }),
+            cacheControl: {
+              type: 'ephemeral'
             }
-          }),
-          cacheControl: {
-            type: 'ephemeral'
           }
-        }
-      },
-      onFinish: async ({ text, usage, experimental_providerMetadata }) => {
+        },
+        onFinish: async ({ text, usage, experimental_providerMetadata }) => {
         const cacheMetrics = experimental_providerMetadata?.anthropic || {}
         const cacheReadTokens = typeof cacheMetrics.cacheReadInputTokens === 'number'
           ? cacheMetrics.cacheReadInputTokens
@@ -232,16 +249,25 @@ export async function POST(req: Request) {
           cacheCreationTokens
         })
       }
-    })
+    }),
+    `chat-${Date.now()}`
+    )
 
     // 7. Retourner le stream
     return result.toDataStreamResponse()
   } catch (error: any) {
+    const circuitState = resilientClient.getCircuitState()
+    const metrics = resilientClient.getMetrics()
+
     logger.error('Chat request failed', {
       errorType: error.name || 'UnknownError',
       errorStatus: error.status,
       errorMessage: error.message || 'Unknown error occurred',
-      phase: error.status === 401 || error.status === 429 ? 'authentication' : 'processing'
+      phase: error.status === 401 || error.status === 429 ? 'authentication' : 'processing',
+      circuitState,
+      successRate: metrics.totalRequests > 0
+        ? (metrics.successfulRequests / metrics.totalRequests * 100).toFixed(2) + '%'
+        : 'N/A'
     })
 
     // Track error
