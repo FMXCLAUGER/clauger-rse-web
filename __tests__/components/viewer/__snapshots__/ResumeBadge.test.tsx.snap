@@ -1,0 +1,10 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`ResumeBadge Visual Regression renders correctly with all expected elements 1`] = `
+<div
+  class="absolute top-2 right-2 px-2 py-1 rounded text-xs font-semibold z-10 animate-pulse"
+  style="background-color: rgb(248, 181, 0); color: rgb(51, 51, 51); animation-duration: 2s;"
+>
+  Reprendre
+</div>
+`;
