@@ -1,6 +1,20 @@
 {
   "extends": "next/core-web-vitals",
   "rules": {
-    "react/no-unescaped-entities": "off"
-  }
+    "react/no-unescaped-entities": "off",
+    "no-console": "error"
+  },
+  "overrides": [
+    {
+      "files": [
+        "lib/security/secure-logger.ts",
+        "lib/validations/env.ts",
+        "__tests__/**/*.ts",
+        "__tests__/**/*.tsx"
+      ],
+      "rules": {
+        "no-console": "off"
+      }
+    }
+  ]
 }

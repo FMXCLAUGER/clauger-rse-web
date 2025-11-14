@@ -16,6 +16,7 @@ import type {
 } from './types'
 import { STORAGE_KEYS, MAX_EVENT_AGE_MS } from './config'
 import { isLocalStorageAvailable } from './config'
+import { logger, logStorageError } from '@/lib/security'
 
 /**
  * Filtres pour la récupération des événements
@@ -34,7 +35,7 @@ export interface EventFilters {
  */
 export function saveEvent(event: AnalyticsEvent): boolean {
   if (!isLocalStorageAvailable()) {
-    console.warn('[Analytics] localStorage non disponible')
+    logger.warn('localStorage unavailable for analytics', { feature: 'analytics' })
     return false
   }
 
@@ -51,7 +52,7 @@ export function saveEvent(event: AnalyticsEvent): boolean {
     localStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(updatedEvents))
     return true
   } catch (error) {
-    console.error('[Analytics] Erreur lors de la sauvegarde:', error)
+    logStorageError('save', error, 'analyticsEvents')
     return false
   }
 }
@@ -97,7 +98,7 @@ export function getEvents(filters?: EventFilters): AnalyticsEvent[] {
 
     return events
   } catch (error) {
-    console.error('[Analytics] Erreur lors de la récupération:', error)
+    logStorageError('retrieve', error, 'analyticsEvents')
     return []
   }
 }
@@ -297,7 +298,7 @@ export function clearOldEvents(maxAge: number = MAX_EVENT_AGE_MS): number {
 
     return removedCount
   } catch (error) {
-    console.error('[Analytics] Erreur lors du nettoyage:', error)
+    logStorageError('cleanup', error, 'analyticsEvents')
     return 0
   }
 }
@@ -314,7 +315,7 @@ export function clearAllEvents(): void {
     localStorage.removeItem(STORAGE_KEYS.EVENTS)
     localStorage.removeItem(STORAGE_KEYS.SUMMARY)
   } catch (error) {
-    console.error('[Analytics] Erreur lors de la suppression:', error)
+    logStorageError('delete', error, 'analyticsEvents')
   }
 }
 
@@ -330,7 +331,7 @@ export function saveSummary(summary: MetricsSummary): void {
   try {
     localStorage.setItem(STORAGE_KEYS.SUMMARY, JSON.stringify(summary))
   } catch (error) {
-    console.error('[Analytics] Erreur lors de la sauvegarde du résumé:', error)
+    logStorageError('saveSummary', error, 'analyticsSummary')
   }
 }
 
@@ -349,7 +350,7 @@ export function getSummary(): MetricsSummary {
       return JSON.parse(raw)
     }
   } catch (error) {
-    console.error('[Analytics] Erreur lors de la récupération du résumé:', error)
+    logStorageError('retrieveSummary', error, 'analyticsSummary')
   }
 
   // Fallback: calcule et sauvegarde

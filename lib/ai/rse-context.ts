@@ -1,5 +1,6 @@
 import fs from 'fs'
 import path from 'path'
+import { logError } from '@/lib/security'
 
 /**
  * Interfaces pour le contexte RSE structuré
@@ -50,7 +51,7 @@ export class RSEContextParser {
       const content = fs.readFileSync(this.ANALYSIS_PATH, 'utf-8')
       return content
     } catch (error) {
-      console.error('Erreur lors du chargement de l\'analyse RSE:', error)
+      logError('RSE analysis markdown loading failed', error, { file: 'analyse-rse.md' })
       return ''
     }
   }

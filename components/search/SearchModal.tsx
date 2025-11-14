@@ -18,6 +18,7 @@ import {
 import { resultsExporter, type ExportFormat } from "@/lib/search/export-results"
 import { toast } from "sonner"
 import { SearchSkeleton } from "./SearchSkeleton"
+import { logError } from '@/lib/security/logger-helpers'
 
 export function SearchModal() {
   const router = useRouter()
@@ -70,7 +71,7 @@ export function SearchModal() {
           setIndexLoadTime(loadTime)
           setSearchIndex(index)
         } catch (err) {
-          console.error("Failed to load search index:", err)
+          logError('Search index loading failed', err, { component: 'SearchModal' })
           setError("Impossible de charger l'index de recherche")
         } finally {
           setLoading(false)
@@ -140,7 +141,7 @@ export function SearchModal() {
         // Store raw results, let useMemo handle filtering
         setResults(searchResults)
       } catch (err) {
-        console.error("Search error:", err)
+        logError('Search query execution failed', err, { component: 'SearchModal', query: searchQuery })
         setResults([])
         setSearchTime(null)
       } finally {
@@ -215,7 +216,7 @@ export function SearchModal() {
         })
         toast.success(`Résultats exportés en ${format.toUpperCase()}`)
       } catch (error) {
-        console.error('Export error:', error)
+        logError('Search results export failed', error, { component: 'SearchModal', format })
         toast.error("Erreur lors de l'export")
       }
     },
@@ -228,7 +229,7 @@ export function SearchModal() {
       await resultsExporter.copyToClipboard(markdown)
       toast.success('Résultats copiés dans le presse-papiers')
     } catch (error) {
-      console.error('Copy error:', error)
+      logError('Search results copy to clipboard failed', error, { component: 'SearchModal' })
       toast.error('Erreur lors de la copie')
     }
   }, [results, query])
@@ -241,7 +242,7 @@ export function SearchModal() {
       await navigator.clipboard.writeText(url.toString())
       toast.success('Lien de recherche copié !')
     } catch (error) {
-      console.error('Share error:', error)
+      logError('Search URL sharing failed', error, { component: 'SearchModal', query })
       toast.error('Erreur lors du partage')
     }
   }, [query])

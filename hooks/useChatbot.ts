@@ -10,6 +10,7 @@ import {
   trackRateLimitExceeded,
   trackSessionEnded
 } from '@/lib/analytics/tracker'
+import { logger, logError, logStorageError } from '@/lib/security'
 
 interface UseChatbotOptions {
   currentPage?: number
@@ -34,16 +35,16 @@ export function useChatbot(options: UseChatbotOptions = {}) {
       currentPage
     },
     onError: error => {
-      console.error('[useChatbot] Erreur:', error)
+      logError('Chatbot request failed', error, { hook: 'useChatbot' })
       toast.error('Une erreur est survenue', {
         description: error.message || 'Veuillez réessayer.'
       })
       onError?.(error)
     },
     onFinish: message => {
-      console.log('[useChatbot] Message terminé:', {
+      logger.debug('Chat message completed', {
         role: message.role,
-        length: message.content.length
+        contentLength: message.content.length
       })
 
       // Sauvegarder l'historique
@@ -73,10 +74,10 @@ export function useChatbot(options: UseChatbotOptions = {}) {
         const history = JSON.parse(stored)
         // Note: useChat ne permet pas de définir messages directement
         // L'historique sera chargé via setMessages si disponible
-        console.log('[useChatbot] Historique chargé:', history.length, 'messages')
+        logger.debug('Chat history loaded', { messageCount: history.length })
       }
     } catch (error) {
-      console.error('[useChatbot] Erreur lors du chargement de l\'historique:', error)
+      logStorageError('load', error, 'chatHistory')
     }
   }
 
@@ -87,7 +88,7 @@ export function useChatbot(options: UseChatbotOptions = {}) {
       const limitedMessages = messages.slice(-MAX_HISTORY_LENGTH)
       localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(limitedMessages))
     } catch (error) {
-      console.error('[useChatbot] Erreur lors de la sauvegarde de l\'historique:', error)
+      logStorageError('save', error, 'chatHistory')
     }
   }
 
@@ -98,7 +99,7 @@ export function useChatbot(options: UseChatbotOptions = {}) {
       // Recharger la page pour réinitialiser le chat
       window.location.reload()
     } catch (error) {
-      console.error('[useChatbot] Erreur lors de l\'effacement de l\'historique:', error)
+      logStorageError('clear', error, 'chatHistory')
     }
   }
 
@@ -239,7 +240,7 @@ export function useCurrentPage(): number | undefined {
           }
         }
       } catch (error) {
-        console.error('[useCurrentPage] Erreur:', error)
+        logStorageError('parse', error, 'clauger-reading-state')
       }
     }
   }, [])

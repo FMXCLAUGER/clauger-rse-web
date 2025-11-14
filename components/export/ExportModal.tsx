@@ -4,6 +4,7 @@ import { useState } from "react"
 import { X, Download, FileText, FileSpreadsheet, Loader2 } from "lucide-react"
 import { exportDashboardPDF, exportDataCSV, exportAllDataCSV } from "@/lib/export/export-utils"
 import { toast } from "sonner"
+import { logError } from '@/lib/security/logger-helpers'
 
 interface ExportModalProps {
   isOpen: boolean
@@ -29,7 +30,7 @@ export function ExportModal({ isOpen, onClose, activeTab }: ExportModalProps) {
       toast.success("PDF exporté avec succès !")
       onClose()
     } catch (error) {
-      console.error("Export PDF error:", error)
+      logError('Dashboard PDF export failed', error, { component: 'ExportModal', activeTab })
       toast.error("Erreur lors de l'export PDF")
     } finally {
       setLoading(false)
@@ -42,7 +43,7 @@ export function ExportModal({ isOpen, onClose, activeTab }: ExportModalProps) {
       toast.success("CSV exporté avec succès !")
       onClose()
     } catch (error) {
-      console.error("Export CSV error:", error)
+      logError('Dashboard CSV export failed', error, { component: 'ExportModal', activeTab })
       toast.error("Erreur lors de l'export CSV")
     }
   }
@@ -53,7 +54,7 @@ export function ExportModal({ isOpen, onClose, activeTab }: ExportModalProps) {
       toast.success("Toutes les données exportées !")
       onClose()
     } catch (error) {
-      console.error("Export all CSV error:", error)
+      logError('Complete CSV export failed', error, { component: 'ExportModal' })
       toast.error("Erreur lors de l'export")
     }
   }

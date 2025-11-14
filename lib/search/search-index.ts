@@ -1,5 +1,6 @@
 import type { OCRData, SearchResult, SearchOptions } from './types'
 import { queryParser, type ParsedQuery, type QueryTerm } from './query-parser'
+import { logger, logError, logPerformance } from '@/lib/security'
 
 const FRENCH_STOPWORDS = new Set([
   'le', 'la', 'les', 'un', 'une', 'des', 'de', 'du', 'au', 'aux',
@@ -71,7 +72,7 @@ export class SearchIndex {
     if (!this.index) {
       const Document = await loadFlexSearch()
       this.index = new Document(this.indexConfig)
-      console.log('FlexSearch loaded dynamically')
+      logger.debug('FlexSearch module loaded dynamically')
     }
 
     for (const page of data.pages) {
@@ -106,7 +107,7 @@ export class SearchIndex {
     }
 
     const loadTime = Date.now() - startTime
-    console.log(`Search index loaded in ${loadTime}ms (vocabulary: ${this.vocabulary.size} words)`)
+    logPerformance('Search index loading', loadTime, { vocabularySize: this.vocabulary.size })
 
     return {
       totalPages: data.pages.length,
@@ -129,7 +130,7 @@ export class SearchIndex {
 
     // Ensure index is loaded before searching
     if (!this.index) {
-      console.warn('Search index not loaded yet')
+      logger.warn('Search attempted before index loaded', { operation: 'search' })
       return []
     }
 
@@ -151,7 +152,7 @@ export class SearchIndex {
     if (results.length === 0 || results.every((r: any) => r.result.length === 0)) {
       const correctedQuery = this.getSuggestion(query)
       if (correctedQuery && correctedQuery !== query) {
-        console.log(`Fuzzy search: "${query}" → "${correctedQuery}"`)
+        logger.debug('Fuzzy search correction applied', { originalQuery: query, correctedQuery })
         const normalizedCorrected = this.normalizeText(correctedQuery)
         results = this.index.search(normalizedCorrected, {
           index: ['title', 'content'],
@@ -216,7 +217,7 @@ export class SearchIndex {
 
     // Ensure index is loaded (defensive check)
     if (!this.index) {
-      console.warn('Search index not loaded for advanced search')
+      logger.warn('Search attempted before index loaded', { operation: 'advancedSearch' })
       return []
     }
 
@@ -574,7 +575,7 @@ export async function getSearchIndex(): Promise<SearchIndex> {
     const data: OCRData = await response.json()
     await searchIndexInstance.loadData(data)
   } catch (error) {
-    console.error('Failed to initialize search index:', error)
+    logError('Search index initialization failed', error)
     throw error
   }
 

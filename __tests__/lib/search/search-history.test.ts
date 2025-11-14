@@ -5,6 +5,7 @@ import {
   removeFromSearchHistory,
   SearchHistoryItem,
 } from '@/lib/search/search-history'
+import { logger } from '@/lib/security/secure-logger'
 
 const STORAGE_KEY = 'clauger-search-history'
 const MAX_HISTORY = 10
@@ -42,7 +43,7 @@ describe('search-history', () => {
 
     // Mock Date.now for consistent timestamps
     jest.spyOn(Date, 'now').mockReturnValue(1000000)
-    jest.spyOn(console, 'error').mockImplementation(() => {})
+    jest.spyOn(logger, 'error').mockImplementation(() => {})
   })
 
   afterEach(() => {
@@ -89,10 +90,11 @@ describe('search-history', () => {
 
       const history = getSearchHistory()
       expect(history).toEqual([])
-      expect(console.error).toHaveBeenCalledWith(
-        'Failed to load search history:',
-        expect.any(Error)
-      )
+      expect(logger.error).toHaveBeenCalledWith('localStorage load failed', {
+        operation: 'load',
+        key: 'searchHistory',
+        error: expect.any(String)
+      })
     })
 
     it('should handle localStorage.getItem throwing error', () => {
@@ -106,10 +108,11 @@ describe('search-history', () => {
 
       const history = getSearchHistory()
       expect(history).toEqual([])
-      expect(console.error).toHaveBeenCalledWith(
-        'Failed to load search history:',
-        expect.any(Error)
-      )
+      expect(logger.error).toHaveBeenCalledWith('localStorage load failed', {
+        operation: 'load',
+        key: 'searchHistory',
+        error: expect.any(String)
+      })
     })
 
     it('should handle SSR context gracefully', () => {
@@ -195,10 +198,11 @@ describe('search-history', () => {
 
       addToSearchHistory('test')
 
-      expect(console.error).toHaveBeenCalledWith(
-        'Failed to save search history:',
-        expect.any(Error)
-      )
+      expect(logger.error).toHaveBeenCalledWith('localStorage save failed', {
+        operation: 'save',
+        key: 'searchHistory',
+        error: expect.any(String)
+      })
     })
 
     // Note: SSR behavior is tested in search-history.ssr.test.ts
@@ -236,10 +240,11 @@ describe('search-history', () => {
 
       clearSearchHistory()
 
-      expect(console.error).toHaveBeenCalledWith(
-        'Failed to clear search history:',
-        expect.any(Error)
-      )
+      expect(logger.error).toHaveBeenCalledWith('localStorage clear failed', {
+        operation: 'clear',
+        key: 'searchHistory',
+        error: expect.any(String)
+      })
     })
 
     // Note: SSR behavior is tested in search-history.ssr.test.ts
@@ -314,10 +319,11 @@ describe('search-history', () => {
 
       removeFromSearchHistory('query1')
 
-      expect(console.error).toHaveBeenCalledWith(
-        'Failed to remove from search history:',
-        expect.any(Error)
-      )
+      expect(logger.error).toHaveBeenCalledWith('localStorage remove failed', {
+        operation: 'remove',
+        key: 'searchHistory',
+        error: expect.any(String)
+      })
     })
 
     // Note: SSR behavior is tested in search-history.ssr.test.ts

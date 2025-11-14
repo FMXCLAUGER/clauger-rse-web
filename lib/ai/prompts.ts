@@ -197,7 +197,7 @@ Réponds maintenant aux questions de l'utilisateur en te basant sur ce contexte.
  * Helper pour formater une citation
  */
 export function formatCitation(section: string, page?: number): string {
-  if (page) {
+  if (page !== undefined) {
     return `*Source : ${section} (page ${page})*`
   }
   return `*Source : ${section}*`

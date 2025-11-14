@@ -1,4 +1,5 @@
 import { RSEContextParser, type RSEContext } from './rse-context'
+import { logger, logError, logPerformance } from '@/lib/security'
 
 /**
  * Gestionnaire de la base de connaissances RSE
@@ -50,21 +51,20 @@ export class RSEKnowledgeBase {
    */
   private async _loadContextInternal(): Promise<void> {
     try {
-      console.log('[RSE Knowledge Base] Chargement du contexte RSE...')
+      logger.debug('Loading RSE knowledge base context')
       const startTime = Date.now()
 
       this.context = await RSEContextParser.parseAnalysis()
       this.fullAnalysisText = await RSEContextParser.loadFullAnalysis()
 
       const loadTime = Date.now() - startTime
-      console.log(`[RSE Knowledge Base] Contexte chargé en ${loadTime}ms`)
-      console.log(
-        `[RSE Knowledge Base] ${this.context.sections.length} sections, ` +
-          `${this.context.scores.length} scores, ` +
-          `${this.context.recommendations.length} recommandations`
-      )
+      logPerformance('RSE knowledge base loading', loadTime, {
+        sectionsCount: this.context.sections.length,
+        scoresCount: this.context.scores.length,
+        recommendationsCount: this.context.recommendations.length
+      })
     } catch (error) {
-      console.error('[RSE Knowledge Base] Erreur lors du chargement:', error)
+      logError('RSE knowledge base loading failed', error)
       throw error
     }
   }
@@ -167,7 +167,7 @@ export class RSEKnowledgeBase {
   invalidateCache(): void {
     this.context = null
     this.fullAnalysisText = null
-    console.log('[RSE Knowledge Base] Cache invalidé')
+    logger.debug('RSE knowledge base cache invalidated')
   }
 
   /**

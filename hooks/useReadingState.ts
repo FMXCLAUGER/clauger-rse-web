@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import type { ZoomLevel } from "@/lib/design/clauger-colors"
+import { logStorageError } from "@/lib/security/logger-helpers"
 
 interface ReadingState {
   lastPage: number
@@ -18,14 +19,18 @@ export function useReadingState(currentPage: number, currentZoom: ZoomLevel, cur
   useEffect(() => {
     if (typeof window === "undefined") return
 
-    const saved = localStorage.getItem(STORAGE_KEY)
-    if (saved) {
-      try {
-        const state: ReadingState = JSON.parse(saved)
-        setSavedState(state)
-      } catch (error) {
-        console.error("Failed to parse reading state:", error)
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY)
+      if (saved) {
+        try {
+          const state: ReadingState = JSON.parse(saved)
+          setSavedState(state)
+        } catch (error) {
+          logStorageError('parse', error, 'readingState')
+        }
       }
+    } catch (error) {
+      logStorageError('load', error, 'readingState')
     }
   }, [])
 
@@ -39,13 +44,21 @@ export function useReadingState(currentPage: number, currentZoom: ZoomLevel, cur
       timestamp: Date.now(),
     }
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
-    setSavedState(state)
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
+      setSavedState(state)
+    } catch (error) {
+      logStorageError('save', error, 'readingState')
+    }
   }, [currentPage, currentZoom, currentSidebarCollapsed])
 
   const clearState = useCallback(() => {
     if (typeof window === "undefined") return
-    localStorage.removeItem(STORAGE_KEY)
+    try {
+      localStorage.removeItem(STORAGE_KEY)
+    } catch (error) {
+      logStorageError('clear', error, 'readingState')
+    }
     setSavedState(null)
   }, [])
 

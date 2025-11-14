@@ -3,6 +3,7 @@
 import { useEffect } from "react"
 import Link from "next/link"
 import { AlertTriangle, Home, RefreshCw } from "lucide-react"
+import { logger } from "@/lib/security"
 
 export default function GlobalError({
   error,
@@ -12,7 +13,12 @@ export default function GlobalError({
   reset: () => void
 }) {
   useEffect(() => {
-    console.error("Global error:", error)
+    logger.error("Global application error caught by error boundary", {
+      errorMessage: error.message,
+      errorStack: error.stack,
+      errorDigest: error.digest,
+      component: "GlobalErrorBoundary"
+    })
   }, [error])
 
   return (

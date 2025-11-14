@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { getEvents, calculateSummary, type EventFilters } from '@/lib/analytics'
 import type { AnalyticsEvent, MetricsSummary } from '@/lib/analytics/types'
+import { logError } from '@/lib/security/logger-helpers'
 
 export function useAnalytics(filters?: EventFilters) {
   const [events, setEvents] = useState<AnalyticsEvent[]>([])
@@ -18,7 +19,7 @@ export function useAnalytics(filters?: EventFilters) {
         setEvents(loadedEvents)
         setSummary(calculatedSummary)
       } catch (error) {
-        console.error('[useAnalytics] Erreur chargement:', error)
+        logError('Analytics data loading failed', error, { hook: 'useAnalytics' })
       } finally {
         setIsLoading(false)
       }

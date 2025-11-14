@@ -5,6 +5,7 @@ import html2canvas from "html2canvas"
 import Papa from "papaparse"
 import { environmentData, socialData, governanceData } from "@/lib/data/rse-data"
 import { PAGES } from "@/lib/constants"
+import { logError } from '@/lib/security/logger-helpers'
 
 // Export dashboard as PDF
 export async function exportDashboardPDF(dashboardId: string, dashboardName: string) {
@@ -189,7 +190,7 @@ export async function exportReportPagesPDF(selectedPages: number[], filename?: s
       pdf.text(pageText, (pageWidth - textWidth) / 2, pageHeight - 7)
 
     } catch (error) {
-      console.error(`Erreur lors du chargement de la page ${pageNum}:`, error)
+      logError('Report page image loading failed', error, { pageNumber: pageNum })
       throw new Error(`Impossible de charger la page ${pageNum}`)
     }
   }

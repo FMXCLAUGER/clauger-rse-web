@@ -23,6 +23,7 @@ import type {
 } from './types'
 import { saveEvent } from './storage'
 import { getAnalyticsConfig, isAnalyticsEnabled, STORAGE_KEYS } from './config'
+import { logger, logError, logStorageError } from '@/lib/security'
 
 /**
  * Récupère ou crée un ID de session
@@ -83,7 +84,7 @@ function trackVercelAnalytics(event: AnalyticsEvent): void {
 
     track(event.eventType, flatProperties)
   } catch (error) {
-    console.error('[AnalyticsTracker] Vercel Analytics error:', error)
+    logError('Vercel Analytics tracking failed', error, { eventType: event.eventType })
   }
 }
 
@@ -95,7 +96,7 @@ function sendEvent(event: AnalyticsEvent): void {
 
   // Log en mode développement
   if (config.enableConsoleLog) {
-    console.log('[Analytics]', event.eventType, event)
+    logger.debug('Analytics event tracked', { eventType: event.eventType, event })
   }
 
   // Sauvegarde locale
@@ -349,7 +350,7 @@ export function resetSession(): void {
     sessionStorage.removeItem(STORAGE_KEYS.SESSION_ID)
     sessionStorage.removeItem(STORAGE_KEYS.SESSION_START)
   } catch (error) {
-    console.error('[Analytics] Erreur lors de la réinitialisation:', error)
+    logStorageError('clear', error, 'analytics-session')
   }
 }
 

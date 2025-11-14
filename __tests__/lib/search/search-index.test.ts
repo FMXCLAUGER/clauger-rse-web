@@ -1,5 +1,6 @@
 import { SearchIndex, getSearchIndex } from '@/lib/search/search-index'
 import type { OCRData } from '@/lib/search/types'
+import { logger } from '@/lib/security/secure-logger'
 
 // Create mock Document constructor that can be accessed by tests
 const mockDocumentConstructor = jest.fn().mockImplementation(function(this: any, config: any) {
@@ -924,7 +925,7 @@ describe('getSearchIndex', () => {
     mockFetch = global.fetch as jest.Mock
     mockFetch.mockClear()
     jest.spyOn(console, 'log').mockImplementation(() => {})
-    jest.spyOn(console, 'error').mockImplementation(() => {})
+    jest.spyOn(logger, 'error').mockImplementation(() => {})
   })
 
   afterEach(() => {
@@ -1008,24 +1009,28 @@ describe('getSearchIndex', () => {
     } as Response)
 
     const { getSearchIndex } = require('@/lib/search/search-index')
+    const { logger: loggerModule } = require('@/lib/security/secure-logger')
+    const errorSpy = jest.spyOn(loggerModule, 'error').mockImplementation(() => {})
 
     await expect(getSearchIndex()).rejects.toThrow('Failed to load OCR data: Not Found')
-    expect(console.error).toHaveBeenCalledWith(
-      'Failed to initialize search index:',
-      expect.any(Error)
-    )
+    expect(errorSpy).toHaveBeenCalledWith('Search index initialization failed', {
+      errorMessage: expect.any(String),
+      errorStack: expect.any(String)
+    })
   })
 
   it('should throw error when fetch throws', async () => {
     mockFetch.mockRejectedValue(new Error('Network error'))
 
     const { getSearchIndex } = require('@/lib/search/search-index')
+    const { logger: loggerModule } = require('@/lib/security/secure-logger')
+    const errorSpy = jest.spyOn(loggerModule, 'error').mockImplementation(() => {})
 
     await expect(getSearchIndex()).rejects.toThrow('Network error')
-    expect(console.error).toHaveBeenCalledWith(
-      'Failed to initialize search index:',
-      expect.any(Error)
-    )
+    expect(errorSpy).toHaveBeenCalledWith('Search index initialization failed', {
+      errorMessage: expect.any(String),
+      errorStack: expect.any(String)
+    })
   })
 
   it('should throw error when JSON parsing fails', async () => {

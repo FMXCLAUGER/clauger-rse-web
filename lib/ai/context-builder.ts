@@ -1,6 +1,7 @@
 import { knowledgeBase } from './knowledge-base'
 import { SemanticChunker } from './semantic-chunker'
 import type { OCRData } from '@/lib/search/types'
+import { logger, logError } from '@/lib/security'
 
 /**
  * Options pour la construction du contexte
@@ -99,9 +100,11 @@ export class ContextBuilder {
     // 7. Tronquer si nécessaire
     let finalContext = fullContext
     if (fullContext.length > maxContextLength) {
-      console.warn(
-        `[Context Builder] Contexte tronqué de ${fullContext.length} à ${maxContextLength} caractères`
-      )
+      logger.warn('Context truncated to fit token limit', {
+        originalLength: fullContext.length,
+        truncatedLength: maxContextLength,
+        reduction: fullContext.length - maxContextLength
+      })
       finalContext = fullContext.slice(0, maxContextLength) + '\n\n[... Contexte tronqué pour limites de tokens ...]'
     }
 
@@ -325,7 +328,7 @@ export class ContextBuilder {
       }
       return await response.json()
     } catch (error) {
-      console.error('[Context Builder] Erreur chargement OCR:', error)
+      logError('OCR data loading failed for context builder', error)
       return {
         metadata: {
           totalPages: 0,

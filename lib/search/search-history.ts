@@ -1,3 +1,5 @@
+import { logStorageError } from '@/lib/security/logger-helpers'
+
 const STORAGE_KEY = "clauger-search-history"
 const MAX_HISTORY = 10
 
@@ -16,7 +18,7 @@ export function getSearchHistory(): SearchHistoryItem[] {
     const history = JSON.parse(stored) as SearchHistoryItem[]
     return history.slice(0, MAX_HISTORY)
   } catch (error) {
-    console.error("Failed to load search history:", error)
+    logStorageError('load', error, 'searchHistory')
     return []
   }
 }
@@ -40,7 +42,7 @@ export function addToSearchHistory(query: string): void {
 
     localStorage.setItem(STORAGE_KEY, JSON.stringify(newHistory))
   } catch (error) {
-    console.error("Failed to save search history:", error)
+    logStorageError('save', error, 'searchHistory')
   }
 }
 
@@ -50,7 +52,7 @@ export function clearSearchHistory(): void {
   try {
     localStorage.removeItem(STORAGE_KEY)
   } catch (error) {
-    console.error("Failed to clear search history:", error)
+    logStorageError('clear', error, 'searchHistory')
   }
 }
 
@@ -62,6 +64,6 @@ export function removeFromSearchHistory(query: string): void {
     const filtered = history.filter((item) => item.query !== query)
     localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered))
   } catch (error) {
-    console.error("Failed to remove from search history:", error)
+    logStorageError('remove', error, 'searchHistory')
   }
 }

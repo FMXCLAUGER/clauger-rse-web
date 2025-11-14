@@ -3,6 +3,7 @@
 import { useEffect } from "react"
 import Link from "next/link"
 import { AlertTriangle, Home, RefreshCw } from "lucide-react"
+import { logger } from "@/lib/security"
 
 export default function Error({
   error,
@@ -12,7 +13,12 @@ export default function Error({
   reset: () => void
 }) {
   useEffect(() => {
-    console.error("Report page error:", error)
+    logger.error("Report page error caught by error boundary", {
+      errorMessage: error.message,
+      errorStack: error.stack,
+      errorDigest: error.digest,
+      component: "ReportErrorBoundary"
+    })
   }, [error])
 
   return (

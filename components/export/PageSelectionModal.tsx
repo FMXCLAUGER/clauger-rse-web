@@ -6,6 +6,7 @@ import { exportReportPagesPDF } from "@/lib/export/export-utils"
 import { PAGES, TOTAL_PAGES } from "@/lib/constants"
 import { toast } from "sonner"
 import Image from "next/image"
+import { logError } from '@/lib/security/logger-helpers'
 
 interface PageSelectionModalProps {
   isOpen: boolean
@@ -45,7 +46,7 @@ export function PageSelectionModal({ isOpen, onClose, currentPage }: PageSelecti
       toast.success(`PDF téléchargé avec succès (${selectedPages.length} page${selectedPages.length > 1 ? 's' : ''})`)
       onClose()
     } catch (error) {
-      console.error("Export PDF error:", error)
+      logError('Report pages PDF export failed', error, { component: 'PageSelectionModal', pageCount: selectedPages.length })
       toast.error("Erreur lors de la génération du PDF")
     } finally {
       setLoading(false)

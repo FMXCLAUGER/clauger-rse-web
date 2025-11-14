@@ -1,3 +1,5 @@
 export { InputSanitizer, INJECTION_TEST_CASES } from './input-sanitizer'
 export { SecureLogger, logger } from './secure-logger'
+export { logError, logStorageError, logPerformance } from './logger-helpers'
+export { loggerConfig } from './logger-config'
 export type { ValidationResult, LogLevel, LogEntry, PIIPattern } from './types'

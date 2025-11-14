@@ -1,3 +1,5 @@
+import { logStorageError } from '@/lib/security'
+
 interface RateLimiterState {
   tokens: number
   lastUpdate: number
@@ -75,7 +77,7 @@ export class RateLimiter {
         }
       }
     } catch (error) {
-      console.error('[RateLimiter] Error reading state:', error)
+      logStorageError('read', error, 'rateLimiterState')
     }
 
     return {
@@ -88,7 +90,7 @@ export class RateLimiter {
     try {
       localStorage.setItem(this.storageKey, JSON.stringify(state))
     } catch (error) {
-      console.error('[RateLimiter] Error saving state:', error)
+      logStorageError('save', error, 'rateLimiterState')
     }
   }
 }
