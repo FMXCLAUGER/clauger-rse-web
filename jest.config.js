@@ -10,6 +10,7 @@ const customJestConfig = {
   moduleNameMapper: {
     '^@/test-utils$': '<rootDir>/__tests__/utils/test-utils',
     '^@/(.*)$': '<rootDir>/$1',
+    '\\.(css|less|scss|sass)$': '<rootDir>/__mocks__/styleMock.js',
   },
   collectCoverageFrom: [
     'app/**/*.{js,jsx,ts,tsx}',
@@ -34,7 +35,7 @@ const customJestConfig = {
     '__tests__/utils/',
   ],
   transformIgnorePatterns: [
-    'node_modules/(?!(nanoid|flexsearch)/)',
+    'node_modules/(?!(nanoid|flexsearch|yet-another-react-lightbox)/)',
   ],
   coverageThreshold: {
     global: {
