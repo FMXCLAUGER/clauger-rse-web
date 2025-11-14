@@ -1,19 +1,13 @@
 import { describe, it, expect, beforeEach, jest } from '@jest/globals'
 
-// Create mock functions first
-const mockNanoidFn = jest.fn(() => 'mock-id')
+// Create mock functions first - use jest.fn() without default implementations
+// so mockReturnValue() works properly in tests
+const mockNanoidFn = jest.fn()
 const mockTrackFn = jest.fn()
 const mockLoggerDebugFn = jest.fn()
-const mockIsAnalyticsEnabledFn = jest.fn(() => true)
-const mockGetAnalyticsConfigFn = jest.fn(() => ({
-  enabled: true,
-  enableConsoleLog: false,
-  enableLocalStorage: true,
-  enableVercelAnalytics: false,
-  maxStoredEvents: 1000,
-  storageKey: 'clauger_analytics_events',
-}))
-const mockSaveEventFn = jest.fn(() => true)
+const mockIsAnalyticsEnabledFn = jest.fn()
+const mockGetAnalyticsConfigFn = jest.fn()
+const mockSaveEventFn = jest.fn()
 
 // Mock ESM modules before any imports that use them
 jest.mock('nanoid', () => ({
@@ -47,11 +41,6 @@ jest.mock('@/lib/analytics/config', () => ({
   MAX_EVENT_AGE_MS: 30 * 24 * 60 * 60 * 1000,
 }))
 
-// Mock storage module
-jest.mock('@/lib/analytics/storage', () => ({
-  saveEvent: mockSaveEventFn,
-}))
-
 import {
   trackMessageSent,
   trackCacheMetrics,
@@ -65,6 +54,8 @@ import {
   trackResilienceMetrics,
   getSessionMetrics,
   resetSession,
+  __setDependenciesForTesting,
+  __resetDependencies,
 } from '@/lib/analytics/tracker'
 
 // Get mock functions
@@ -98,27 +89,80 @@ Object.defineProperty(global, 'sessionStorage', {
   writable: true,
 })
 
+// Mock localStorage for tests
+const localStorageMock = (() => {
+  let store: Record<string, string> = {}
+
+  return {
+    getItem: (key: string) => store[key] || null,
+    setItem: (key: string, value: string) => {
+      store[key] = value
+    },
+    removeItem: (key: string) => {
+      delete store[key]
+    },
+    clear: () => {
+      store = {}
+    },
+  }
+})()
+
+Object.defineProperty(global, 'localStorage', {
+  value: localStorageMock,
+  writable: true,
+})
+
+// Mock window object for Vercel Analytics tests
+// @ts-ignore - window doesn't exist in Node.js but we need it for tests
+global.window = {
+  navigator: { userAgent: 'test-agent' },
+  location: { pathname: '/', href: 'http://localhost/' },
+} as any
+
 describe('Analytics Tracker', () => {
   let eventIdCounter = 0
 
   beforeEach(() => {
     sessionStorageMock.clear()
+    localStorageMock.clear()
     jest.clearAllMocks()
     eventIdCounter = 0
 
     // Setup nanoid to return predictable IDs
     mockNanoid.mockImplementation(() => `test-id-${++eventIdCounter}`)
 
-    // Reset default mocks
-    mockIsAnalyticsEnabled.mockReturnValue(true)
-    mockGetAnalyticsConfig.mockReturnValue({
+    // Reset default mocks using mockImplementation for better control
+    mockIsAnalyticsEnabled.mockImplementation(() => true)
+    mockGetAnalyticsConfig.mockImplementation(() => ({
       enabled: true,
       enableConsoleLog: false,
       enableLocalStorage: true,
       enableVercelAnalytics: false,
       maxStoredEvents: 1000,
       storageKey: 'clauger_analytics_events',
+    }))
+
+    // Reset mockSaveEvent to return true by default
+    mockSaveEvent.mockImplementation(() => true)
+
+    // Inject all dependencies using dependency injection
+    __setDependenciesForTesting({
+      saveEvent: mockSaveEvent,
+      getAnalyticsConfig: mockGetAnalyticsConfig,
+      isAnalyticsEnabled: mockIsAnalyticsEnabled,
+      logger: {
+        debug: mockLoggerDebug,
+        info: jest.fn(),
+        warn: jest.fn(),
+        error: jest.fn(),
+      } as any,
+      track: mockTrack,
     })
+  })
+
+  afterEach(() => {
+    // Reset to original implementations
+    __resetDependencies()
   })
 
   describe('Session Management', () => {
@@ -222,7 +266,7 @@ describe('Analytics Tracker', () => {
     })
 
     it('should not track when analytics disabled', () => {
-      mockIsAnalyticsEnabled.mockReturnValue(false)
+      mockIsAnalyticsEnabled.mockImplementation(() => false)
 
       trackMessageSent({ queryLength: 10, messageCount: 1 })
 
@@ -499,7 +543,8 @@ describe('Analytics Tracker', () => {
         expect.objectContaining({
           properties: expect.objectContaining({
             errorType: 'NETWORK_ERROR',
-            errorStatus: undefined,
+            errorMessage: 'Connection failed',
+            phase: 'request',
           }),
         })
       )
@@ -615,14 +660,14 @@ describe('Analytics Tracker', () => {
 
   describe('Integration with Storage', () => {
     it('should save event when localStorage enabled', () => {
-      mockGetAnalyticsConfig.mockReturnValue({
+      mockGetAnalyticsConfig.mockImplementation(() => ({
         enabled: true,
         enableConsoleLog: false,
         enableLocalStorage: true,
         enableVercelAnalytics: false,
         maxStoredEvents: 1000,
         storageKey: 'clauger_analytics_events',
-      })
+      }))
 
       trackMessageSent({ queryLength: 10, messageCount: 1 })
 
@@ -630,14 +675,14 @@ describe('Analytics Tracker', () => {
     })
 
     it('should not save event when localStorage disabled', () => {
-      mockGetAnalyticsConfig.mockReturnValue({
+      mockGetAnalyticsConfig.mockImplementation(() => ({
         enabled: true,
         enableConsoleLog: false,
         enableLocalStorage: false,
         enableVercelAnalytics: false,
         maxStoredEvents: 1000,
         storageKey: 'clauger_analytics_events',
-      })
+      }))
 
       trackMessageSent({ queryLength: 10, messageCount: 1 })
 
@@ -647,14 +692,14 @@ describe('Analytics Tracker', () => {
 
   describe('Integration with Vercel Analytics', () => {
     it('should send to Vercel when enabled', () => {
-      mockGetAnalyticsConfig.mockReturnValue({
+      mockGetAnalyticsConfig.mockImplementation(() => ({
         enabled: true,
         enableConsoleLog: false,
         enableLocalStorage: false,
         enableVercelAnalytics: true,
         maxStoredEvents: 1000,
         storageKey: 'clauger_analytics_events',
-      })
+      }))
 
       trackMessageSent({ queryLength: 10, messageCount: 1 })
 
@@ -668,14 +713,14 @@ describe('Analytics Tracker', () => {
     })
 
     it('should flatten array properties for Vercel', () => {
-      mockGetAnalyticsConfig.mockReturnValue({
+      mockGetAnalyticsConfig.mockImplementation(() => ({
         enabled: true,
         enableConsoleLog: false,
         enableLocalStorage: false,
         enableVercelAnalytics: true,
         maxStoredEvents: 1000,
         storageKey: 'clauger_analytics_events',
-      })
+      }))
 
       trackContextBuilt({
         sources: ['file1.md', 'file2.md', 'file3.md'],
@@ -697,14 +742,14 @@ describe('Analytics Tracker', () => {
     })
 
     it('should not send to Vercel when disabled', () => {
-      mockGetAnalyticsConfig.mockReturnValue({
+      mockGetAnalyticsConfig.mockImplementation(() => ({
         enabled: true,
         enableConsoleLog: false,
         enableLocalStorage: true,
         enableVercelAnalytics: false,
         maxStoredEvents: 1000,
         storageKey: 'clauger_analytics_events',
-      })
+      }))
 
       trackMessageSent({ queryLength: 10, messageCount: 1 })
 
@@ -714,14 +759,14 @@ describe('Analytics Tracker', () => {
 
   describe('Console Logging', () => {
     it('should log when console logging enabled', () => {
-      mockGetAnalyticsConfig.mockReturnValue({
+      mockGetAnalyticsConfig.mockImplementation(() => ({
         enabled: true,
         enableConsoleLog: true,
         enableLocalStorage: false,
         enableVercelAnalytics: false,
         maxStoredEvents: 1000,
         storageKey: 'clauger_analytics_events',
-      })
+      }))
 
       trackMessageSent({ queryLength: 10, messageCount: 1 })
 
@@ -734,14 +779,14 @@ describe('Analytics Tracker', () => {
     })
 
     it('should not log when console logging disabled', () => {
-      mockGetAnalyticsConfig.mockReturnValue({
+      mockGetAnalyticsConfig.mockImplementation(() => ({
         enabled: true,
         enableConsoleLog: false,
         enableLocalStorage: true,
         enableVercelAnalytics: false,
         maxStoredEvents: 1000,
         storageKey: 'clauger_analytics_events',
-      })
+      }))
 
       trackMessageSent({ queryLength: 10, messageCount: 1 })
 

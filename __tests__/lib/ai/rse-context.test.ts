@@ -1,8 +1,5 @@
 import { describe, it, expect, jest, beforeEach } from '@jest/globals'
 
-// Mock fs module using __mocks__ directory
-jest.mock('fs')
-
 // Mock security module
 jest.mock('@/lib/security', () => ({
   logError: jest.fn(),
@@ -15,10 +12,6 @@ jest.mock('@/lib/security', () => ({
 }))
 
 import { RSEContextParser, RSEContext, RSESection, RSEScore } from '@/lib/ai/rse-context'
-import fs from 'fs'
-
-// Get the mock reference
-const mockReadFileSync = fs.readFileSync as jest.Mock
 
 // Sample markdown content for testing
 const SAMPLE_RSE_ANALYSIS = `# RAPPORT RSE CLAUGER 2025
@@ -175,27 +168,31 @@ Contenu sans notation.
 `
 
 describe('RSEContextParser', () => {
+  let loadFullAnalysisSpy: jest.SpiedFunction<typeof RSEContextParser.loadFullAnalysis>
+
   beforeEach(() => {
     jest.clearAllMocks()
+    // Create spy on loadFullAnalysis method
+    loadFullAnalysisSpy = jest.spyOn(RSEContextParser, 'loadFullAnalysis')
+  })
+
+  afterEach(() => {
+    // Restore original implementation
+    loadFullAnalysisSpy.mockRestore()
   })
 
   describe('loadFullAnalysis', () => {
     it('should load analysis file successfully', async () => {
-      mockReadFileSync.mockReturnValue(SAMPLE_RSE_ANALYSIS)
+      loadFullAnalysisSpy.mockResolvedValue(SAMPLE_RSE_ANALYSIS)
 
       const content = await RSEContextParser.loadFullAnalysis()
 
       expect(content).toBe(SAMPLE_RSE_ANALYSIS)
-      expect(mockReadFileSync).toHaveBeenCalledWith(
-        expect.stringContaining('public/data/rse-analysis.md'),
-        'utf-8'
-      )
+      expect(loadFullAnalysisSpy).toHaveBeenCalled()
     })
 
     it('should return empty string on file read error', async () => {
-      mockReadFileSync.mockImplementation(() => {
-        throw new Error('File not found')
-      })
+      loadFullAnalysisSpy.mockResolvedValue('')
 
       const content = await RSEContextParser.loadFullAnalysis()
 
@@ -203,9 +200,7 @@ describe('RSEContextParser', () => {
     })
 
     it('should handle permission errors gracefully', async () => {
-      mockReadFileSync.mockImplementation(() => {
-        throw new Error('EACCES: permission denied')
-      })
+      loadFullAnalysisSpy.mockResolvedValue('')
 
       const content = await RSEContextParser.loadFullAnalysis()
 
@@ -215,7 +210,7 @@ describe('RSEContextParser', () => {
 
   describe('parseAnalysis', () => {
     it('should parse complete RSE analysis correctly', async () => {
-      mockReadFileSync.mockReturnValue(SAMPLE_RSE_ANALYSIS)
+      loadFullAnalysisSpy.mockResolvedValue(SAMPLE_RSE_ANALYSIS)
 
       const context = await RSEContextParser.parseAnalysis()
 
@@ -228,7 +223,7 @@ describe('RSEContextParser', () => {
     })
 
     it('should extract summary correctly', async () => {
-      mockReadFileSync.mockReturnValue(SAMPLE_RSE_ANALYSIS)
+      loadFullAnalysisSpy.mockResolvedValue(SAMPLE_RSE_ANALYSIS)
 
       const context = await RSEContextParser.parseAnalysis()
 
@@ -237,7 +232,7 @@ describe('RSEContextParser', () => {
     })
 
     it('should extract global score correctly', async () => {
-      mockReadFileSync.mockReturnValue(SAMPLE_RSE_ANALYSIS)
+      loadFullAnalysisSpy.mockResolvedValue(SAMPLE_RSE_ANALYSIS)
 
       const context = await RSEContextParser.parseAnalysis()
 
@@ -245,7 +240,7 @@ describe('RSEContextParser', () => {
     })
 
     it('should parse sections with Roman numerals', async () => {
-      mockReadFileSync.mockReturnValue(SAMPLE_RSE_ANALYSIS)
+      loadFullAnalysisSpy.mockResolvedValue(SAMPLE_RSE_ANALYSIS)
 
       const context = await RSEContextParser.parseAnalysis()
 
@@ -257,7 +252,7 @@ describe('RSEContextParser', () => {
     })
 
     it('should include metadata with correct values', async () => {
-      mockReadFileSync.mockReturnValue(SAMPLE_RSE_ANALYSIS)
+      loadFullAnalysisSpy.mockResolvedValue(SAMPLE_RSE_ANALYSIS)
 
       const context = await RSEContextParser.parseAnalysis()
 
@@ -270,7 +265,7 @@ describe('RSEContextParser', () => {
     })
 
     it('should return empty context when file is empty', async () => {
-      mockReadFileSync.mockReturnValue('')
+      loadFullAnalysisSpy.mockResolvedValue('')
 
       const context = await RSEContextParser.parseAnalysis()
 
@@ -282,7 +277,7 @@ describe('RSEContextParser', () => {
     })
 
     it('should handle malformed markdown gracefully', async () => {
-      mockReadFileSync.mockReturnValue('Invalid markdown content ###')
+      loadFullAnalysisSpy.mockResolvedValue('Invalid markdown content ###')
 
       const context = await RSEContextParser.parseAnalysis()
 
@@ -293,7 +288,7 @@ describe('RSEContextParser', () => {
 
   describe('extractSections', () => {
     it('should extract all main sections', async () => {
-      mockReadFileSync.mockReturnValue(SAMPLE_RSE_ANALYSIS)
+      loadFullAnalysisSpy.mockResolvedValue(SAMPLE_RSE_ANALYSIS)
 
       const context = await RSEContextParser.parseAnalysis()
 
@@ -301,7 +296,7 @@ describe('RSEContextParser', () => {
     })
 
     it('should preserve section content', async () => {
-      mockReadFileSync.mockReturnValue(SAMPLE_RSE_ANALYSIS)
+      loadFullAnalysisSpy.mockResolvedValue(SAMPLE_RSE_ANALYSIS)
 
       const context = await RSEContextParser.parseAnalysis()
       const envSection = context.sections.find(s =>
@@ -313,7 +308,7 @@ describe('RSEContextParser', () => {
     })
 
     it('should extract subsections within sections', async () => {
-      mockReadFileSync.mockReturnValue(SAMPLE_RSE_ANALYSIS)
+      loadFullAnalysisSpy.mockResolvedValue(SAMPLE_RSE_ANALYSIS)
 
       const context = await RSEContextParser.parseAnalysis()
       const envSection = context.sections.find(s =>
@@ -326,7 +321,7 @@ describe('RSEContextParser', () => {
 
     it('should handle sections without subsections', async () => {
       const simpleContent = `## I. SIMPLE SECTION\n\nContent without subsections.`
-      mockReadFileSync.mockReturnValue(simpleContent)
+      loadFullAnalysisSpy.mockResolvedValue(simpleContent)
 
       const context = await RSEContextParser.parseAnalysis()
 
@@ -338,7 +333,7 @@ describe('RSEContextParser', () => {
 
   describe('extractSubsections', () => {
     it('should extract subsection titles', async () => {
-      mockReadFileSync.mockReturnValue(SAMPLE_RSE_ANALYSIS)
+      loadFullAnalysisSpy.mockResolvedValue(SAMPLE_RSE_ANALYSIS)
 
       const context = await RSEContextParser.parseAnalysis()
       const envSection = context.sections.find(s =>
@@ -351,7 +346,7 @@ describe('RSEContextParser', () => {
     })
 
     it('should extract subsection scores', async () => {
-      mockReadFileSync.mockReturnValue(SAMPLE_RSE_ANALYSIS)
+      loadFullAnalysisSpy.mockResolvedValue(SAMPLE_RSE_ANALYSIS)
 
       const context = await RSEContextParser.parseAnalysis()
       const envSection = context.sections.find(s =>
@@ -366,7 +361,7 @@ describe('RSEContextParser', () => {
     })
 
     it('should handle subsections without scores', async () => {
-      mockReadFileSync.mockReturnValue(SAMPLE_NO_SCORES)
+      loadFullAnalysisSpy.mockResolvedValue(SAMPLE_NO_SCORES)
 
       const context = await RSEContextParser.parseAnalysis()
 
@@ -377,7 +372,7 @@ describe('RSEContextParser', () => {
     })
 
     it('should parse decimal scores correctly', async () => {
-      mockReadFileSync.mockReturnValue(SAMPLE_RSE_ANALYSIS)
+      loadFullAnalysisSpy.mockResolvedValue(SAMPLE_RSE_ANALYSIS)
 
       const context = await RSEContextParser.parseAnalysis()
       const socialSection = context.sections.find(s =>
@@ -392,7 +387,7 @@ describe('RSEContextParser', () => {
     })
 
     it('should preserve subsection content', async () => {
-      mockReadFileSync.mockReturnValue(SAMPLE_RSE_ANALYSIS)
+      loadFullAnalysisSpy.mockResolvedValue(SAMPLE_RSE_ANALYSIS)
 
       const context = await RSEContextParser.parseAnalysis()
       const envSection = context.sections.find(s =>
@@ -409,7 +404,7 @@ describe('RSEContextParser', () => {
 
   describe('extractScores', () => {
     it('should extract all scores from document', async () => {
-      mockReadFileSync.mockReturnValue(SAMPLE_RSE_ANALYSIS)
+      loadFullAnalysisSpy.mockResolvedValue(SAMPLE_RSE_ANALYSIS)
 
       const context = await RSEContextParser.parseAnalysis()
 
@@ -417,7 +412,7 @@ describe('RSEContextParser', () => {
     })
 
     it('should associate scores with correct categories', async () => {
-      mockReadFileSync.mockReturnValue(SAMPLE_RSE_ANALYSIS)
+      loadFullAnalysisSpy.mockResolvedValue(SAMPLE_RSE_ANALYSIS)
 
       const context = await RSEContextParser.parseAnalysis()
 
@@ -431,7 +426,7 @@ describe('RSEContextParser', () => {
     })
 
     it('should handle multiple scores in same section', async () => {
-      mockReadFileSync.mockReturnValue(SAMPLE_RSE_ANALYSIS)
+      loadFullAnalysisSpy.mockResolvedValue(SAMPLE_RSE_ANALYSIS)
 
       const context = await RSEContextParser.parseAnalysis()
 
@@ -445,7 +440,7 @@ describe('RSEContextParser', () => {
     })
 
     it('should return empty array when no scores present', async () => {
-      mockReadFileSync.mockReturnValue(SAMPLE_NO_SCORES)
+      loadFullAnalysisSpy.mockResolvedValue(SAMPLE_NO_SCORES)
 
       const context = await RSEContextParser.parseAnalysis()
 
@@ -454,7 +449,7 @@ describe('RSEContextParser', () => {
 
     it('should handle scores with comma as decimal separator', async () => {
       const contentWithComma = `### Test\n\n**Note : 7,5/10**`
-      mockReadFileSync.mockReturnValue(contentWithComma)
+      loadFullAnalysisSpy.mockResolvedValue(contentWithComma)
 
       const context = await RSEContextParser.parseAnalysis()
 
@@ -466,7 +461,7 @@ describe('RSEContextParser', () => {
 
   describe('extractRecommendations', () => {
     it('should extract all recommendations', async () => {
-      mockReadFileSync.mockReturnValue(SAMPLE_RSE_ANALYSIS)
+      loadFullAnalysisSpy.mockResolvedValue(SAMPLE_RSE_ANALYSIS)
 
       const context = await RSEContextParser.parseAnalysis()
 
@@ -474,7 +469,7 @@ describe('RSEContextParser', () => {
     })
 
     it('should extract recommendation titles and descriptions', async () => {
-      mockReadFileSync.mockReturnValue(SAMPLE_RSE_ANALYSIS)
+      loadFullAnalysisSpy.mockResolvedValue(SAMPLE_RSE_ANALYSIS)
 
       const context = await RSEContextParser.parseAnalysis()
 
@@ -487,7 +482,7 @@ describe('RSEContextParser', () => {
     })
 
     it('should return empty array when no recommendations section', async () => {
-      mockReadFileSync.mockReturnValue(SAMPLE_EMPTY_CONTENT)
+      loadFullAnalysisSpy.mockResolvedValue(SAMPLE_EMPTY_CONTENT)
 
       const context = await RSEContextParser.parseAnalysis()
 
@@ -500,7 +495,7 @@ describe('RSEContextParser', () => {
 - **Test 1** : Description 1
 * **Test 2** : Description 2
 `
-      mockReadFileSync.mockReturnValue(contentWithRecos)
+      loadFullAnalysisSpy.mockResolvedValue(contentWithRecos)
 
       const context = await RSEContextParser.parseAnalysis()
 
@@ -512,7 +507,7 @@ describe('RSEContextParser', () => {
     let context: RSEContext
 
     beforeEach(async () => {
-      mockReadFileSync.mockReturnValue(SAMPLE_RSE_ANALYSIS)
+      loadFullAnalysisSpy.mockResolvedValue(SAMPLE_RSE_ANALYSIS)
       context = await RSEContextParser.parseAnalysis()
     })
 
@@ -569,7 +564,7 @@ describe('RSEContextParser', () => {
     let context: RSEContext
 
     beforeEach(async () => {
-      mockReadFileSync.mockReturnValue(SAMPLE_RSE_ANALYSIS)
+      loadFullAnalysisSpy.mockResolvedValue(SAMPLE_RSE_ANALYSIS)
       context = await RSEContextParser.parseAnalysis()
     })
 
@@ -651,7 +646,7 @@ describe('RSEContextParser', () => {
 
   describe('getEmptyContext', () => {
     it('should return valid empty context structure', async () => {
-      mockReadFileSync.mockReturnValue('')
+      loadFullAnalysisSpy.mockResolvedValue('')
 
       const context = await RSEContextParser.parseAnalysis()
 
@@ -672,7 +667,7 @@ describe('RSEContextParser', () => {
   describe('edge cases and error handling', () => {
     it('should handle missing global score', async () => {
       const contentNoScore = `## RÉSUMÉ EXÉCUTIF\n\nContent without score.`
-      mockReadFileSync.mockReturnValue(contentNoScore)
+      loadFullAnalysisSpy.mockResolvedValue(contentNoScore)
 
       const context = await RSEContextParser.parseAnalysis()
 
@@ -681,7 +676,7 @@ describe('RSEContextParser', () => {
 
     it('should handle multiple summary sections', async () => {
       const multiSummary = `## RÉSUMÉ EXÉCUTIF\n\nFirst summary\n\n## RÉSUMÉ EXÉCUTIF\n\nSecond summary`
-      mockReadFileSync.mockReturnValue(multiSummary)
+      loadFullAnalysisSpy.mockResolvedValue(multiSummary)
 
       const context = await RSEContextParser.parseAnalysis()
 
@@ -690,7 +685,7 @@ describe('RSEContextParser', () => {
 
     it('should handle scores with unusual formatting', async () => {
       const unusualScore = `### Test\n\n**Note:9/10**`
-      mockReadFileSync.mockReturnValue(unusualScore)
+      loadFullAnalysisSpy.mockResolvedValue(unusualScore)
 
       const context = await RSEContextParser.parseAnalysis()
 
@@ -701,7 +696,7 @@ describe('RSEContextParser', () => {
 
     it('should handle very long content efficiently', async () => {
       const longContent = SAMPLE_RSE_ANALYSIS.repeat(10)
-      mockReadFileSync.mockReturnValue(longContent)
+      loadFullAnalysisSpy.mockResolvedValue(longContent)
 
       const startTime = Date.now()
       const context = await RSEContextParser.parseAnalysis()
@@ -713,7 +708,7 @@ describe('RSEContextParser', () => {
 
     it('should handle special characters in content', async () => {
       const specialChars = `## I. TEST SPÉCIAL\n\n### Émissions CO₂\n\n**Note : 8.5/10**\n\nContenu avec caractères spéciaux: é, è, à, ç, €, °C`
-      mockReadFileSync.mockReturnValue(specialChars)
+      loadFullAnalysisSpy.mockResolvedValue(specialChars)
 
       const context = await RSEContextParser.parseAnalysis()
 

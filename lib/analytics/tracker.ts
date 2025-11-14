@@ -4,7 +4,7 @@
  */
 
 import { nanoid } from 'nanoid'
-import { track } from '@vercel/analytics'
+import { track as _track } from '@vercel/analytics'
 import type {
   AnalyticsEvent,
   MessageSentEvent,
@@ -21,9 +21,49 @@ import type {
   EventType,
   EventCategory,
 } from './types'
-import { saveEvent } from './storage'
-import { getAnalyticsConfig, isAnalyticsEnabled, STORAGE_KEYS } from './config'
-import { logger, logError, logStorageError } from '@/lib/security'
+import { saveEvent as _saveEvent } from './storage'
+import { getAnalyticsConfig as _getAnalyticsConfig, isAnalyticsEnabled as _isAnalyticsEnabled, STORAGE_KEYS } from './config'
+import { logger as _logger, logError, logStorageError } from '@/lib/security'
+
+/**
+ * Injectable dependencies for testing
+ * @internal
+ */
+let saveEvent = _saveEvent
+let getAnalyticsConfig = _getAnalyticsConfig
+let isAnalyticsEnabled = _isAnalyticsEnabled
+let logger = _logger
+let track = _track
+
+/**
+ * Override dependencies for testing purposes only
+ * @internal - DO NOT USE IN PRODUCTION CODE
+ */
+export function __setDependenciesForTesting(deps: {
+  saveEvent?: typeof _saveEvent
+  getAnalyticsConfig?: typeof _getAnalyticsConfig
+  isAnalyticsEnabled?: typeof _isAnalyticsEnabled
+  logger?: typeof _logger
+  track?: typeof _track
+}) {
+  if (deps.saveEvent) saveEvent = deps.saveEvent
+  if (deps.getAnalyticsConfig) getAnalyticsConfig = deps.getAnalyticsConfig
+  if (deps.isAnalyticsEnabled) isAnalyticsEnabled = deps.isAnalyticsEnabled
+  if (deps.logger) logger = deps.logger
+  if (deps.track) track = deps.track
+}
+
+/**
+ * Reset to original implementations
+ * @internal - DO NOT USE IN PRODUCTION CODE
+ */
+export function __resetDependencies() {
+  saveEvent = _saveEvent
+  getAnalyticsConfig = _getAnalyticsConfig
+  isAnalyticsEnabled = _isAnalyticsEnabled
+  logger = _logger
+  track = _track
+}
 
 /**
  * Récupère ou crée un ID de session

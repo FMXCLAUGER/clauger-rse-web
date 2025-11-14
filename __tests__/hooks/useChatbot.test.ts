@@ -1,5 +1,5 @@
 import { renderHook, waitFor, act } from '@testing-library/react'
-import { useChatbot, useCurrentPage } from '@/hooks/useChatbot'
+import { useChatbot, useCurrentPage, windowHelpers } from '@/hooks/useChatbot'
 import { WELCOME_MESSAGE } from '@/lib/ai/prompts'
 import { chatRateLimiter } from '@/lib/ai/rate-limiter'
 import { trackSessionStarted, trackRateLimitExceeded, trackSessionEnded } from '@/lib/analytics/tracker'
@@ -29,9 +29,16 @@ const mockTrackSessionEnded = trackSessionEnded as jest.MockedFunction<typeof tr
 describe('useChatbot', () => {
   let mockChatReturn: any
   let mockLocalStorage: Storage
-  let mockReload: jest.Mock
+  let getLocationHrefSpy: jest.SpyInstance
+  let getLocationSearchSpy: jest.SpyInstance
+  let reloadPageSpy: jest.SpyInstance
 
   beforeEach(() => {
+    // Setup windowHelpers spies
+    getLocationHrefSpy = jest.spyOn(windowHelpers, 'getLocationHref').mockReturnValue('http://localhost:3000')
+    getLocationSearchSpy = jest.spyOn(windowHelpers, 'getLocationSearch').mockReturnValue('')
+    reloadPageSpy = jest.spyOn(windowHelpers, 'reloadPage').mockImplementation(() => {})
+
     // Mock localStorage
     mockLocalStorage = {
       getItem: jest.fn(),
@@ -46,16 +53,6 @@ describe('useChatbot', () => {
       writable: true,
       configurable: true,
     })
-
-    // Mock window.location - create a fresh mock
-    mockReload = jest.fn()
-    // For useChatbot tests, we just need the reload function and href
-    // Delete and recreate to ensure clean slate
-    delete (window as any).location
-    ;(window as any).location = {
-      href: 'http://localhost:3000',
-      reload: mockReload,
-    }
 
     // Mock window.confirm
     window.confirm = jest.fn()
@@ -100,10 +97,14 @@ describe('useChatbot', () => {
   })
 
   describe('initialization', () => {
-    it('should initialize with default state', () => {
+    it('should initialize with default state', async () => {
       const { result } = renderHook(() => useChatbot())
 
-      expect(result.current.isInitialized).toBe(false)
+      // After mount, isInitialized should become true
+      await waitFor(() => {
+        expect(result.current.isInitialized).toBe(true)
+      })
+
       expect(result.current.isNewConversation).toBe(true)
       expect(result.current.welcomeMessage).toBe(WELCOME_MESSAGE)
       expect(result.current.stats).toEqual({
@@ -465,7 +466,7 @@ describe('useChatbot', () => {
         "Voulez-vous vraiment effacer l'historique de la conversation ?"
       )
       expect(mockLocalStorage.removeItem).toHaveBeenCalledWith('clauger-chat-history')
-      expect(mockReload).toHaveBeenCalled()
+      expect(reloadPageSpy).toHaveBeenCalled()
     })
 
     it('should not clear history when cancelled', () => {
@@ -478,7 +479,7 @@ describe('useChatbot', () => {
       })
 
       expect(mockLocalStorage.removeItem).not.toHaveBeenCalled()
-      expect(mockReload).not.toHaveBeenCalled()
+      expect(reloadPageSpy).not.toHaveBeenCalled()
     })
 
     it('should call clearHistory directly', () => {
@@ -489,7 +490,7 @@ describe('useChatbot', () => {
       })
 
       expect(mockLocalStorage.removeItem).toHaveBeenCalledWith('clauger-chat-history')
-      expect(mockReload).toHaveBeenCalled()
+      expect(reloadPageSpy).toHaveBeenCalled()
     })
 
     it('should handle localStorage errors on clear', () => {
@@ -560,8 +561,12 @@ describe('useChatbot', () => {
 
 describe('useCurrentPage', () => {
   let mockLocalStorage: Storage
+  let getLocationSearchSpy: jest.SpyInstance
 
   beforeEach(() => {
+    // Setup windowHelpers spy
+    getLocationSearchSpy = jest.spyOn(windowHelpers, 'getLocationSearch').mockReturnValue('')
+
     // Mock localStorage
     mockLocalStorage = {
       getItem: jest.fn(),
@@ -581,10 +586,7 @@ describe('useCurrentPage', () => {
   })
 
   it('should return undefined when no page is set', () => {
-    delete (window as any).location
-    window.location = {
-      search: '',
-    } as any
+    getLocationSearchSpy.mockReturnValue('')
 
     const { result } = renderHook(() => useCurrentPage())
 
@@ -592,10 +594,7 @@ describe('useCurrentPage', () => {
   })
 
   it('should extract page from URL params', async () => {
-    delete (window as any).location
-    window.location = {
-      search: '?page=5',
-    } as any
+    getLocationSearchSpy.mockReturnValue('?page=5')
 
     const { result } = renderHook(() => useCurrentPage())
 
@@ -605,10 +604,7 @@ describe('useCurrentPage', () => {
   })
 
   it('should extract page from localStorage reading state', async () => {
-    delete (window as any).location
-    window.location = {
-      search: '',
-    } as any
+    getLocationSearchSpy.mockReturnValue('')
 
     const readingState = { lastPage: 10, progress: 0.5 }
     ;(mockLocalStorage.getItem as jest.Mock).mockReturnValue(JSON.stringify(readingState))
@@ -621,10 +617,7 @@ describe('useCurrentPage', () => {
   })
 
   it('should prefer URL param over localStorage', async () => {
-    delete (window as any).location
-    window.location = {
-      search: '?page=7',
-    } as any
+    getLocationSearchSpy.mockReturnValue('?page=7')
 
     const readingState = { lastPage: 10 }
     ;(mockLocalStorage.getItem as jest.Mock).mockReturnValue(JSON.stringify(readingState))
@@ -637,10 +630,7 @@ describe('useCurrentPage', () => {
   })
 
   it('should handle invalid JSON in localStorage', async () => {
-    delete (window as any).location
-    window.location = {
-      search: '',
-    } as any
+    getLocationSearchSpy.mockReturnValue('')
 
     ;(mockLocalStorage.getItem as jest.Mock).mockReturnValue('invalid json')
 
@@ -652,10 +642,7 @@ describe('useCurrentPage', () => {
   })
 
   it('should handle missing lastPage in reading state', async () => {
-    delete (window as any).location
-    window.location = {
-      search: '',
-    } as any
+    getLocationSearchSpy.mockReturnValue('')
 
     const readingState = { progress: 0.5 }
     ;(mockLocalStorage.getItem as jest.Mock).mockReturnValue(JSON.stringify(readingState))
@@ -668,10 +655,7 @@ describe('useCurrentPage', () => {
   })
 
   it('should parse page number correctly', async () => {
-    delete (window as any).location
-    window.location = {
-      search: '?page=42',
-    } as any
+    getLocationSearchSpy.mockReturnValue('?page=42')
 
     const { result } = renderHook(() => useCurrentPage())
 

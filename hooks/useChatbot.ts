@@ -12,6 +12,13 @@ import {
 } from '@/lib/analytics/tracker'
 import { logger, logError, logStorageError } from '@/lib/security'
 
+// Helpers for window.location - extracted for testability
+export const windowHelpers = {
+  getLocationHref: () => window.location.href,
+  getLocationSearch: () => window.location.search,
+  reloadPage: () => window.location.reload()
+}
+
 interface UseChatbotOptions {
   currentPage?: number
   onError?: (error: Error) => void
@@ -60,7 +67,7 @@ export function useChatbot(options: UseChatbotOptions = {}) {
 
       // Track session started
       trackSessionStarted({
-        url: window.location.href,
+        url: windowHelpers.getLocationHref(),
         currentPage
       })
     }
@@ -97,7 +104,7 @@ export function useChatbot(options: UseChatbotOptions = {}) {
     try {
       localStorage.removeItem(CHAT_HISTORY_KEY)
       // Recharger la page pour réinitialiser le chat
-      window.location.reload()
+      windowHelpers.reloadPage()
     } catch (error) {
       logStorageError('clear', error, 'chatHistory')
     }
@@ -224,7 +231,7 @@ export function useCurrentPage(): number | undefined {
 
   useEffect(() => {
     // Récupérer la page depuis l'URL ou le localStorage
-    const params = new URLSearchParams(window.location.search)
+    const params = new URLSearchParams(windowHelpers.getLocationSearch())
     const pageParam = params.get('page')
 
     if (pageParam) {

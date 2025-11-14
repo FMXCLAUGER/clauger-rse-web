@@ -251,6 +251,12 @@ export class RSEContextParser {
    */
   static searchInContext(context: RSEContext, query: string): RSESection[] {
     const results: RSESection[] = []
+
+    // Return empty array for empty queries
+    if (!query || query.trim() === '') {
+      return results
+    }
+
     const queryLower = query.toLowerCase()
 
     for (const section of context.sections) {

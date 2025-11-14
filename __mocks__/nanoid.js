@@ -1,4 +1,13 @@
 // Mock nanoid to avoid ESM import issues in Jest
+let counter = 0
+
 module.exports = {
-  nanoid: () => 'test-id-' + Math.random().toString(36).substring(7)
+  nanoid: () => {
+    counter++
+    return `test-id-${counter}`
+  },
+  // Export reset function for tests
+  __resetCounter: () => {
+    counter = 0
+  }
 }
