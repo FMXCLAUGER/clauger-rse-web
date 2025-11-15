@@ -5,6 +5,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { Bot, User } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { getMessageText } from '@/lib/ai/message-utils'
 
 interface ChatMessageProps {
   message: UIMessage
@@ -15,10 +16,8 @@ export function ChatMessage({ message, isLast = false }: ChatMessageProps) {
   const isUser = message.role === 'user'
   const isAssistant = message.role === 'assistant'
 
-  // Extract content as string (v5 compatibility)
-  const content = typeof (message as any).content === 'string'
-    ? (message as any).content
-    : ''
+  // Extract content using v5-compatible utility
+  const content = getMessageText(message)
 
   return (
     <div
