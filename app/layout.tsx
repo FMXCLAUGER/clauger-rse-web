@@ -4,6 +4,7 @@ import { Inter, Montserrat } from "next/font/google"
 import { headers } from "next/headers"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme/ThemeProvider"
+import { SessionProvider } from "@/components/auth/SessionProvider"
 import { SkipLink } from "@/components/a11y/SkipLink"
 import { SearchModalWithSuspense } from "@/components/search/SearchModalWithSuspense"
 import { ChatbotWithSuspense } from "@/components/chatbot/ChatbotWithSuspense"
@@ -94,48 +95,50 @@ export default function RootLayout({
   return (
     <html lang="fr" suppressHydrationWarning>
       <body className={`${inter.variable} ${montserrat.variable} font-sans antialiased`}>
-        <SkipLink />
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-          nonce={nonce || undefined}
-        >
-          <SearchModalWithSuspense />
-          <ChatbotWithSuspense />
-          {children}
-          <Toaster
-            position="top-right"
-            expand={true}
-            richColors
-            closeButton
-            duration={4000}
-            toastOptions={{
-              classNames: {
-                toast: 'border-2',
-                title: 'font-semibold',
-                description: 'text-sm opacity-90',
-                success: 'border-green-500/20',
-                error: 'border-red-500/20',
-                warning: 'border-yellow-500/20',
-                info: 'border-blue-500/20',
-              },
-            }}
-          />
-        </ThemeProvider>
-        {/*
-          Vercel Analytics/SpeedInsights disabled in production due to CSP incompatibility.
-          These components inject inline scripts without nonce support (GitHub Issue #122).
-          Re-enable when Vercel adds nonce prop support or if CSP is relaxed.
-          Currently enabled only in preview/development environments.
-        */}
-        {process.env.VERCEL_ENV !== 'production' && (
-          <>
-            <SpeedInsights />
-            <Analytics />
-          </>
-        )}
+        <SessionProvider>
+          <SkipLink />
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+            nonce={nonce || undefined}
+          >
+            <SearchModalWithSuspense />
+            <ChatbotWithSuspense />
+            {children}
+            <Toaster
+              position="top-right"
+              expand={true}
+              richColors
+              closeButton
+              duration={4000}
+              toastOptions={{
+                classNames: {
+                  toast: 'border-2',
+                  title: 'font-semibold',
+                  description: 'text-sm opacity-90',
+                  success: 'border-green-500/20',
+                  error: 'border-red-500/20',
+                  warning: 'border-yellow-500/20',
+                  info: 'border-blue-500/20',
+                },
+              }}
+            />
+          </ThemeProvider>
+          {/*
+            Vercel Analytics/SpeedInsights disabled in production due to CSP incompatibility.
+            These components inject inline scripts without nonce support (GitHub Issue #122).
+            Re-enable when Vercel adds nonce prop support or if CSP is relaxed.
+            Currently enabled only in preview/development environments.
+          */}
+          {process.env.VERCEL_ENV !== 'production' && (
+            <>
+              <SpeedInsights />
+              <Analytics />
+            </>
+          )}
+        </SessionProvider>
       </body>
     </html>
   )
