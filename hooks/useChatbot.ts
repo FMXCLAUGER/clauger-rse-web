@@ -1,6 +1,6 @@
 'use client'
 
-import { useChat } from '@ai-sdk/react'
+import { useChat, type UIMessage as Message } from '@ai-sdk/react'
 import { useEffect, useState, type FormEvent, type ChangeEvent } from 'react'
 import { toast } from 'sonner'
 import { WELCOME_MESSAGE } from '@/lib/ai/prompts'
@@ -11,6 +11,15 @@ import {
   trackSessionEnded
 } from '@/lib/analytics/tracker'
 import { logger, logError, logStorageError } from '@/lib/security'
+
+type ChatStatus = 'idle' | 'submitting' | 'streaming'
+
+interface ChatWithStatus {
+  status?: ChatStatus
+  messages: Message[]
+  sendMessage?: (options: { text: string }) => void
+  [key: string]: unknown
+}
 
 // Helpers for window.location - extracted for testability
 export const windowHelpers = {
@@ -211,7 +220,8 @@ export function useChatbot(options: UseChatbotOptions = {}) {
   }, [chat.messages])
 
   // Compute isLoading for v5 compatibility (v5 uses 'status' instead)
-  const isLoading = (chat as any).status === 'submitting' || (chat as any).status === 'streaming'
+  const chatWithStatus = chat as unknown as ChatWithStatus
+  const isLoading = chatWithStatus.status === 'submitting' || chatWithStatus.status === 'streaming'
 
   return {
     // Props du useChat original

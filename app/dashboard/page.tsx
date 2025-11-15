@@ -1,8 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import Link from "next/link"
-import { ArrowLeft, Leaf, Users, Scale, TrendingUp, Download } from "lucide-react"
+import { ArrowLeft, Leaf, Users, Scale, TrendingUp, Download, FileSpreadsheet } from "lucide-react"
 import { ChartCard } from "@/components/dashboard/ChartCard"
 import { EmissionsChart } from "@/components/dashboard/charts/EmissionsChart"
 import { EnergyChart } from "@/components/dashboard/charts/EnergyChart"
@@ -16,6 +16,9 @@ import { BoardCompositionChart } from "@/components/dashboard/charts/BoardCompos
 import { BudgetChart } from "@/components/dashboard/charts/BudgetChart"
 import { ComplianceScore } from "@/components/dashboard/charts/ComplianceScore"
 import { ExportModal } from "@/components/export/ExportModal"
+import { ExportCSVButton } from "@/components/export/ExportCSVButton"
+import { SocialShareButtons } from "@/components/share/SocialShareButtons"
+import { HelpTooltip } from "@/components/ui/help-tooltip"
 import {
   environmentData,
   socialData,
@@ -35,6 +38,52 @@ export default function DashboardPage() {
     { id: "social" as Tab, label: "Social", icon: Users, color: "text-blue-600" },
     { id: "governance" as Tab, label: "Gouvernance", icon: Scale, color: "text-purple-600" },
   ]
+
+  // Prepare CSV data based on active tab
+  const csvData = useMemo(() => {
+    const timestamp = new Date().toISOString().split('T')[0]
+
+    if (activeTab === "environment") {
+      return {
+        data: [
+          ...environmentData.emissions.map(item => ({
+            Année: item.year,
+            'Scope 1': item.scope1,
+            'Scope 2': item.scope2,
+            'Scope 3': item.scope3,
+            Total: item.scope1 + item.scope2 + item.scope3,
+          })),
+        ],
+        filename: `environnement-${timestamp}`,
+      }
+    }
+
+    if (activeTab === "social") {
+      return {
+        data: [
+          ...socialData.workforce.map(item => ({
+            Année: item.year,
+            Hommes: item.men,
+            Femmes: item.women,
+            Total: item.total,
+          })),
+        ],
+        filename: `social-${timestamp}`,
+      }
+    }
+
+    // governance
+    return {
+      data: [
+        ...governanceData.budget.map(item => ({
+          Pilier: item.pillar,
+          Montant: item.amount,
+          Pourcentage: item.percentage,
+        })),
+      ],
+      filename: `gouvernance-${timestamp}`,
+    }
+  }, [activeTab])
 
   return (
     <div className="min-h-screen bg-[#F9FAFB] dark:bg-gray-950">
@@ -58,14 +107,29 @@ export default function DashboardPage() {
                 Visualisations interactives des indicateurs de performance ESG
               </p>
             </div>
-            <button
-              onClick={() => setExportModalOpen(true)}
-              className="flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary/90 text-white rounded-lg font-semibold transition-all hover:scale-105 shadow-lg"
-              aria-label="Exporter tous les dashboards"
-            >
-              <Download className="w-5 h-5" />
-              <span>Exporter</span>
-            </button>
+            <div className="flex items-center gap-3">
+              <SocialShareButtons
+                title={`Tableau de Bord RSE 2025 - ${tabs.find(t => t.id === activeTab)?.label}`}
+                description="Découvrez nos indicateurs de performance ESG"
+                variant="outline"
+                size="default"
+              />
+              <ExportCSVButton
+                data={csvData.data}
+                filename={csvData.filename}
+                label="CSV"
+                variant="outline"
+                size="default"
+              />
+              <button
+                onClick={() => setExportModalOpen(true)}
+                className="flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary/90 text-white rounded-lg font-semibold transition-all hover:scale-105 shadow-lg"
+                aria-label="Exporter tous les dashboards"
+              >
+                <Download className="w-5 h-5" />
+                <span>Exporter</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -108,9 +172,12 @@ export default function DashboardPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 md:gap-5 lg:gap-6 mb-6">
               <div className="lg:col-span-4 bg-white dark:bg-gray-800 rounded-xl p-6 border border-[#E5E7EB] dark:border-gray-700 shadow-[0_1px_3px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_12px_rgba(0,136,204,0.15)] transition-all">
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-sm font-medium text-[#666666] dark:text-gray-400 uppercase tracking-wider">
-                    Émissions totales 2025
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-[#666666] dark:text-gray-400 uppercase tracking-wider">
+                      Émissions totales 2025
+                    </span>
+                    <HelpTooltip content="Somme des émissions Scope 1, 2 et 3 exprimée en tonnes équivalent CO2" />
+                  </div>
                   <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-success to-[#10B981]/70 flex items-center justify-center">
                     <TrendingUp className="w-5 h-5 text-white" strokeWidth={2.5} />
                   </div>

@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
-import { X, Send, RotateCcw, Maximize2, Minimize2 } from 'lucide-react'
+import { X, Send, RotateCcw, Maximize2, Minimize2, MessageSquare, Bot, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useChatbot, useCurrentPage } from '@/hooks/useChatbot'
 import { ChatMessage } from './ChatMessage'
@@ -177,6 +177,26 @@ export function ChatbotModal({ isOpen, onClose }: ChatbotModalProps) {
             </>
           )}
         </div>
+
+        {/* Stats Bar */}
+        {!isNewConversation && stats.messageCount > 0 && (
+          <div className="border-t px-4 py-2 bg-muted/30 shrink-0">
+            <div className="flex items-center justify-center gap-6 text-xs text-muted-foreground">
+              <div className="flex items-center gap-1.5">
+                <MessageSquare className="w-3.5 h-3.5" />
+                <span>{stats.messageCount} messages</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <User className="w-3.5 h-3.5" />
+                <span>{stats.userMessages} questions</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Bot className="w-3.5 h-3.5" />
+                <span>{stats.assistantMessages} réponses</span>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Input Area */}
         <div className="border-t p-4 shrink-0">

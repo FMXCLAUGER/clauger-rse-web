@@ -2,6 +2,8 @@ import { knowledgeBase } from './knowledge-base'
 import { SemanticChunker } from './semantic-chunker'
 import type { OCRData } from '@/lib/search/types'
 import { logger, logError } from '@/lib/security'
+import fs from 'fs'
+import path from 'path'
 
 /**
  * Options pour la construction du contexte
@@ -322,9 +324,20 @@ export class ContextBuilder {
    */
   private static async loadOCRData(): Promise<OCRData> {
     try {
+      if (typeof window === 'undefined') {
+        const filePath = path.join(process.cwd(), 'public', 'data', 'ocr', 'pages.json')
+
+        if (!fs.existsSync(filePath)) {
+          throw new Error(`OCR file not found: ${filePath}`)
+        }
+
+        const fileContent = fs.readFileSync(filePath, 'utf-8')
+        return JSON.parse(fileContent)
+      }
+
       const response = await fetch('/data/ocr/pages.json')
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+        throw new Error(`HTTP error! status: ${response.ok}`)
       }
       return await response.json()
     } catch (error) {

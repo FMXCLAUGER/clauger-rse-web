@@ -60,6 +60,9 @@ jest.mock('lucide-react', () => ({
   RotateCcw: () => <span>Restart</span>,
   Maximize2: () => <span>Maximize</span>,
   Minimize2: () => <span>Minimize</span>,
+  MessageSquare: () => <span>Messages</span>,
+  Bot: () => <span>Bot</span>,
+  User: () => <span>User</span>,
 }))
 
 describe('ChatbotModal', () => {
@@ -143,7 +146,8 @@ describe('ChatbotModal', () => {
       })
 
       render(<ChatbotModal isOpen={true} onClose={mockOnClose} />)
-      expect(screen.getByText(/2 messages/i)).toBeInTheDocument()
+      const messageElements = screen.getAllByText(/2 messages/i)
+      expect(messageElements.length).toBeGreaterThan(0)
     })
 
     it('displays current page when available', () => {

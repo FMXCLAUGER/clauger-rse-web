@@ -101,9 +101,21 @@ export default function RootLayout({
           {children}
           <Toaster
             position="top-right"
-            expand={false}
+            expand={true}
             richColors
             closeButton
+            duration={4000}
+            toastOptions={{
+              classNames: {
+                toast: 'border-2',
+                title: 'font-semibold',
+                description: 'text-sm opacity-90',
+                success: 'border-green-500/20',
+                error: 'border-red-500/20',
+                warning: 'border-yellow-500/20',
+                info: 'border-blue-500/20',
+              },
+            }}
           />
         </ThemeProvider>
         <SpeedInsights />

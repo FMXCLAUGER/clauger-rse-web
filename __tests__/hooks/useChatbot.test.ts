@@ -78,6 +78,7 @@ describe('useChatbot', () => {
       reload: jest.fn(),
       stop: jest.fn(),
       append: jest.fn(),
+      sendMessage: jest.fn(),
     }
 
     mockUseChat.mockReturnValue(mockChatReturn)
@@ -261,11 +262,15 @@ describe('useChatbot', () => {
       const { result } = renderHook(() => useChatbot())
 
       await act(async () => {
+        result.current.handleInputChange({ target: { value: 'Test message' } } as any)
+      })
+
+      await act(async () => {
         await result.current.handleSubmit()
       })
 
       expect(mockChatRateLimiter.checkAndConsume).toHaveBeenCalled()
-      expect(mockChatReturn.handleSubmit).toHaveBeenCalled()
+      expect(mockChatReturn.sendMessage).toHaveBeenCalledWith({ text: 'Test message' })
       expect(mockToast.error).not.toHaveBeenCalled()
     })
 
@@ -279,13 +284,17 @@ describe('useChatbot', () => {
       const { result } = renderHook(() => useChatbot())
 
       await act(async () => {
+        result.current.handleInputChange({ target: { value: 'Test message' } } as any)
+      })
+
+      await act(async () => {
         await result.current.handleSubmit()
       })
 
       expect(mockToast.error).toHaveBeenCalledWith('Trop de requêtes', {
         description: 'Veuillez patienter 30s avant de réessayer.',
       })
-      expect(mockChatReturn.handleSubmit).not.toHaveBeenCalled()
+      expect(mockChatReturn.sendMessage).not.toHaveBeenCalled()
     })
 
     it('should track rate limit exceeded event', async () => {
@@ -296,6 +305,10 @@ describe('useChatbot', () => {
       })
 
       const { result } = renderHook(() => useChatbot())
+
+      await act(async () => {
+        result.current.handleInputChange({ target: { value: 'Test message' } } as any)
+      })
 
       await act(async () => {
         await result.current.handleSubmit()
@@ -325,20 +338,13 @@ describe('useChatbot', () => {
 
   describe('sendSuggestedQuestion', () => {
     it('should send suggested question when rate limit allows', async () => {
-      jest.useFakeTimers()
       const { result } = renderHook(() => useChatbot())
 
       await act(async () => {
         await result.current.sendSuggestedQuestion('What is RSE?')
       })
 
-      expect(mockChatReturn.setInput).toHaveBeenCalledWith('What is RSE?')
-
-      act(() => {
-        jest.advanceTimersByTime(100)
-      })
-
-      expect(mockChatReturn.handleSubmit).toHaveBeenCalled()
+      expect(mockChatReturn.sendMessage).toHaveBeenCalledWith({ text: 'What is RSE?' })
 
       jest.useRealTimers()
     })
@@ -545,17 +551,16 @@ describe('useChatbot', () => {
 
   describe('props forwarding', () => {
     it('should forward all useChat props', () => {
-      mockChatReturn.isLoading = true
+      mockChatReturn.status = 'submitting'
       mockChatReturn.error = new Error('Test')
-      mockChatReturn.input = 'Test input'
+      mockUseChat.mockReturnValue(mockChatReturn)
 
       const { result } = renderHook(() => useChatbot())
 
       expect(result.current.isLoading).toBe(true)
       expect(result.current.error).toEqual(new Error('Test'))
-      expect(result.current.input).toBe('Test input')
       expect(result.current.messages).toEqual([])
-      expect(result.current.setInput).toBe(mockChatReturn.setInput)
+      expect(result.current.handleInputChange).toBeDefined()
     })
   })
 })

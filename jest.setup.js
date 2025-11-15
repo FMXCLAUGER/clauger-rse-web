@@ -56,3 +56,37 @@ Object.defineProperty(global, 'crypto', {
 
 // Mock fetch for API calls
 global.fetch = jest.fn()
+
+// Mock TransformStream for Vercel AI SDK (used in streaming responses)
+if (typeof TransformStream === 'undefined') {
+  global.TransformStream = class TransformStream {
+    constructor() {
+      this.readable = {
+        getReader: () => ({
+          read: async () => ({ done: true, value: undefined }),
+          releaseLock: () => {},
+          cancel: async () => {},
+        }),
+        pipeThrough: (stream) => stream,
+        pipeTo: async () => {},
+        cancel: async () => {},
+      }
+      this.writable = {
+        getWriter: () => ({
+          write: async () => {},
+          close: async () => {},
+          abort: async () => {},
+        }),
+        abort: async () => {},
+      }
+    }
+  }
+}
+
+// Mock TextEncoderStream and TextDecoderStream if needed
+if (typeof TextEncoderStream === 'undefined') {
+  global.TextEncoderStream = class TextEncoderStream extends TransformStream {}
+}
+if (typeof TextDecoderStream === 'undefined') {
+  global.TextDecoderStream = class TextDecoderStream extends TransformStream {}
+}

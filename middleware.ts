@@ -1,11 +1,31 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
+import { checkRateLimit, getRateLimitHeaders } from "@/lib/security/rate-limiter-server"
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64")
 
   const isDev = process.env.NODE_ENV === "development"
   const isPreview = process.env.VERCEL_ENV === "preview"
+
+  if (request.nextUrl.pathname.startsWith('/api/')) {
+    const ip = request.ip || request.headers.get('x-forwarded-for') || 'anonymous'
+    const rateLimitResult = await checkRateLimit(ip, request.nextUrl.pathname)
+
+    if (!rateLimitResult.allowed) {
+      const response = NextResponse.json(
+        { error: 'Too many requests', retryAfter: rateLimitResult.retryAfter },
+        { status: 429 }
+      )
+
+      const headers = getRateLimitHeaders(rateLimitResult)
+      Object.entries(headers).forEach(([key, value]) => {
+        response.headers.set(key, value)
+      })
+
+      return response
+    }
+  }
 
   const cspHeader = `
     default-src 'self';
@@ -33,7 +53,11 @@ export function middleware(request: NextRequest) {
     },
   })
 
-  response.headers.set("Content-Security-Policy-Report-Only", cspHeader)
+  if (process.env.NODE_ENV === 'production' && process.env.VERCEL_ENV !== 'preview') {
+    response.headers.set("Content-Security-Policy", cspHeader)
+  } else {
+    response.headers.set("Content-Security-Policy-Report-Only", cspHeader)
+  }
 
   response.headers.set(
     "Strict-Transport-Security",
