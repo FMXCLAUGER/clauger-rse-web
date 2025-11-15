@@ -195,7 +195,7 @@ export default function ReportViewer({ initialPage }: ReportViewerProps) {
           onToggleFocus={toggleFocusMode}
         />
 
-        <main id="main-content" className="flex-1 relative bg-gray-200 dark:bg-gray-900 p-4 md:p-8 overflow-auto">
+        <main id="main-content" className="flex-1 relative bg-white dark:bg-gray-900 p-4 md:p-8 overflow-auto transition-colors duration-200">
           <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
             Page {currentPage} sur {TOTAL_PAGES}
           </div>

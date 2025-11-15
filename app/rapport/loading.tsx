@@ -24,7 +24,7 @@ export default function Loading() {
           </div>
         </header>
 
-        <main className="flex-1 flex items-center justify-center p-8 bg-gray-200 dark:bg-gray-900">
+        <main className="flex-1 flex items-center justify-center p-8 bg-white dark:bg-gray-900 transition-colors duration-200">
           <div className="max-w-4xl w-full animate-pulse">
             <div className="aspect-[3/4] bg-white dark:bg-gray-800 rounded-2xl shadow-2xl flex items-center justify-center">
               <div className="text-center">

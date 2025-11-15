@@ -80,15 +80,15 @@ export default function HomePage() {
         </div>
       </section>
 
-      <footer className="bg-primary dark:bg-gray-900 text-white py-12 border-t border-primary-foreground/10 dark:border-gray-700">
+      <footer className="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white py-12 border-t border-gray-200 dark:border-gray-700 transition-colors duration-200">
         <div className="container mx-auto px-4 text-center">
           <div className="mb-4">
             <h3 className="font-montserrat text-2xl font-bold mb-2">Clauger</h3>
-            <p className="text-white/80 dark:text-gray-300 text-sm">
+            <p className="text-gray-600 dark:text-gray-300 text-sm">
               {RAPPORT_DATA.baseline}
             </p>
           </div>
-          <div className="text-sm text-white/60 dark:text-gray-400">
+          <div className="text-sm text-gray-500 dark:text-gray-400">
             © 2025 Clauger. Tous droits réservés.
           </div>
         </div>
