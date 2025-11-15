@@ -44,7 +44,7 @@ export default function ReportViewerWithAnnotations({ initialPage }: ReportViewe
 
   // Annotation State
   const [annotationMode, setAnnotationMode] = useState(false)
-  const [annotationColor, setAnnotationColor] = useState(ANNOTATION_COLORS.default)
+  const [annotationColor, setAnnotationColor] = useState<string>(ANNOTATION_COLORS.default)
   const [selectedAnnotation, setSelectedAnnotation] = useState<Annotation | null>(null)
   const [editorOpen, setEditorOpen] = useState(false)
   const [annotationListOpen, setAnnotationListOpen] = useState(false)
