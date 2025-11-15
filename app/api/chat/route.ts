@@ -16,6 +16,7 @@ import { InputSanitizer } from '@/lib/security/input-sanitizer'
 import { logger } from '@/lib/security/secure-logger'
 import { ModelRouter } from '@/lib/ai/model-router'
 import { ResilientAIClient } from '@/lib/resilience/resilient-ai-client'
+import { getMessageText } from '@/lib/ai/message-utils'
 
 const resilientClient = new ResilientAIClient({
   circuitBreaker: {
@@ -72,9 +73,9 @@ export async function POST(req: Request) {
       )
     }
 
-    // 3. Extraire la dernière question de l'utilisateur
+    // 3. Extraire la dernière question de l'utilisateur (AI SDK v5 format)
     const lastMessage = messages[messages.length - 1]
-    const userQuery = lastMessage?.content || ''
+    const userQuery = lastMessage ? getMessageText(lastMessage) : ''
 
     // 3.5 Validation et sanitization de l'input utilisateur
     const validation = InputSanitizer.validate(userQuery)

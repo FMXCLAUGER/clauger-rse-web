@@ -1,4 +1,5 @@
 import type { UIMessage } from 'ai'
+import { getMessageText } from './message-utils'
 
 export const CLAUDE_MODELS = {
   HAIKU: {
@@ -168,19 +169,8 @@ export class ModelRouter {
   static selectModel(messages: UIMessage[], currentPage?: number): RoutingDecision {
     const lastMessage = messages[messages.length - 1]
 
-    // Handle different content types from AI SDK
-    // Using 'unknown' to avoid TypeScript inference issues with Message type
-    let userQuery = ''
-    const content = (lastMessage as any)?.content
-
-    if (typeof content === 'string') {
-      userQuery = content
-    } else if (Array.isArray(content)) {
-      // Content can be an array of content parts
-      userQuery = (content as any[])
-        .map((part: any) => part.text || '')
-        .join(' ')
-    }
+    // Extract user query using AI SDK v5 compatible utility
+    const userQuery = lastMessage ? getMessageText(lastMessage) : ''
 
     const complexity = this.analyzeComplexity(userQuery)
 
@@ -203,14 +193,7 @@ export class ModelRouter {
     }
 
     const conversationLength = messages.reduce((sum, msg) => {
-      let contentText = ''
-      const msgContent = (msg as any)?.content
-
-      if (typeof msgContent === 'string') {
-        contentText = msgContent
-      } else if (Array.isArray(msgContent)) {
-        contentText = (msgContent as any[]).map((part: any) => part.text || '').join(' ')
-      }
+      const contentText = getMessageText(msg)
       return sum + contentText.length
     }, 0)
 

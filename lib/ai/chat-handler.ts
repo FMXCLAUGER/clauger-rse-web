@@ -1,4 +1,5 @@
 import type { UIMessage } from 'ai'
+import { getMessageText } from './message-utils'
 
 /**
  * Utilitaires pour la gestion des conversations du chatbot
@@ -50,7 +51,7 @@ export function formatMessageForExport(message: UIMessage): string {
   const timestamp = (message as any).createdAt
     ? new Date((message as any).createdAt).toLocaleString('fr-FR')
     : ''
-  const content = (message as any).content || ''
+  const content = getMessageText(message)
 
   return `### ${role} ${timestamp ? `(${timestamp})` : ''}\n\n${content}\n`
 }
@@ -104,8 +105,8 @@ export function analyzeConversationSentiment(messages: UIMessage[]): {
     assistantMessages.length > 0
       ? Math.round(
           assistantMessages.reduce((sum, m) => {
-            const content = (m as any).content || ''
-            return sum + (typeof content === 'string' ? content.length : 0)
+            const content = getMessageText(m)
+            return sum + content.length
           }, 0) / assistantMessages.length
         )
       : 0
@@ -121,8 +122,8 @@ export function analyzeConversationSentiment(messages: UIMessage[]): {
   }
 
   userMessages.forEach(message => {
-    const content = (message as any).content || ''
-    const contentLower = typeof content === 'string' ? content.toLowerCase() : ''
+    const content = getMessageText(message)
+    const contentLower = content.toLowerCase()
     Object.entries(topicKeywords).forEach(([topic, keywords]) => {
       if (keywords.some(kw => contentLower.includes(kw))) {
         topics.add(topic)
@@ -142,8 +143,7 @@ export function analyzeConversationSentiment(messages: UIMessage[]): {
  * Suggère des questions de suivi basées sur le dernier message
  */
 export function suggestFollowUpQuestions(lastMessage: UIMessage): string[] {
-  const messageContent = (lastMessage as any).content || ''
-  const content = typeof messageContent === 'string' ? messageContent.toLowerCase() : ''
+  const content = getMessageText(lastMessage).toLowerCase()
   const suggestions: string[] = []
 
   // Suggestions basées sur le contenu
