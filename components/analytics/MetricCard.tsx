@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { Card } from '@/components/ui/card'
 import { ArrowUp, ArrowDown, Minus } from 'lucide-react'
 
@@ -7,7 +8,7 @@ interface MetricCardProps {
   description?: string
   trend?: 'up' | 'down' | 'stable'
   trendValue?: string
-  icon?: React.ReactNode
+  icon?: ReactNode
 }
 
 export function MetricCard({ title, value, description, trend, trendValue, icon }: MetricCardProps) {

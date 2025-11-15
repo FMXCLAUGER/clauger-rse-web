@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import type { ReactNode } from "react"
 import { Inter, Montserrat } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme/ThemeProvider"
@@ -83,7 +84,7 @@ export const viewport = {
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: ReactNode
 }) {
   return (
     <html lang="fr" suppressHydrationWarning>

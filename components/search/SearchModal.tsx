@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useCallback, useMemo } from "react"
+import { useEffect, useState, useCallback, useMemo, type MouseEvent } from "react"
 import { Command } from "cmdk"
 import { Search, FileText, AlertCircle, Clock, X, Download, Copy, Check, Share2 } from "lucide-react"
 import { useRouter, useSearchParams } from "next/navigation"
@@ -197,7 +197,7 @@ export function SearchModal() {
   )
 
   const handleRemoveHistory = useCallback(
-    (historyQuery: string, e: React.MouseEvent) => {
+    (historyQuery: string, e: MouseEvent) => {
       e.stopPropagation()
       removeFromSearchHistory(historyQuery)
       setHistory(getSearchHistory())

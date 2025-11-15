@@ -1,7 +1,7 @@
 'use client'
 
 import { useChat } from 'ai/react'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { toast } from 'sonner'
 import { WELCOME_MESSAGE } from '@/lib/ai/prompts'
 import { chatRateLimiter } from '@/lib/ai/rate-limiter'
@@ -111,7 +111,7 @@ export function useChatbot(options: UseChatbotOptions = {}) {
   }
 
   // Wrapper pour handleSubmit avec rate limiting
-  const handleSubmitWithRateLimit = async (e?: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmitWithRateLimit = async (e?: FormEvent<HTMLFormElement>) => {
     e?.preventDefault()
 
     const rateLimitResult = await chatRateLimiter.checkAndConsume()

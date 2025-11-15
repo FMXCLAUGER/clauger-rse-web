@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
 import { X, Send, RotateCcw, Maximize2, Minimize2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useChatbot, useCurrentPage } from '@/hooks/useChatbot'
@@ -51,14 +51,14 @@ export function ChatbotModal({ isOpen, onClose }: ChatbotModalProps) {
 
   // Gestion du clavier (Escape pour fermer)
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
+    const handleEscape = (e: globalThis.KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
         onClose()
       }
     }
 
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
+    window.addEventListener('keydown', handleEscape)
+    return () => window.removeEventListener('keydown', handleEscape)
   }, [isOpen, onClose])
 
   // Track modal open
@@ -72,7 +72,7 @@ export function ChatbotModal({ isOpen, onClose }: ChatbotModalProps) {
   }, [isOpen, currentPage])
 
   // Gestion de l'envoi du message
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (input.trim() && !isLoading) {
       handleSubmit(e)
@@ -80,7 +80,7 @@ export function ChatbotModal({ isOpen, onClose }: ChatbotModalProps) {
   }
 
   // Gestion de Enter/Shift+Enter
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       if (input.trim() && !isLoading) {

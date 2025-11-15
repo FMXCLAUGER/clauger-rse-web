@@ -1,5 +1,7 @@
+import type { ReactNode } from 'react'
+
 interface VisuallyHiddenProps {
-  children: React.ReactNode
+  children: ReactNode
 }
 
 export function VisuallyHidden({ children }: VisuallyHiddenProps) {

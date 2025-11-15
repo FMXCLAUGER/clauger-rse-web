@@ -1,3 +1,4 @@
+import { type FormEvent } from 'react'
 import { renderHook, waitFor, act } from '@testing-library/react'
 import { useChatbot, useCurrentPage, windowHelpers } from '@/hooks/useChatbot'
 import { WELCOME_MESSAGE } from '@/lib/ai/prompts'
@@ -310,7 +311,7 @@ describe('useChatbot', () => {
     it('should handle form event preventDefault', async () => {
       const mockEvent = {
         preventDefault: jest.fn(),
-      } as unknown as React.FormEvent<HTMLFormElement>
+      } as unknown as FormEvent<HTMLFormElement>
 
       const { result } = renderHook(() => useChatbot())
 

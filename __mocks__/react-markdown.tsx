@@ -1,8 +1,7 @@
-const React = require('react')
+import { createElement } from 'react'
 
 const ReactMarkdown = ({ children }: { children: string }) => {
-  return React.createElement('div', { 'data-testid': 'markdown-content' }, children)
+  return createElement('div', { 'data-testid': 'markdown-content' }, children)
 }
 
-module.exports = ReactMarkdown
-module.exports.default = ReactMarkdown
+export default ReactMarkdown
