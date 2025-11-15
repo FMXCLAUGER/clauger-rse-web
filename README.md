@@ -90,6 +90,7 @@ cp .env.example .env.local
 
 ```env
 ANTHROPIC_API_KEY=sk-ant-...
+BLOB_READ_WRITE_TOKEN=vercel_blob_rw_...  # Pour analytics globales (voir docs/VERCEL_BLOB_SETUP.md)
 ```
 
 4. **Lancer le serveur de développement**
@@ -149,7 +150,10 @@ clauger-rse-web/
 │   │   ├── circuit-breaker.ts        # Pattern circuit breaker
 │   │   └── retry.ts                  # Retry avec backoff
 │   ├── analytics/
-│   │   └── tracker.ts                # Analytics anonymes
+│   │   ├── tracker.ts                # Analytics client-side
+│   │   ├── blob-storage.ts           # Vercel Blob storage layer
+│   │   ├── storage.ts                # Aggregation & summaries
+│   │   └── types.ts                  # Types analytics
 │   └── constants.ts                  # Données rapport (36 pages, KPIs)
 ├── hooks/
 │   ├── useChatbot.ts                 # Hook chatbot principal
@@ -197,6 +201,7 @@ clauger-rse-web/
 
 **Infrastructure**
 - **Vercel** (hosting + edge functions)
+- **Vercel Blob** (analytics storage)
 - **GitHub Actions** (CI/CD)
 
 ---
@@ -289,6 +294,57 @@ Budget : 10,000 tokens de réflexion avant la réponse.
 - PieChart, RadarChart, ComposedChart
 - Responsive & accessibles
 - Export PNG individuel
+
+---
+
+## 📊 Analytics Globales avec Vercel Blob
+
+### Architecture
+
+L'application utilise **Vercel Blob Storage** pour stocker les événements analytics de manière centralisée et accessible à tous les utilisateurs.
+
+**Flux de données:**
+```
+Client → POST /api/analytics/track → Vercel Blob (events.json)
+                                    ↓
+                              Max 10K events (FIFO)
+                                    ↓
+Admin → GET /api/analytics/summary → Résumés agrégés
+```
+
+### Fonctionnalités
+
+**Tracking automatique:**
+- Page views (rapport, dashboard, chat)
+- Chat interactions (questions, réponses)
+- Search queries (recherche dans le rapport)
+- Export actions (PDF, graphiques)
+- Navigation patterns
+
+**Dashboards admin:**
+- `/admin/analytics` - Métriques générales
+- `/admin/ai-analytics` - Statistiques IA/chatbot
+
+**API endpoints:**
+- `POST /api/analytics/track` - Enregistrer un événement
+- `GET /api/analytics/events` - Récupérer avec filtres
+- `GET /api/analytics/summary` - Résumés et stats
+
+### Configuration
+
+Voir la documentation complète: [docs/VERCEL_BLOB_SETUP.md](docs/VERCEL_BLOB_SETUP.md)
+
+**Étapes rapides:**
+1. Créer un Blob store sur Vercel Dashboard
+2. Récupérer `BLOB_READ_WRITE_TOKEN`
+3. Déployer l'application
+
+**Caractéristiques:**
+- Stockage: JSON blob (`analytics/events.json`)
+- Limite: 10,000 événements max (FIFO)
+- Rétention: 30 jours (cleanup automatique)
+- Cache: Fallback en mémoire si Blob indisponible
+- Sécurité: Logging sécurisé, validation des événements
 
 ---
 
@@ -414,9 +470,18 @@ vercel --prod
 4. **Configurer variables d'environnement**
 ```bash
 vercel env add ANTHROPIC_API_KEY production
+# Le BLOB_READ_WRITE_TOKEN sera automatiquement ajouté lors de la création du Blob store
 ```
 
-5. **Accès**
+5. **Configurer Vercel Blob pour analytics** (voir [docs/VERCEL_BLOB_SETUP.md](docs/VERCEL_BLOB_SETUP.md))
+```bash
+# Créer un Blob store via le dashboard Vercel
+# Storage → Create Database → Blob
+# Puis récupérer les variables localement:
+vercel env pull .env.local
+```
+
+6. **Accès**
 - Production: `https://clauger-rse-web.vercel.app`
 - Preview: `https://clauger-rse-web-{branch}.vercel.app`
 
