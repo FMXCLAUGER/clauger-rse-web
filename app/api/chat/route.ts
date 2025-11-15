@@ -1,4 +1,4 @@
-import { streamText } from 'ai'
+import { streamText, convertToModelMessages } from 'ai'
 import { anthropic } from '@ai-sdk/anthropic'
 import { ContextBuilder } from '@/lib/ai/context-builder'
 import { buildSystemMessageWithCaching } from '@/lib/ai/prompts'
@@ -184,7 +184,7 @@ export async function POST(req: Request) {
       async () => streamText({
         model: anthropic(routingDecision.model.id),
         system: systemMessages,
-        messages: messages,
+        messages: convertToModelMessages(messages),
         maxOutputTokens: thinkingConfig.enabled ? 4096 : 2048,
         temperature: 0.3,
         providerOptions: {
