@@ -10,8 +10,15 @@ const nextConfig = {
     imageSizes: [32, 48, 64, 96, 128, 256, 384],
     minimumCacheTTL: 60 * 60 * 24 * 30,
   },
-  webpack: (config, { isServer }) => {
+  webpack: (config, { isServer, dev }) => {
     config.resolve.alias.canvas = false;
+
+    // CRITICAL: Disable eval() in production for CSP compliance
+    if (!dev) {
+      // Production: use hidden-source-map (no eval, good for error monitoring)
+      config.devtool = 'hidden-source-map';
+    }
+    // Development: Next.js uses eval-source-map by default (fastest rebuilds)
 
     if (!isServer) {
       config.optimization = {
