@@ -1,4 +1,4 @@
-import type { Message } from 'ai'
+import type { UIMessage } from 'ai'
 
 /**
  * Utilitaires pour la gestion des conversations du chatbot
@@ -45,19 +45,20 @@ export function extractPageReferences(content: string): number[] {
 /**
  * Formatte un message pour l'export
  */
-export function formatMessageForExport(message: Message): string {
+export function formatMessageForExport(message: UIMessage): string {
   const role = message.role === 'user' ? 'Utilisateur' : 'Assistant'
-  const timestamp = message.createdAt
-    ? new Date(message.createdAt).toLocaleString('fr-FR')
+  const timestamp = (message as any).createdAt
+    ? new Date((message as any).createdAt).toLocaleString('fr-FR')
     : ''
+  const content = (message as any).content || ''
 
-  return `### ${role} ${timestamp ? `(${timestamp})` : ''}\n\n${message.content}\n`
+  return `### ${role} ${timestamp ? `(${timestamp})` : ''}\n\n${content}\n`
 }
 
 /**
  * Exporte la conversation en Markdown
  */
-export function exportConversationAsMarkdown(messages: Message[]): string {
+export function exportConversationAsMarkdown(messages: UIMessage[]): string {
   let markdown = '# Conversation avec l\'Assistant RSE Clauger\n\n'
   markdown += `Date d'export : ${new Date().toLocaleString('fr-FR')}\n\n`
   markdown += '---\n\n'
@@ -73,7 +74,7 @@ export function exportConversationAsMarkdown(messages: Message[]): string {
 /**
  * Télécharge la conversation en fichier Markdown
  */
-export function downloadConversation(messages: Message[]): void {
+export function downloadConversation(messages: UIMessage[]): void {
   const markdown = exportConversationAsMarkdown(messages)
   const blob = new Blob([markdown], { type: 'text/markdown' })
   const url = URL.createObjectURL(blob)
@@ -90,7 +91,7 @@ export function downloadConversation(messages: Message[]): void {
 /**
  * Analyse le sentiment d'une conversation
  */
-export function analyzeConversationSentiment(messages: Message[]): {
+export function analyzeConversationSentiment(messages: UIMessage[]): {
   totalQuestions: number
   totalResponses: number
   averageResponseLength: number
@@ -102,7 +103,10 @@ export function analyzeConversationSentiment(messages: Message[]): {
   const averageResponseLength =
     assistantMessages.length > 0
       ? Math.round(
-          assistantMessages.reduce((sum, m) => sum + m.content.length, 0) / assistantMessages.length
+          assistantMessages.reduce((sum, m) => {
+            const content = (m as any).content || ''
+            return sum + (typeof content === 'string' ? content.length : 0)
+          }, 0) / assistantMessages.length
         )
       : 0
 
@@ -117,7 +121,8 @@ export function analyzeConversationSentiment(messages: Message[]): {
   }
 
   userMessages.forEach(message => {
-    const contentLower = message.content.toLowerCase()
+    const content = (message as any).content || ''
+    const contentLower = typeof content === 'string' ? content.toLowerCase() : ''
     Object.entries(topicKeywords).forEach(([topic, keywords]) => {
       if (keywords.some(kw => contentLower.includes(kw))) {
         topics.add(topic)
@@ -136,8 +141,9 @@ export function analyzeConversationSentiment(messages: Message[]): {
 /**
  * Suggère des questions de suivi basées sur le dernier message
  */
-export function suggestFollowUpQuestions(lastMessage: Message): string[] {
-  const content = lastMessage.content.toLowerCase()
+export function suggestFollowUpQuestions(lastMessage: UIMessage): string[] {
+  const messageContent = (lastMessage as any).content || ''
+  const content = typeof messageContent === 'string' ? messageContent.toLowerCase() : ''
   const suggestions: string[] = []
 
   // Suggestions basées sur le contenu

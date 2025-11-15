@@ -1,6 +1,6 @@
 import { describe, it, expect } from '@jest/globals'
 import { ModelRouter, CLAUDE_MODELS } from '@/lib/ai/model-router'
-import type { Message } from 'ai'
+import type { UIMessage } from 'ai'
 
 describe('ModelRouter', () => {
   describe('analyzeComplexity', () => {
@@ -86,7 +86,7 @@ describe('ModelRouter', () => {
 
   describe('selectModel', () => {
     it('should select Haiku for simple queries', () => {
-      const messages: Message[] = [
+      const messages: UIMessage[] = [
         { id: '1', role: 'user', content: 'Quel est le score environnement ?' }
       ]
 
@@ -98,7 +98,7 @@ describe('ModelRouter', () => {
     })
 
     it('should select Haiku for medium queries', () => {
-      const messages: Message[] = [
+      const messages: UIMessage[] = [
         { id: '1', role: 'user', content: 'Comment Clauger améliore son bilan carbone ?' }
       ]
 
@@ -109,7 +109,7 @@ describe('ModelRouter', () => {
     })
 
     it('should select Sonnet for complex queries', () => {
-      const messages: Message[] = [
+      const messages: UIMessage[] = [
         { id: '1', role: 'user', content: 'Analyser en profondeur l\'évolution ESG 2020-2025 et projeter 2030' }
       ]
 
@@ -121,7 +121,7 @@ describe('ModelRouter', () => {
     })
 
     it('should handle multi-turn conversations', () => {
-      const messages: Message[] = [
+      const messages: UIMessage[] = [
         { id: '1', role: 'user', content: 'Quel est le score ?' },
         { id: '2', role: 'assistant', content: 'Le score est 6.2/10' },
         { id: '3', role: 'user', content: 'Pourquoi ?' }
@@ -134,7 +134,7 @@ describe('ModelRouter', () => {
     })
 
     it('should provide reasoning for decision', () => {
-      const messages: Message[] = [
+      const messages: UIMessage[] = [
         { id: '1', role: 'user', content: 'Analyser la stratégie' }
       ]
 
@@ -222,7 +222,7 @@ describe('ModelRouter', () => {
 
   describe('Cost Savings Analysis', () => {
     it('should show significant savings for simple queries', () => {
-      const messages: Message[] = [
+      const messages: UIMessage[] = [
         { id: '1', role: 'user', content: 'Quel est le score ?' }
       ]
 
@@ -238,7 +238,7 @@ describe('ModelRouter', () => {
     })
 
     it('should calculate estimated cost for decision', () => {
-      const messages: Message[] = [
+      const messages: UIMessage[] = [
         { id: '1', role: 'user', content: 'Quel est le score ?' }
       ]
 

@@ -1,4 +1,4 @@
-import type { Message } from 'ai'
+import type { UIMessage } from 'ai'
 
 export const CLAUDE_MODELS = {
   HAIKU: {
@@ -165,13 +165,13 @@ export class ModelRouter {
     return Math.ceil(text.length / 4)
   }
 
-  static selectModel(messages: Message[], currentPage?: number): RoutingDecision {
+  static selectModel(messages: UIMessage[], currentPage?: number): RoutingDecision {
     const lastMessage = messages[messages.length - 1]
 
     // Handle different content types from AI SDK
     // Using 'unknown' to avoid TypeScript inference issues with Message type
     let userQuery = ''
-    const content = lastMessage?.content as unknown
+    const content = (lastMessage as any)?.content
 
     if (typeof content === 'string') {
       userQuery = content
@@ -204,7 +204,7 @@ export class ModelRouter {
 
     const conversationLength = messages.reduce((sum, msg) => {
       let contentText = ''
-      const msgContent = msg?.content as unknown
+      const msgContent = (msg as any)?.content
 
       if (typeof msgContent === 'string') {
         contentText = msgContent

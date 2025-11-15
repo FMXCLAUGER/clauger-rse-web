@@ -2,7 +2,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { ChatbotModal } from '@/components/chatbot/ChatbotModal'
 import { useChatbot, useCurrentPage } from '@/hooks/useChatbot'
 import { trackSessionStarted } from '@/lib/analytics/tracker'
-import type { Message } from 'ai'
+import type { UIMessage } from 'ai'
 
 // Mock hooks
 jest.mock('@/hooks/useChatbot', () => ({
@@ -70,7 +70,7 @@ describe('ChatbotModal', () => {
   const mockOnClose = jest.fn()
 
   const defaultChatbotState = {
-    messages: [] as Message[],
+    messages: [] as UIMessage[],
     input: '',
     handleInputChange: mockHandleInputChange,
     handleSubmit: mockHandleSubmit,
@@ -125,7 +125,7 @@ describe('ChatbotModal', () => {
     })
 
     it('displays message count when messages exist', () => {
-      const messages: Message[] = [
+      const messages: UIMessage[] = [
         { id: '1', role: 'user', content: 'Hello' },
         { id: '2', role: 'assistant', content: 'Hi there' },
       ]
@@ -190,7 +190,7 @@ describe('ChatbotModal', () => {
     })
 
     it('renders messages when conversation exists', () => {
-      const messages: Message[] = [
+      const messages: UIMessage[] = [
         { id: '1', role: 'user', content: 'Hello' },
         { id: '2', role: 'assistant', content: 'Hi there' },
       ]
@@ -514,7 +514,7 @@ describe('ChatbotModal', () => {
 
   describe('Message Display', () => {
     it('marks last message correctly', () => {
-      const messages: Message[] = [
+      const messages: UIMessage[] = [
         { id: '1', role: 'user', content: 'First message' },
         { id: '2', role: 'assistant', content: 'Second message' },
         { id: '3', role: 'user', content: 'Third message' },
@@ -536,7 +536,7 @@ describe('ChatbotModal', () => {
     })
 
     it('renders all messages in order', () => {
-      const messages: Message[] = [
+      const messages: UIMessage[] = [
         { id: '1', role: 'user', content: 'Hello' },
         { id: '2', role: 'assistant', content: 'Hi there' },
         { id: '3', role: 'user', content: 'How are you?' },

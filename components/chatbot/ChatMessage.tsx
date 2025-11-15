@@ -1,19 +1,24 @@
 'use client'
 
-import { type Message } from 'ai'
+import { type UIMessage } from 'ai'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { Bot, User } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface ChatMessageProps {
-  message: Message
+  message: UIMessage
   isLast?: boolean
 }
 
 export function ChatMessage({ message, isLast = false }: ChatMessageProps) {
   const isUser = message.role === 'user'
   const isAssistant = message.role === 'assistant'
+
+  // Extract content as string (v5 compatibility)
+  const content = typeof (message as any).content === 'string'
+    ? (message as any).content
+    : ''
 
   return (
     <div
@@ -47,7 +52,7 @@ export function ChatMessage({ message, isLast = false }: ChatMessageProps) {
         {/* Message Text */}
         <div className="prose prose-sm dark:prose-invert max-w-none">
           {isUser ? (
-            <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
+            <p className="text-sm whitespace-pre-wrap break-words">{content}</p>
           ) : (
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
@@ -101,16 +106,16 @@ export function ChatMessage({ message, isLast = false }: ChatMessageProps) {
                 hr: () => <hr className="my-3 border-border" />
               }}
             >
-              {message.content}
+              {content}
             </ReactMarkdown>
           )}
         </div>
 
         {/* Metadata (timestamp, etc.) */}
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          {message.createdAt && (
-            <time dateTime={message.createdAt.toISOString()}>
-              {message.createdAt.toLocaleTimeString('fr-FR', {
+          {(message as any).createdAt && (
+            <time dateTime={(message as any).createdAt.toISOString()}>
+              {(message as any).createdAt.toLocaleTimeString('fr-FR', {
                 hour: '2-digit',
                 minute: '2-digit'
               })}

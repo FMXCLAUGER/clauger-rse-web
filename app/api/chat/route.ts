@@ -184,9 +184,9 @@ export async function POST(req: Request) {
         model: anthropic(routingDecision.model.id),
         system: systemMessages,
         messages: messages,
-        maxTokens: thinkingConfig.enabled ? 4096 : 2048,
+        maxOutputTokens: thinkingConfig.enabled ? 4096 : 2048,
         temperature: 0.3,
-        experimental_providerMetadata: {
+        providerOptions: {
           anthropic: {
             ...(thinkingConfig.enabled && {
               thinking: {
@@ -199,17 +199,17 @@ export async function POST(req: Request) {
             }
           }
         },
-        onFinish: async ({ text, usage, experimental_providerMetadata }) => {
-        const cacheMetrics = experimental_providerMetadata?.anthropic || {}
+        onFinish: async ({ text, usage, response }) => {
+        const cacheMetrics = (response as any)?.anthropic || {}
         const cacheReadTokens = typeof cacheMetrics.cacheReadInputTokens === 'number'
           ? cacheMetrics.cacheReadInputTokens
           : 0
         const cacheCreationTokens = typeof cacheMetrics.cacheCreationInputTokens === 'number'
           ? cacheMetrics.cacheCreationInputTokens
           : 0
-        const inputTokens = usage.promptTokens || 0
-        const outputTokens = usage.completionTokens || 0
-        const totalTokens = usage.totalTokens || 0
+        const inputTokens = (usage as any).promptTokens || 0
+        const outputTokens = (usage as any).completionTokens || 0
+        const totalTokens = (usage as any).totalTokens || 0
         const duration = Date.now() - startTime
 
         // Calculate cache savings using actual model pricing
@@ -274,7 +274,7 @@ export async function POST(req: Request) {
     )
 
     // 7. Retourner le stream
-    return result.toDataStreamResponse()
+    return result.toUIMessageStreamResponse()
   } catch (error: any) {
     const circuitState = resilientClient.getCircuitState()
     const metrics = resilientClient.getMetrics()
