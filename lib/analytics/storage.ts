@@ -1,11 +1,12 @@
 /**
- * Gestion du stockage local des événements analytics
- * Permet de sauvegarder, récupérer et analyser les métriques
+ * Local storage management for analytics events
+ * Allows saving, retrieving, and analyzing metrics
  */
 
 import type {
   AnalyticsEvent,
   MetricsSummary,
+  AISummary,
   MetricsExport,
   EventType,
   EventCategory,
@@ -13,13 +14,14 @@ import type {
   CacheMetricsEvent,
   ThinkingActivatedEvent,
   ResilienceMetricsEvent,
+  MessageSentEvent,
 } from './types'
 import { STORAGE_KEYS, MAX_EVENT_AGE_MS } from './config'
 import { isLocalStorageAvailable } from './config'
 import { logger, logStorageError } from '@/lib/security'
 
 /**
- * Filtres pour la récupération des événements
+ * Filters for event retrieval
  */
 export interface EventFilters {
   eventType?: EventType
@@ -43,7 +45,7 @@ export function saveEvent(event: AnalyticsEvent): boolean {
     const existingEvents = getEvents()
     const updatedEvents = [...existingEvents, event]
 
-    // Limite le nombre d'événements stockés
+    // Limit the number of stored events
     const config = { maxStoredEvents: 1000 }
     if (updatedEvents.length > config.maxStoredEvents) {
       updatedEvents.shift()
@@ -75,7 +77,7 @@ export function getEvents(filters?: EventFilters): AnalyticsEvent[] {
 
     let events: AnalyticsEvent[] = JSON.parse(raw)
 
-    // Application des filtres
+    // Apply filters
     if (filters) {
       if (filters.eventType) {
         events = events.filter((e) => e.eventType === filters.eventType)
@@ -243,6 +245,107 @@ export function calculateSummary(): MetricsSummary {
 }
 
 /**
+ * Calcule un résumé des métriques IA à partir des événements stockés
+ * Analyse le routing Haiku vs Sonnet, les coûts et la complexité des requêtes
+ * @returns Résumé des métriques IA
+ */
+export function calculateAISummary(): AISummary {
+  const events = getEvents()
+
+  // Filter chat.message.sent events containing AI data
+  const messageEvents = events.filter(
+    (e) => e.eventType === 'chat.message.sent'
+  ) as MessageSentEvent[]
+
+  // Separate by model (Haiku vs Sonnet)
+  const haikuEvents = messageEvents.filter(
+    (e) => e.properties.modelUsed?.toLowerCase().includes('haiku')
+  )
+  const sonnetEvents = messageEvents.filter(
+    (e) => e.properties.modelUsed?.toLowerCase().includes('sonnet')
+  )
+
+  const totalHaikuRequests = haikuEvents.length
+  const totalSonnetRequests = sonnetEvents.length
+  const totalRequests = totalHaikuRequests + totalSonnetRequests
+
+  const haikuUsageRate =
+    totalRequests > 0 ? (totalHaikuRequests / totalRequests) * 100 : 0
+
+  // Calculate costs
+  const haikuTotalCost = haikuEvents.reduce(
+    (sum, e) => sum + (e.properties.estimatedCost || 0),
+    0
+  )
+  const sonnetTotalCost = sonnetEvents.reduce(
+    (sum, e) => sum + (e.properties.estimatedCost || 0),
+    0
+  )
+  const totalAICost = haikuTotalCost + sonnetTotalCost
+  const avgCostPerRequest = totalRequests > 0 ? totalAICost / totalRequests : 0
+
+  // Calculate savings (if everything was Sonnet)
+  // Sonnet costs approximately 3.75x more than Haiku
+  const sonnetPriceMultiplier = 3.75
+  const costIfAllSonnet = haikuTotalCost * sonnetPriceMultiplier + sonnetTotalCost
+  const routingSavings = costIfAllSonnet - totalAICost
+
+  // Distribution par complexité (simple <3, medium 3-6, complex >=6)
+  const simpleQueryCount = messageEvents.filter(
+    (e) => (e.properties.complexityScore || 0) < 3
+  ).length
+  const mediumQueryCount = messageEvents.filter(
+    (e) =>
+      (e.properties.complexityScore || 0) >= 3 &&
+      (e.properties.complexityScore || 0) < 6
+  ).length
+  const complexQueryCount = messageEvents.filter(
+    (e) => (e.properties.complexityScore || 0) >= 6
+  ).length
+
+  const avgComplexityScore =
+    messageEvents.length > 0
+      ? messageEvents.reduce(
+          (sum, e) => sum + (e.properties.complexityScore || 0),
+          0
+        ) / messageEvents.length
+      : 0
+
+  // Projections (based on last 7 days)
+  const sevenDaysAgo = new Date()
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+
+  const recentEvents = messageEvents.filter(
+    (e) => new Date(e.timestamp).getTime() >= sevenDaysAgo.getTime()
+  )
+
+  const recentCost = recentEvents.reduce(
+    (sum, e) => sum + (e.properties.estimatedCost || 0),
+    0
+  )
+
+  const dailyAvgCost = recentEvents.length > 0 ? recentCost / 7 : 0
+  const monthlyProjectedCost = dailyAvgCost * 30
+
+  return {
+    totalHaikuRequests,
+    totalSonnetRequests,
+    haikuUsageRate,
+    totalAICost,
+    avgCostPerRequest,
+    haikuTotalCost,
+    sonnetTotalCost,
+    routingSavings,
+    simpleQueryCount,
+    mediumQueryCount,
+    complexQueryCount,
+    avgComplexityScore,
+    monthlyProjectedCost,
+    dailyAvgCost,
+  }
+}
+
+/**
  * Exporte toutes les métriques au format MetricsExport
  * @returns Export complet des métriques
  */
@@ -250,7 +353,7 @@ export function exportMetrics(): MetricsExport {
   const events = getEvents()
   const summary = calculateSummary()
 
-  // Détermine la période couverte
+  // Determine the covered period
   const timestamps = events.map((e) => new Date(e.timestamp).getTime())
   const start =
     timestamps.length > 0

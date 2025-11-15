@@ -62,6 +62,10 @@ export function EnjeuxDetailModal({
         aria-labelledby="modal-title"
         className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto"
       >
+        <div className="md:hidden flex justify-center pt-2 pb-1">
+          <div className="w-12 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" aria-hidden="true" />
+        </div>
+
         <button
           type="button"
           onClick={onClose}

@@ -68,7 +68,7 @@ export function ChartCard({
           )}
         </div>
       </header>
-      <div className="px-6 pb-6 pt-2 flex-1">
+      <div className="px-6 pb-6 pt-2 flex-1 min-h-[250px] h-64 sm:h-72 md:h-80">
         {isLoading ? <ChartSkeleton height={loadingHeight} /> : children}
       </div>
     </article>

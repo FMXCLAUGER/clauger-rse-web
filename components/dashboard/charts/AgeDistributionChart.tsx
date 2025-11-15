@@ -19,7 +19,7 @@ const COLORS = ["#0088CC", "#F8B500", "#10B981", "#F59E0B", "#EF4444"]
 
 export function AgeDistributionChart({ data }: AgeDistributionChartProps) {
   return (
-    <ResponsiveContainer width="100%" height={300}>
+    <ResponsiveContainer width="100%" height="100%">
       <BarChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
         <CartesianGrid stroke="#E5E7EB" className="dark:stroke-gray-700" strokeDasharray="3 3" />
         <XAxis

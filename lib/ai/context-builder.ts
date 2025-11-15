@@ -32,8 +32,8 @@ export interface BuiltContext {
 }
 
 /**
- * Constructeur de contexte intelligent pour Claude
- * Combine l'analyse experte RSE, les données OCR, et les métadonnées
+ * Intelligent context builder for Claude
+ * Combines expert RSE analysis, OCR data, and metadata
  */
 export class ContextBuilder {
   /**
@@ -57,35 +57,35 @@ export class ContextBuilder {
     const relevantSections: string[] = []
     let systemContext = ''
 
-    // 1. Ajouter l'analyse experte complète (source principale)
+    // 1. Add complete expert analysis (main source)
     if (includeFullAnalysis) {
       const fullAnalysis = await knowledgeBase.getFullAnalysisText()
       systemContext += fullAnalysis + '\n\n'
       sources.push('Analyse experte RSE Clauger 2025')
     }
 
-    // 2. Ajouter les scores si demandé
+    // 2. Add scores if requested
     if (includeScores) {
       const scores = await knowledgeBase.getScores()
       relevantSections.push(scores)
       sources.push('Scores RSE détaillés')
     }
 
-    // 3. Ajouter les recommandations si demandé
+    // 3. Add recommendations if requested
     if (includeRecommendations) {
       const recommendations = await knowledgeBase.getRecommendations()
       relevantSections.push(recommendations)
       sources.push('Recommandations RSE')
     }
 
-    // 4. Recherche contextuelle si query fournie
+    // 4. Contextual search if query provided
     if (searchQuery) {
       const searchResults = await knowledgeBase.search(searchQuery)
       relevantSections.push(searchResults)
       sources.push(`Recherche: "${searchQuery}"`)
     }
 
-    // 5. Ajouter les données OCR de la page actuelle si pertinent
+    // 5. Add OCR data from current page if relevant
     if (includeOCRData && currentPage) {
       const ocrData = await this.loadOCRData()
       const pageData = ocrData.pages.find(p => p.pageNumber === currentPage)
@@ -96,7 +96,7 @@ export class ContextBuilder {
       }
     }
 
-    // 6. Combiner toutes les sections
+    // 6. Combine all sections
     const fullContext = systemContext + relevantSections.join('\n\n---\n\n')
 
     // 7. Tronquer si nécessaire

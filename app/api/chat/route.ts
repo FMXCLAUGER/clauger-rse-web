@@ -33,8 +33,8 @@ const resilientClient = new ResilientAIClient({
   }
 })
 
-// Configuration Node.js Runtime (nécessaire pour fs/path)
-// export const runtime = 'edge' // ❌ Incompatible avec fs
+// Node.js Runtime configuration (required for fs/path)
+// export const runtime = 'edge' // ❌ Incompatible with fs
 export const dynamic = 'force-dynamic'
 
 /**
@@ -47,7 +47,7 @@ export const dynamic = 'force-dynamic'
  */
 export async function POST(req: Request) {
   try {
-    // 1. Vérifier la clé API
+    // 1. Check API key
     if (!process.env.ANTHROPIC_API_KEY) {
       return new Response(
         JSON.stringify({
@@ -60,7 +60,7 @@ export async function POST(req: Request) {
       )
     }
 
-    // 2. Parser le body
+    // 2. Parse request body
     const { messages, currentPage } = await req.json()
 
     if (!messages || !Array.isArray(messages)) {
@@ -73,7 +73,7 @@ export async function POST(req: Request) {
       )
     }
 
-    // 3. Extraire la dernière question de l'utilisateur (AI SDK v5 format)
+    // 3. Extract last user question (AI SDK v5 format)
     const lastMessage = messages[messages.length - 1]
     const userQuery = lastMessage ? getMessageText(lastMessage) : ''
 

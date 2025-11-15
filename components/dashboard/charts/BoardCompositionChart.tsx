@@ -10,7 +10,7 @@ const COLORS = ["#0088CC", "#F8B500", "#10B981", "#F59E0B"]
 
 export function BoardCompositionChart({ data }: BoardCompositionChartProps) {
   return (
-    <ResponsiveContainer width="100%" height={300}>
+    <ResponsiveContainer width="100%" height="100%">
       <PieChart>
         <Pie
           data={data}

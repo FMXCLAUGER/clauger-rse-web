@@ -37,8 +37,8 @@ const CHAT_HISTORY_KEY = 'clauger-chat-history'
 const MAX_HISTORY_LENGTH = 50
 
 /**
- * Hook personnalisé pour le chatbot RSE
- * Wrapper autour du useChat de Vercel AI SDK avec fonctionnalités spécifiques
+ * Custom hook for RSE chatbot
+ * Wrapper around Vercel AI SDK useChat with specific features
  */
 export function useChatbot(options: UseChatbotOptions = {}) {
   const { currentPage, onError } = options
@@ -65,12 +65,12 @@ export function useChatbot(options: UseChatbotOptions = {}) {
         contentLength: typeof content === 'string' ? content.length : 0
       })
 
-      // Sauvegarder l'historique
+      // Save history
       saveHistory(chat.messages)
     }
   } as any)
 
-  // Charger l'historique au montage
+  // Load history on mount
   useEffect(() => {
     if (!isInitialized) {
       loadHistory()
@@ -84,14 +84,14 @@ export function useChatbot(options: UseChatbotOptions = {}) {
     }
   }, [isInitialized, currentPage])
 
-  // Fonction pour charger l'historique depuis localStorage
+  // Function to load history from localStorage
   const loadHistory = () => {
     try {
       const stored = localStorage.getItem(CHAT_HISTORY_KEY)
       if (stored) {
         const history = JSON.parse(stored)
-        // Note: useChat ne permet pas de définir messages directement
-        // L'historique sera chargé via setMessages si disponible
+        // Note: useChat doesn't allow setting messages directly
+        // History will be loaded via setMessages if available
         logger.debug('Chat history loaded', { messageCount: history.length })
       }
     } catch (error) {
@@ -99,10 +99,10 @@ export function useChatbot(options: UseChatbotOptions = {}) {
     }
   }
 
-  // Fonction pour sauvegarder l'historique dans localStorage
+  // Function to save history to localStorage
   const saveHistory = (messages: typeof chat.messages) => {
     try {
-      // Limiter la taille de l'historique
+      // Limit history size
       const limitedMessages = messages.slice(-MAX_HISTORY_LENGTH)
       localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(limitedMessages))
     } catch (error) {
@@ -110,11 +110,11 @@ export function useChatbot(options: UseChatbotOptions = {}) {
     }
   }
 
-  // Fonction pour effacer l'historique
+  // Function to clear history
   const clearHistory = () => {
     try {
       localStorage.removeItem(CHAT_HISTORY_KEY)
-      // Recharger la page pour réinitialiser le chat
+      // Reload page to reset chat
       windowHelpers.reloadPage()
     } catch (error) {
       logStorageError('clear', error, 'chatHistory')
@@ -126,7 +126,7 @@ export function useChatbot(options: UseChatbotOptions = {}) {
     setInput(e.target.value)
   }
 
-  // Wrapper pour handleSubmit avec rate limiting
+  // Wrapper for handleSubmit with rate limiting
   const handleSubmitWithRateLimit = async (e?: FormEvent<HTMLFormElement>) => {
     e?.preventDefault()
 
@@ -158,7 +158,7 @@ export function useChatbot(options: UseChatbotOptions = {}) {
     setInput('')
   }
 
-  // Fonction pour envoyer une question suggérée
+  // Function to send a suggested question
   const sendSuggestedQuestion = async (question: string) => {
     const rateLimitResult = await chatRateLimiter.checkAndConsume()
 
@@ -183,17 +183,17 @@ export function useChatbot(options: UseChatbotOptions = {}) {
     chat.sendMessage({ text: question })
   }
 
-  // Fonction pour redémarrer la conversation
+  // Function to restart conversation
   const restartConversation = () => {
     if (confirm('Voulez-vous vraiment effacer l\'historique de la conversation ?')) {
       clearHistory()
     }
   }
 
-  // Vérifier si c'est une nouvelle conversation
+  // Check if this is a new conversation
   const isNewConversation = chat.messages.length === 0
 
-  // Statistiques de la conversation
+  // Conversation statistics
   const stats = {
     messageCount: chat.messages.length,
     userMessages: chat.messages.filter(m => m.role === 'user').length,
@@ -224,7 +224,7 @@ export function useChatbot(options: UseChatbotOptions = {}) {
   const isLoading = chatWithStatus.status === 'submitting' || chatWithStatus.status === 'streaming'
 
   return {
-    // Props du useChat original
+    // Original useChat props
     ...chat,
 
     // Manual input state management (v5 requirement)
@@ -234,15 +234,15 @@ export function useChatbot(options: UseChatbotOptions = {}) {
     // V5 compatibility
     isLoading,
 
-    // Remplacer handleSubmit par la version avec rate limiting
+    // Replace handleSubmit with rate limiting version
     handleSubmit: handleSubmitWithRateLimit,
 
-    // Fonctions personnalisées
+    // Custom functions
     sendSuggestedQuestion,
     restartConversation,
     clearHistory,
 
-    // États personnalisés
+    // Custom states
     isInitialized,
     isNewConversation,
     stats,
@@ -253,21 +253,21 @@ export function useChatbot(options: UseChatbotOptions = {}) {
 }
 
 /**
- * Hook pour gérer le contexte de la page actuelle
- * Détecte automatiquement la page en cours de lecture
+ * Hook to manage current page context
+ * Automatically detects the page being read
  */
 export function useCurrentPage(): number | undefined {
   const [currentPage, setCurrentPage] = useState<number | undefined>(undefined)
 
   useEffect(() => {
-    // Récupérer la page depuis l'URL ou le localStorage
+    // Get page from URL or localStorage
     const params = new URLSearchParams(windowHelpers.getLocationSearch())
     const pageParam = params.get('page')
 
     if (pageParam) {
       setCurrentPage(parseInt(pageParam, 10))
     } else {
-      // Essayer de récupérer depuis le reading state
+      // Try to get from reading state
       try {
         const readingState = localStorage.getItem('clauger-reading-state')
         if (readingState) {

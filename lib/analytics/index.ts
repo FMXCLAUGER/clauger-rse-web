@@ -23,6 +23,7 @@ export type {
   AnalyticsEvent,
   StoredMetrics,
   MetricsSummary,
+  AISummary,
   AnalyticsConfig,
   MetricsExport
 } from './types'
@@ -35,6 +36,7 @@ export {
   saveEvent,
   getEvents,
   calculateSummary,
+  calculateAISummary,
   exportMetrics,
   clearAllEvents,
   clearOldEvents,

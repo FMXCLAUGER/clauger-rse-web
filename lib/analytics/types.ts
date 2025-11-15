@@ -292,6 +292,23 @@ export interface MetricsSummary {
   p95ResilienceLatency: number
 }
 
+export interface AISummary {
+  totalHaikuRequests: number
+  totalSonnetRequests: number
+  haikuUsageRate: number
+  totalAICost: number
+  avgCostPerRequest: number
+  haikuTotalCost: number
+  sonnetTotalCost: number
+  routingSavings: number
+  simpleQueryCount: number
+  mediumQueryCount: number
+  complexQueryCount: number
+  avgComplexityScore: number
+  monthlyProjectedCost: number
+  dailyAvgCost: number
+}
+
 // =============================================================================
 // ANALYTICS CONFIG
 // =============================================================================

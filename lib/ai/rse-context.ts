@@ -66,21 +66,21 @@ export class RSEContextParser {
       return this.getEmptyContext()
     }
 
-    // Extraction du résumé exécutif
+    // Extract executive summary
     const summaryMatch = content.match(/## RÉSUMÉ EXÉCUTIF([\s\S]*?)(?=\n##\s|\n---\n##|$)/)
     const summary = summaryMatch ? summaryMatch[1].trim() : ''
 
-    // Extraction de la notation globale
+    // Extract global score
     const globalScoreMatch = content.match(/Notation globale\s*:\s*\*\*(\d+)\/100\*\*/)
     const globalScore = globalScoreMatch ? parseInt(globalScoreMatch[1], 10) : 0
 
-    // Extraction des sections principales
+    // Extract main sections
     const sections = this.extractSections(content)
 
-    // Extraction des scores détaillés
+    // Extract detailed scores
     const scores = this.extractScores(content)
 
-    // Extraction des recommandations
+    // Extract recommendations
     const recommendations = this.extractRecommendations(content)
 
     return {
@@ -99,7 +99,7 @@ export class RSEContextParser {
   }
 
   /**
-   * Extrait les sections principales du document
+   * Extract main sections from document
    */
   private static extractSections(content: string): RSESection[] {
     const sections: RSESection[] = []
@@ -130,7 +130,7 @@ export class RSEContextParser {
   }
 
   /**
-   * Extrait les sous-sections d'une section
+   * Extract subsections from a section
    */
   private static extractSubsections(sectionContent: string): RSESection[] {
     const subsections: RSESection[] = []
@@ -149,7 +149,7 @@ export class RSEContextParser {
 
       const title = match[1].trim()
 
-      // Extraction du score si présent (format **Note : X/10**)
+      // Extract score if present (format **Note : X/10**)
       const scoreMatch = content.match(/\*\*Note\s*:\s*(\d+(?:[.,]\d+)?)\s*\/\s*10\*\*/)
       const score = scoreMatch ? parseFloat(scoreMatch[1].replace(',', '.')) : undefined
 
@@ -164,7 +164,7 @@ export class RSEContextParser {
   }
 
   /**
-   * Extrait tous les scores du document
+   * Extract all scores from document
    */
   private static extractScores(content: string): RSEScore[] {
     const scores: RSEScore[] = []
@@ -179,7 +179,7 @@ export class RSEContextParser {
     while ((match = scoreRegex.exec(content)) !== null) {
       const score = parseFloat(match[1].replace(',', '.'))
 
-      // Trouver le titre de la sous-section correspondante
+      // Find the corresponding subsection title
       let category = 'Non catégorisé'
       for (const titleMatch of subsectionTitles) {
         if (titleMatch.index! < match.index!) {
@@ -202,18 +202,18 @@ export class RSEContextParser {
   }
 
   /**
-   * Extrait les recommandations du document
+   * Extract recommendations from document
    */
   private static extractRecommendations(content: string): string[] {
     const recommendations: string[] = []
 
-    // Recherche de la section recommandations
+    // Search for recommendations section
     const recoMatch = content.match(/##\s+.*RECOMMANDATIONS.*([\s\S]*?)(?=\n##\s|$)/i)
 
     if (recoMatch) {
       const recoContent = recoMatch[1]
 
-      // Extraction des items de liste (- ou *)
+      // Extract list items (- or *)
       const items = recoContent.match(/^[\s]*[-*]\s+\*\*(.+?)\*\*\s*:(.+?)$/gm)
 
       if (items) {
@@ -267,7 +267,7 @@ export class RSEContextParser {
         results.push(section)
       }
 
-      // Recherche dans les sous-sections
+      // Search in subsections
       if (section.subsections) {
         for (const subsection of section.subsections) {
           if (
@@ -284,20 +284,20 @@ export class RSEContextParser {
   }
 
   /**
-   * Formatte le contexte pour Claude (injection dans le prompt)
+   * Format context for Claude (inject into prompt)
    */
   static formatForClaude(context: RSEContext, maxLength?: number): string {
     let formatted = `# RAPPORT RSE CLAUGER ${context.metadata.year}\n\n`
     formatted += `## Résumé Exécutif\n${context.summary}\n\n`
     formatted += `**Notation globale : ${context.globalScore}/100**\n\n`
 
-    // Ajouter les sections principales
+    // Add main sections
     for (const section of context.sections) {
       formatted += `## ${section.title}\n`
       formatted += `${section.content}\n\n`
     }
 
-    // Tronquer si nécessaire
+    // Truncate if necessary
     if (maxLength && formatted.length > maxLength) {
       formatted = formatted.slice(0, maxLength) + '\n\n[... Contenu tronqué ...]'
     }

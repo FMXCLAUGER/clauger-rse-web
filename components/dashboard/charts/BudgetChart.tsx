@@ -20,7 +20,7 @@ const COLORS = ["#10B981", "#0088CC", "#F8B500"]
 
 export function BudgetChart({ data }: BudgetChartProps) {
   return (
-    <ResponsiveContainer width="100%" height={300}>
+    <ResponsiveContainer width="100%" height="100%">
       <BarChart
         data={data}
         margin={{ top: 5, right: 30, left: 20, bottom: 5 }}

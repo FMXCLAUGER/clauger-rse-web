@@ -29,6 +29,7 @@
     "@radix-ui/react-slot": "^1.2.4",
     "@radix-ui/react-tooltip": "^1.2.8",
     "@vercel/analytics": "^1.5.0",
+    "@vercel/blob": "^2.0.0",
     "@vercel/speed-insights": "^1.2.0",
     "ai": "^5.0.93",
     "class-variance-authority": "^0.7.1",
@@ -76,5 +77,8 @@
     "tailwindcss": "^3.4.1",
     "tesseract.js": "^5.1.1",
     "typescript": "^5"
+  },
+  "overrides": {
+    "js-yaml": "^4.1.1"
   }
 }

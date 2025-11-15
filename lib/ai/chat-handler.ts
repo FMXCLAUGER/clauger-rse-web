@@ -2,16 +2,16 @@ import type { UIMessage } from 'ai'
 import { getMessageText } from './message-utils'
 
 /**
- * Utilitaires pour la gestion des conversations du chatbot
+ * Utilities for chatbot conversation management
  */
 
 /**
- * Extrait les citations d'un message assistant
+ * Extract citations from assistant message
  */
 export function extractCitations(content: string): string[] {
   const citations: string[] = []
 
-  // Pattern pour les citations : *Source : ...*
+  // Pattern for citations: *Source : ...*
   const citationRegex = /\*Source\s*:\s*([^*]+)\*/gi
   let match
 
@@ -39,7 +39,7 @@ export function extractPageReferences(content: string): number[] {
     }
   }
 
-  // Dédupliquation et tri
+  // Deduplication and sorting
   return Array.from(new Set(pages)).sort((a, b) => a - b)
 }
 
