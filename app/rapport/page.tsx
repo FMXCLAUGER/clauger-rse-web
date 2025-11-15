@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation"
 import Link from "next/link"
-import ReportViewer from "@/components/viewer/ReportViewer"
+import ReportViewerWithAnnotations from "@/components/viewer/ReportViewerWithAnnotations"
 import { TOTAL_PAGES } from "@/lib/constants"
 import { reportPageSchema } from "@/lib/validations/searchParams"
 
@@ -37,7 +37,7 @@ export default async function RapportPage({ searchParams }: PageProps) {
 
   return (
     <main className="h-screen overflow-hidden">
-      <ReportViewer initialPage={page} />
+      <ReportViewerWithAnnotations initialPage={page} />
     </main>
   )
 }
