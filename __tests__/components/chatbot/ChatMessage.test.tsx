@@ -1,7 +1,7 @@
 import { describe, it, expect, jest } from '@jest/globals'
 import { render, screen } from '@testing-library/react'
 import { ChatMessage } from '@/components/chatbot/ChatMessage'
-import type { Message } from 'ai'
+import type { UIMessage } from 'ai'
 
 jest.mock('lucide-react', () => ({
   Bot: () => <span data-testid="bot-icon">Bot</span>,
@@ -13,14 +13,14 @@ jest.mock('@/lib/utils', () => ({
 }))
 
 describe('ChatMessage', () => {
-  const mockUserMessage: Message = {
+  const mockUserMessage: UIMessage = {
     id: '1',
     role: 'user',
     content: 'Question test utilisateur',
     createdAt: new Date('2025-01-15T14:30:00'),
   }
 
-  const mockAssistantMessage: Message = {
+  const mockAssistantMessage: UIMessage = {
     id: '2',
     role: 'assistant',
     content: 'Réponse de l\'assistant',

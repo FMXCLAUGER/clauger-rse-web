@@ -9,7 +9,7 @@ import {
   suggestFollowUpQuestions,
   validateMessage
 } from '@/lib/ai/chat-handler'
-import type { Message } from 'ai'
+import type { UIMessage } from 'ai'
 
 describe('Chat Handler', () => {
   describe('extractCitations', () => {
@@ -143,7 +143,7 @@ describe('Chat Handler', () => {
 
   describe('formatMessageForExport', () => {
     it('should format user message without timestamp', () => {
-      const message: Message = {
+      const message: UIMessage = {
         id: '1',
         role: 'user',
         content: 'What is the score?'
@@ -155,7 +155,7 @@ describe('Chat Handler', () => {
     })
 
     it('should format assistant message without timestamp', () => {
-      const message: Message = {
+      const message: UIMessage = {
         id: '1',
         role: 'assistant',
         content: 'The score is 6.2/10'
@@ -168,7 +168,7 @@ describe('Chat Handler', () => {
 
     it('should format message with timestamp', () => {
       const date = new Date('2024-01-15T10:30:00')
-      const message: Message = {
+      const message: UIMessage = {
         id: '1',
         role: 'user',
         content: 'Hello',
@@ -183,7 +183,7 @@ describe('Chat Handler', () => {
     })
 
     it('should preserve message content formatting', () => {
-      const message: Message = {
+      const message: UIMessage = {
         id: '1',
         role: 'user',
         content: 'Line 1\n\nLine 2\n- Item 1\n- Item 2'
@@ -204,7 +204,7 @@ describe('Chat Handler', () => {
     })
 
     it('should export single message', () => {
-      const messages: Message[] = [
+      const messages: UIUIMessage[] = [
         { id: '1', role: 'user', content: 'Hello' }
       ]
 
@@ -217,7 +217,7 @@ describe('Chat Handler', () => {
     })
 
     it('should export multiple messages', () => {
-      const messages: Message[] = [
+      const messages: UIUIMessage[] = [
         { id: '1', role: 'user', content: 'Question 1' },
         { id: '2', role: 'assistant', content: 'Answer 1' },
         { id: '3', role: 'user', content: 'Question 2' },
@@ -233,7 +233,7 @@ describe('Chat Handler', () => {
     })
 
     it('should include separator between messages', () => {
-      const messages: Message[] = [
+      const messages: UIUIMessage[] = [
         { id: '1', role: 'user', content: 'Q1' },
         { id: '2', role: 'assistant', content: 'A1' }
       ]
@@ -246,7 +246,7 @@ describe('Chat Handler', () => {
     })
 
     it('should preserve message order', () => {
-      const messages: Message[] = [
+      const messages: UIUIMessage[] = [
         { id: '1', role: 'user', content: 'First' },
         { id: '2', role: 'assistant', content: 'Second' },
         { id: '3', role: 'user', content: 'Third' }
@@ -296,7 +296,7 @@ describe('Chat Handler', () => {
     })
 
     it('should create download link', () => {
-      const messages: Message[] = [
+      const messages: UIUIMessage[] = [
         { id: '1', role: 'user', content: 'Test' }
       ]
 
@@ -307,7 +307,7 @@ describe('Chat Handler', () => {
     })
 
     it('should set correct filename', () => {
-      const messages: Message[] = []
+      const messages: UIUIMessage[] = []
 
       downloadConversation(messages)
 
@@ -315,7 +315,7 @@ describe('Chat Handler', () => {
     })
 
     it('should trigger download', () => {
-      const messages: Message[] = []
+      const messages: UIUIMessage[] = []
 
       downloadConversation(messages)
 
@@ -323,7 +323,7 @@ describe('Chat Handler', () => {
     })
 
     it('should clean up DOM and URL', () => {
-      const messages: Message[] = []
+      const messages: UIUIMessage[] = []
 
       downloadConversation(messages)
 
@@ -331,7 +331,7 @@ describe('Chat Handler', () => {
     })
 
     it('should create blob with markdown content', () => {
-      const messages: Message[] = [
+      const messages: UIUIMessage[] = [
         { id: '1', role: 'user', content: 'Test message' }
       ]
 
@@ -365,7 +365,7 @@ describe('Chat Handler', () => {
     })
 
     it('should count questions and responses', () => {
-      const messages: Message[] = [
+      const messages: UIUIMessage[] = [
         { id: '1', role: 'user', content: 'Q1' },
         { id: '2', role: 'assistant', content: 'A1' },
         { id: '3', role: 'user', content: 'Q2' },
@@ -379,7 +379,7 @@ describe('Chat Handler', () => {
     })
 
     it('should calculate average response length', () => {
-      const messages: Message[] = [
+      const messages: UIUIMessage[] = [
         { id: '1', role: 'assistant', content: 'a'.repeat(100) },
         { id: '2', role: 'assistant', content: 'a'.repeat(200) }
       ]
@@ -390,7 +390,7 @@ describe('Chat Handler', () => {
     })
 
     it('should detect environment topic', () => {
-      const messages: Message[] = [
+      const messages: UIUIMessage[] = [
         { id: '1', role: 'user', content: 'Quelle est la réduction des émissions carbone ?' }
       ]
 
@@ -400,7 +400,7 @@ describe('Chat Handler', () => {
     })
 
     it('should detect social topic', () => {
-      const messages: Message[] = [
+      const messages: UIUIMessage[] = [
         { id: '1', role: 'user', content: 'Quelle est la politique de formation ?' }
       ]
 
@@ -410,7 +410,7 @@ describe('Chat Handler', () => {
     })
 
     it('should detect gouvernance topic', () => {
-      const messages: Message[] = [
+      const messages: UIUIMessage[] = [
         { id: '1', role: 'user', content: 'Comment fonctionne la gouvernance ?' }
       ]
 
@@ -420,7 +420,7 @@ describe('Chat Handler', () => {
     })
 
     it('should detect scores topic', () => {
-      const messages: Message[] = [
+      const messages: UIUIMessage[] = [
         { id: '1', role: 'user', content: 'Quel est le score de notation ?' }
       ]
 
@@ -430,7 +430,7 @@ describe('Chat Handler', () => {
     })
 
     it('should detect recommandations topic', () => {
-      const messages: Message[] = [
+      const messages: UIUIMessage[] = [
         { id: '1', role: 'user', content: 'Quelles sont les recommandations d\'amélioration ?' }
       ]
 
@@ -440,7 +440,7 @@ describe('Chat Handler', () => {
     })
 
     it('should detect multiple topics', () => {
-      const messages: Message[] = [
+      const messages: UIUIMessage[] = [
         { id: '1', role: 'user', content: 'Quel est le score environnement et les recommandations ?' }
       ]
 
@@ -452,7 +452,7 @@ describe('Chat Handler', () => {
     })
 
     it('should only analyze user messages for topics', () => {
-      const messages: Message[] = [
+      const messages: UIUIMessage[] = [
         { id: '1', role: 'assistant', content: 'environnement carbone' },
         { id: '2', role: 'user', content: 'autre chose' }
       ]
@@ -463,7 +463,7 @@ describe('Chat Handler', () => {
     })
 
     it('should handle mixed content', () => {
-      const messages: Message[] = [
+      const messages: UIUIMessage[] = [
         { id: '1', role: 'user', content: 'Q1' },
         { id: '2', role: 'user', content: 'Q2' },
         { id: '3', role: 'assistant', content: 'a'.repeat(100) },
@@ -481,7 +481,7 @@ describe('Chat Handler', () => {
 
   describe('suggestFollowUpQuestions', () => {
     it('should suggest questions for score-related content', () => {
-      const message: Message = {
+      const message: UIMessage = {
         id: '1',
         role: 'assistant',
         content: 'Le score environnement est de 6.2/10'
@@ -495,7 +495,7 @@ describe('Chat Handler', () => {
     })
 
     it('should suggest questions for environment-related content', () => {
-      const message: Message = {
+      const message: UIMessage = {
         id: '1',
         role: 'assistant',
         content: 'Les émissions carbone ont diminué'
@@ -508,7 +508,7 @@ describe('Chat Handler', () => {
     })
 
     it('should suggest questions for social-related content', () => {
-      const message: Message = {
+      const message: UIMessage = {
         id: '1',
         role: 'assistant',
         content: 'Le plan de formation est complet'
@@ -521,7 +521,7 @@ describe('Chat Handler', () => {
     })
 
     it('should suggest questions for governance-related content', () => {
-      const message: Message = {
+      const message: UIMessage = {
         id: '1',
         role: 'assistant',
         content: 'La gouvernance est structurée en comités'
@@ -534,7 +534,7 @@ describe('Chat Handler', () => {
     })
 
     it('should provide generic suggestions for unrecognized content', () => {
-      const message: Message = {
+      const message: UIMessage = {
         id: '1',
         role: 'assistant',
         content: 'Some random content'
@@ -548,7 +548,7 @@ describe('Chat Handler', () => {
     })
 
     it('should return exactly 3 suggestions', () => {
-      const message: Message = {
+      const message: UIMessage = {
         id: '1',
         role: 'assistant',
         content: 'Some content'
@@ -560,7 +560,7 @@ describe('Chat Handler', () => {
     })
 
     it('should be case insensitive', () => {
-      const message: Message = {
+      const message: UIMessage = {
         id: '1',
         role: 'assistant',
         content: 'Le SCORE ENVIRONNEMENT est bon'
@@ -573,7 +573,7 @@ describe('Chat Handler', () => {
     })
 
     it('should prioritize specific suggestions over generic ones', () => {
-      const message: Message = {
+      const message: UIMessage = {
         id: '1',
         role: 'assistant',
         content: 'Score de notation environnement'

@@ -1,7 +1,7 @@
 'use client'
 
-import { useChat } from 'ai/react'
-import { useEffect, useState, type FormEvent } from 'react'
+import { useChat } from '@ai-sdk/react'
+import { useEffect, useState, type FormEvent, type ChangeEvent } from 'react'
 import { toast } from 'sonner'
 import { WELCOME_MESSAGE } from '@/lib/ai/prompts'
 import { chatRateLimiter } from '@/lib/ai/rate-limiter'
@@ -34,30 +34,32 @@ const MAX_HISTORY_LENGTH = 50
 export function useChatbot(options: UseChatbotOptions = {}) {
   const { currentPage, onError } = options
   const [isInitialized, setIsInitialized] = useState(false)
+  const [input, setInput] = useState('')
 
-  // Hook useChat de Vercel AI SDK
+  // Hook useChat de Vercel AI SDK (v5 uses different config structure)
   const chat = useChat({
     api: '/api/chat',
     body: {
       currentPage
     },
-    onError: error => {
+    onError: (error: Error) => {
       logError('Chatbot request failed', error, { hook: 'useChatbot' })
       toast.error('Une erreur est survenue', {
         description: error.message || 'Veuillez réessayer.'
       })
       onError?.(error)
     },
-    onFinish: message => {
+    onFinish: (message: any) => {
+      const content = (message as any).content || ''
       logger.debug('Chat message completed', {
         role: message.role,
-        contentLength: message.content.length
+        contentLength: typeof content === 'string' ? content.length : 0
       })
 
       // Sauvegarder l'historique
       saveHistory(chat.messages)
     }
-  })
+  } as any)
 
   // Charger l'historique au montage
   useEffect(() => {
@@ -110,9 +112,16 @@ export function useChatbot(options: UseChatbotOptions = {}) {
     }
   }
 
+  // Handle input change
+  const handleInputChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    setInput(e.target.value)
+  }
+
   // Wrapper pour handleSubmit avec rate limiting
   const handleSubmitWithRateLimit = async (e?: FormEvent<HTMLFormElement>) => {
     e?.preventDefault()
+
+    if (!input.trim()) return
 
     const rateLimitResult = await chatRateLimiter.checkAndConsume()
 
@@ -133,7 +142,14 @@ export function useChatbot(options: UseChatbotOptions = {}) {
       return
     }
 
-    chat.handleSubmit(e)
+    // Send message using append (v5 compatibility)
+    await (chat as any).append({
+      role: 'user',
+      content: input
+    })
+
+    // Clear input after sending
+    setInput('')
   }
 
   // Fonction pour envoyer une question suggérée
@@ -157,11 +173,11 @@ export function useChatbot(options: UseChatbotOptions = {}) {
       return
     }
 
-    chat.setInput(question)
-    // Petit délai pour que l'input soit mis à jour
-    setTimeout(() => {
-      chat.handleSubmit()
-    }, 100)
+    // Send message directly using append (v5 compatibility)
+    await (chat as any).append({
+      role: 'user',
+      content: question
+    })
   }
 
   // Fonction pour redémarrer la conversation
@@ -200,9 +216,19 @@ export function useChatbot(options: UseChatbotOptions = {}) {
     }
   }, [chat.messages])
 
+  // Compute isLoading for v5 compatibility (v5 uses 'status' instead)
+  const isLoading = (chat as any).status === 'submitting' || (chat as any).status === 'streaming'
+
   return {
     // Props du useChat original
     ...chat,
+
+    // Manual input state management (v5 requirement)
+    input,
+    handleInputChange,
+
+    // V5 compatibility
+    isLoading,
 
     // Remplacer handleSubmit par la version avec rate limiting
     handleSubmit: handleSubmitWithRateLimit,

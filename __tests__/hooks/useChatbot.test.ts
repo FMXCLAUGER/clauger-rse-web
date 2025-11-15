@@ -5,10 +5,10 @@ import { WELCOME_MESSAGE } from '@/lib/ai/prompts'
 import { chatRateLimiter } from '@/lib/ai/rate-limiter'
 import { trackSessionStarted, trackRateLimitExceeded, trackSessionEnded } from '@/lib/analytics/tracker'
 import { toast } from 'sonner'
-import { useChat } from 'ai/react'
+import { useChat } from '@ai-sdk/react'
 
 // Mock dependencies
-jest.mock('ai/react')
+jest.mock('@ai-sdk/react')
 jest.mock('sonner')
 jest.mock('@/lib/ai/rate-limiter')
 jest.mock('@/lib/analytics/tracker')
