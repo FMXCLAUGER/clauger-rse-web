@@ -123,8 +123,18 @@ export default function RootLayout({
             }}
           />
         </ThemeProvider>
-        <SpeedInsights />
-        <Analytics />
+        {/*
+          Vercel Analytics/SpeedInsights disabled in production due to CSP incompatibility.
+          These components inject inline scripts without nonce support (GitHub Issue #122).
+          Re-enable when Vercel adds nonce prop support or if CSP is relaxed.
+          Currently enabled only in preview/development environments.
+        */}
+        {process.env.VERCEL_ENV !== 'production' && (
+          <>
+            <SpeedInsights />
+            <Analytics />
+          </>
+        )}
       </body>
     </html>
   )
