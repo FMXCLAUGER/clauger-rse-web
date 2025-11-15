@@ -67,7 +67,7 @@ export default function ReportViewer({ initialPage }: ReportViewerProps) {
       }
       hasShownResumeToast.current = true
     }
-  }, [savedState])
+  }, [savedState, currentPage, goToPage])
 
   useEffect(() => {
     saveState(currentPage, zoomLevel, sidebarCollapsed)
