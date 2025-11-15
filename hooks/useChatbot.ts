@@ -142,11 +142,8 @@ export function useChatbot(options: UseChatbotOptions = {}) {
       return
     }
 
-    // Send message using append (v5 compatibility)
-    await (chat as any).append({
-      role: 'user',
-      content: input
-    })
+    // Send message using sendMessage (v5 API)
+    chat.sendMessage({ text: input })
 
     // Clear input after sending
     setInput('')
@@ -173,11 +170,8 @@ export function useChatbot(options: UseChatbotOptions = {}) {
       return
     }
 
-    // Send message directly using append (v5 compatibility)
-    await (chat as any).append({
-      role: 'user',
-      content: question
-    })
+    // Send message directly using sendMessage (v5 API)
+    chat.sendMessage({ text: question })
   }
 
   // Fonction pour redémarrer la conversation
