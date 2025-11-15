@@ -5,6 +5,7 @@ import { headers } from "next/headers"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme/ThemeProvider"
 import { SessionProvider } from "@/components/auth/SessionProvider"
+import { Header } from "@/components/layout/Header"
 import { SkipLink } from "@/components/a11y/SkipLink"
 import { SearchModalWithSuspense } from "@/components/search/SearchModalWithSuspense"
 import { ChatbotWithSuspense } from "@/components/chatbot/ChatbotWithSuspense"
@@ -104,6 +105,7 @@ export default function RootLayout({
             disableTransitionOnChange
             nonce={nonce || undefined}
           >
+            <Header />
             <SearchModalWithSuspense />
             <ChatbotWithSuspense />
             {children}
