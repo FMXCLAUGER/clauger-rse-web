@@ -100,6 +100,7 @@ export default function RootLayout({
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
+          nonce={nonce || undefined}
         >
           <SearchModalWithSuspense />
           <ChatbotWithSuspense />
