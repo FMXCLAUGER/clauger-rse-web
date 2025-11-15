@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import type { ReactNode } from "react"
 import { Inter, Montserrat } from "next/font/google"
+import { headers } from "next/headers"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme/ThemeProvider"
 import { SkipLink } from "@/components/a11y/SkipLink"
@@ -86,6 +87,10 @@ export default function RootLayout({
 }: {
   children: ReactNode
 }) {
+  // CRITICAL: Retrieve nonce from middleware - this call enables Next.js to auto-inject
+  // nonces into framework scripts (webpack, chunks, hydration scripts)
+  const nonce = headers().get("x-nonce")
+
   return (
     <html lang="fr" suppressHydrationWarning>
       <body className={`${inter.variable} ${montserrat.variable} font-sans antialiased`}>
