@@ -4,7 +4,11 @@ import { SuggestedQuestions, WelcomeScreen } from '@/components/chatbot/Suggeste
 import { SUGGESTED_QUESTIONS } from '@/lib/ai/prompts'
 
 jest.mock('lucide-react', () => ({
-  MessageCircle: () => <span data-testid="message-circle-icon">MessageCircle</span>,
+  MessageCircle: ({ className, ...props }: any) => (
+    <span data-testid="message-circle-icon" className={className} {...props}>
+      MessageCircle
+    </span>
+  ),
 }))
 
 jest.mock('@/components/ui/button', () => ({
@@ -34,6 +38,7 @@ describe('SuggestedQuestions', () => {
 
     describe('Rendering', () => {
       it.skip('renders MessageCircle icon', () => {
+        // Skipped: lucide-react ESM module mocking issue
         render(<SuggestedQuestions onSelectQuestion={mockOnSelectQuestion} />)
         expect(screen.getByTestId('message-circle-icon')).toBeInTheDocument()
       })
@@ -66,6 +71,7 @@ describe('SuggestedQuestions', () => {
       })
 
       it.skip('buttons have correct variant and size', () => {
+        // Skipped: Button component mock doesn't preserve data-variant/data-size
         const { container } = render(<SuggestedQuestions onSelectQuestion={mockOnSelectQuestion} />)
         const buttons = container.querySelectorAll('button[data-variant="outline"][data-size="sm"]')
         expect(buttons.length).toBe(6)
@@ -155,6 +161,7 @@ describe('SuggestedQuestions', () => {
 
     describe('Rendering', () => {
       it.skip('renders MessageCircle icon in circle', () => {
+        // Skipped: lucide-react ESM module mocking issue
         render(<WelcomeScreen onSelectQuestion={mockOnSelectQuestion} />)
         const icons = screen.getAllByTestId('message-circle-icon')
         expect(icons.length).toBeGreaterThan(0)

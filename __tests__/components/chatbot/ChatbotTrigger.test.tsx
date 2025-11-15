@@ -3,8 +3,16 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import { ChatbotTrigger } from '@/components/chatbot/ChatbotTrigger'
 
 jest.mock('lucide-react', () => ({
-  MessageCircle: () => <span data-testid="message-circle">MessageCircle</span>,
-  X: () => <span data-testid="x-icon">X</span>,
+  MessageCircle: ({ className, ...props }: any) => (
+    <span data-testid="message-circle" className={className} {...props}>
+      MessageCircle
+    </span>
+  ),
+  X: ({ className, ...props }: any) => (
+    <span data-testid="x-icon" className={className} {...props}>
+      X
+    </span>
+  ),
 }))
 
 jest.mock('@/components/chatbot/ChatbotModal', () => ({
@@ -47,6 +55,7 @@ describe('ChatbotTrigger', () => {
     })
 
     it.skip('displays MessageCircle icon when closed', () => {
+      // Skipped: lucide-react ESM module mocking issue
       render(<ChatbotTrigger />)
       expect(screen.queryByTestId('message-circle')).toBeInTheDocument()
     })
@@ -64,6 +73,7 @@ describe('ChatbotTrigger', () => {
     })
 
     it.skip('does not show tooltip when open', () => {
+      // Skipped: ChatbotModal mock not applied, real component renders instead
       const { container } = render(<ChatbotTrigger />)
       const button = screen.getByRole('button')
       fireEvent.click(button)
@@ -71,6 +81,7 @@ describe('ChatbotTrigger', () => {
     })
 
     it.skip('renders ChatbotModal', () => {
+      // Skipped: ChatbotModal mock not applied (Next.js "use client" issue)
       render(<ChatbotTrigger />)
       const button = screen.getByRole('button')
       fireEvent.click(button)
@@ -85,6 +96,7 @@ describe('ChatbotTrigger', () => {
     })
 
     it.skip('toggles isOpen on button click', () => {
+      // Skipped: ChatbotModal mock not applied
       render(<ChatbotTrigger />)
       const button = screen.getByRole('button')
 
@@ -96,6 +108,7 @@ describe('ChatbotTrigger', () => {
     })
 
     it.skip('closes when modal onClose called', () => {
+      // Skipped: ChatbotModal mock not applied
       render(<ChatbotTrigger />)
       const button = screen.getByRole('button')
 
@@ -120,36 +133,55 @@ describe('ChatbotTrigger', () => {
     })
 
     it.skip('opens on Cmd+Shift+C', () => {
+      // Skipped: ChatbotModal mock not applied
       render(<ChatbotTrigger />)
 
-      fireEvent.keyDown(window, {
+      const event = new KeyboardEvent('keydown', {
         key: 'c',
         metaKey: true,
-        shiftKey: true
+        shiftKey: true,
+        bubbles: true
       })
+      window.dispatchEvent(event)
 
       expect(screen.getByTestId('chatbot-modal')).toBeInTheDocument()
     })
 
     it.skip('opens on Ctrl+Shift+C', () => {
+      // Skipped: ChatbotModal mock not applied
       render(<ChatbotTrigger />)
 
-      fireEvent.keyDown(window, {
+      const event = new KeyboardEvent('keydown', {
         key: 'c',
         ctrlKey: true,
-        shiftKey: true
+        shiftKey: true,
+        bubbles: true
       })
+      window.dispatchEvent(event)
 
       expect(screen.getByTestId('chatbot-modal')).toBeInTheDocument()
     })
 
     it.skip('toggles when keyboard shortcut pressed again', () => {
+      // Skipped: ChatbotModal mock not applied
       render(<ChatbotTrigger />)
 
-      fireEvent.keyDown(window, { key: 'c', metaKey: true, shiftKey: true })
+      let event = new KeyboardEvent('keydown', {
+        key: 'c',
+        metaKey: true,
+        shiftKey: true,
+        bubbles: true
+      })
+      window.dispatchEvent(event)
       expect(screen.getByTestId('chatbot-modal')).toBeInTheDocument()
 
-      fireEvent.keyDown(window, { key: 'c', metaKey: true, shiftKey: true })
+      event = new KeyboardEvent('keydown', {
+        key: 'c',
+        metaKey: true,
+        shiftKey: true,
+        bubbles: true
+      })
+      window.dispatchEvent(event)
       expect(screen.queryByTestId('chatbot-modal')).not.toBeInTheDocument()
     })
 
@@ -166,6 +198,7 @@ describe('ChatbotTrigger', () => {
 
   describe('Modal Integration', () => {
     it.skip('passes isOpen prop to ChatbotModal', () => {
+      // Skipped: ChatbotModal mock not applied
       render(<ChatbotTrigger />)
       expect(screen.queryByTestId('chatbot-modal')).not.toBeInTheDocument()
 
@@ -175,6 +208,7 @@ describe('ChatbotTrigger', () => {
     })
 
     it.skip('passes onClose callback to ChatbotModal', () => {
+      // Skipped: ChatbotModal mock not applied
       render(<ChatbotTrigger />)
       const button = screen.getByRole('button')
 
@@ -186,6 +220,7 @@ describe('ChatbotTrigger', () => {
     })
 
     it.skip('syncs state between trigger and modal', () => {
+      // Skipped: ChatbotModal mock not applied
       render(<ChatbotTrigger />)
       const button = screen.getByRole('button')
 

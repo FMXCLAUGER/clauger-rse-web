@@ -15,10 +15,18 @@ jest.mock('@/components/dashboard/KeyFigureCard', () => ({
 }))
 
 jest.mock('lucide-react', () => ({
-  Users: () => <span>Users</span>,
-  Award: () => <span>Award</span>,
-  Leaf: () => <span>Leaf</span>,
-  GraduationCap: () => <span>GraduationCap</span>,
+  Users: ({ className, ...props }: any) => (
+    <span className={className} {...props}>Users</span>
+  ),
+  Award: ({ className, ...props }: any) => (
+    <span className={className} {...props}>Award</span>
+  ),
+  Leaf: ({ className, ...props }: any) => (
+    <span className={className} {...props}>Leaf</span>
+  ),
+  GraduationCap: ({ className, ...props }: any) => (
+    <span className={className} {...props}>GraduationCap</span>
+  ),
 }))
 
 describe('KeyFiguresSection', () => {
@@ -37,6 +45,7 @@ describe('KeyFiguresSection', () => {
     })
 
     it.skip('renders 4 KeyFigureCard instances', () => {
+      // Skipped: Mock doesn't match real KeyFigureCard structure
       render(<KeyFiguresSection kpis={mockKpis} />)
       const cards = screen.getAllByTestId('key-figure-card')
       expect(cards.length).toBe(4)
@@ -58,12 +67,14 @@ describe('KeyFiguresSection', () => {
     })
 
     it.skip('displays correct value', () => {
+      // Skipped: Mock doesn't have testid card-value, needs integration testing
       render(<KeyFiguresSection kpis={mockKpis} />)
       const cards = screen.getAllByTestId('card-value')
       expect(cards[0]).toHaveTextContent('3200')
     })
 
     it.skip('displays "+" unit', () => {
+      // Skipped: Mock doesn't have testid card-unit, needs integration testing
       render(<KeyFiguresSection kpis={mockKpis} />)
       const units = screen.getAllByTestId('card-unit')
       expect(units[0]).toHaveTextContent('+')
@@ -77,6 +88,7 @@ describe('KeyFiguresSection', () => {
     })
 
     it.skip('displays correct value', () => {
+      // Skipped: Mock doesn't have testid card-value, needs integration testing
       render(<KeyFiguresSection kpis={mockKpis} />)
       const cards = screen.getAllByTestId('card-value')
       expect(cards[1]).toHaveTextContent('50')
@@ -90,12 +102,14 @@ describe('KeyFiguresSection', () => {
     })
 
     it.skip('displays correct value', () => {
+      // Skipped: Mock doesn't replicate formatter (val/1000), needs integration testing
       render(<KeyFiguresSection kpis={mockKpis} />)
       const cards = screen.getAllByTestId('card-value')
       expect(cards[2]).toHaveTextContent('718000')
     })
 
     it.skip('displays "k" unit', () => {
+      // Skipped: Mock doesn't have testid card-unit, needs integration testing
       render(<KeyFiguresSection kpis={mockKpis} />)
       const units = screen.getAllByTestId('card-unit')
       expect(units[2]).toHaveTextContent('k')
@@ -109,12 +123,14 @@ describe('KeyFiguresSection', () => {
     })
 
     it.skip('displays correct value', () => {
+      // Skipped: Mock doesn't replicate formatter (val/1000), needs integration testing
       render(<KeyFiguresSection kpis={mockKpis} />)
       const cards = screen.getAllByTestId('card-value')
       expect(cards[3]).toHaveTextContent('300000')
     })
 
     it.skip('displays "k€" unit', () => {
+      // Skipped: Mock doesn't have testid card-unit, needs integration testing
       render(<KeyFiguresSection kpis={mockKpis} />)
       const units = screen.getAllByTestId('card-unit')
       expect(units[3]).toHaveTextContent('k€')
